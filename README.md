@@ -32,38 +32,6 @@ Set `DATABASE_URL` (and `DATABASE_URL_UNPOOLED`) in `.env` to a PostgreSQL conne
 string before running the commands above. `vercel env pull` fetches these from the
 Neon database connected to the Vercel project.
 
-Open http://localhost:3000.
+Open http://localhost:3000, or the live deployment at
+[https://sturdihome.vercel.app/](https://sturdihome.vercel.app/)
 
-**Seeded admin account:** `admin@sturdihome.com` / `Admin123!`
-
-There's no signup form for admins by design: seed additional ones via
-`prisma/seed.ts` or promote a user's `role` to `ADMIN` directly in the database.
-
-## The three user flows
-
-- **Homeowner/Member:** `/signup` → `/member/membership` (mock payment/activation) →
-  `/member/agreement` → `/member/documents` → `/member` dashboard → financing/service
-  requests → appointments
-- **Vendor:** `/apply/vendor` → `/pending-approval` → admin approval at
-  `/admin/vendors` → `/vendor` dashboard → `/vendor/leads`
-- **Financing Partner:** `/apply/financing` → `/pending-approval` → admin approval at
-  `/admin/financing-partners` → `/financing` dashboard → `/financing/referrals`
-
-Admin (`/admin`) can see and manage all members, vendors, financing partners,
-applications, and assign homeowner requests to approved vendors/financing partners.
-
-## Access control
-
-`src/proxy.ts` gates everything under `/member`, `/vendor`, `/financing`, and `/admin`
-by role, redirecting unauthenticated requests to `/login` and cross-role requests to
-the visitor's own dashboard. Layouts under those route groups (e.g.
-`src/app/vendor/layout.tsx`) re-check current DB state, so a vendor whose application
-is later rejected, or a member whose membership lapses, loses page-level access
-immediately, without needing a new token.
-
-## Notes on this being a prototype
-
-- Payment is simulated (`/member/membership` just flips membership status/billing
-  dates; no real payment processor is wired up).
-- Uploaded documents are stored on local disk under `uploads/` (gitignored), served
-  back only to their owner or an admin via `/api/documents/[id]`.
