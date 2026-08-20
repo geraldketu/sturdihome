@@ -28,5 +28,5 @@ npx prisma db seed     # create the admin account
 npm run dev
 ```
 
-Open https://sturdihome.vercel.app/
+Open [https://sturdihome.vercel.app/](https://sturdihome.vercel.app/)
 
