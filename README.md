@@ -11,7 +11,7 @@ never presents itself as the lender or the company doing the work.
 ## Stack
 
 - Next.js 16 (App Router, Server Actions)
-- Prisma + SQLite (`prisma/dev.db`, gitignored)
+- Prisma + PostgreSQL (Neon, connected via Vercel's storage integration)
 - Custom email/password auth: `bcryptjs` for hashing, `jose` (JWT) for sessions in an
   httpOnly cookie
 - `src/proxy.ts` (Next's route-protection layer, formerly "middleware") enforces
@@ -23,10 +23,14 @@ never presents itself as the lender or the company doing the work.
 
 ```bash
 npm install
-npx prisma db push     # create the SQLite schema
+npx prisma db push     # sync the schema to your DATABASE_URL
 npx prisma db seed     # create the admin account
 npm run dev
 ```
+
+Set `DATABASE_URL` (and `DATABASE_URL_UNPOOLED`) in `.env` to a PostgreSQL connection
+string before running the commands above. `vercel env pull` fetches these from the
+Neon database connected to the Vercel project.
 
 Open http://localhost:3000.
 
