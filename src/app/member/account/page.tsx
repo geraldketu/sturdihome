@@ -26,7 +26,7 @@ export default async function AccountPage() {
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500">Phone</dt>
-            <dd className="text-gray-900">{user.phone ?? "—"}</dd>
+            <dd className="text-gray-900">{user.phone ?? "N/A"}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500">Member since</dt>
@@ -34,7 +34,7 @@ export default async function AccountPage() {
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500">Membership plan</dt>
-            <dd className="text-gray-900">{user.membership?.plan ?? "—"}</dd>
+            <dd className="text-gray-900">{user.membership?.plan ?? "N/A"}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500">Membership status</dt>

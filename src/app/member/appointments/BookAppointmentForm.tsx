@@ -30,7 +30,7 @@ export default function BookAppointmentForm({ requests }: { requests: ServiceReq
           <option value="">Select a service request...</option>
           {requests.map((req) => (
             <option key={req.id} value={req.id}>
-              {req.serviceType} — {req.description.slice(0, 40)}
+              {req.serviceType}: {req.description.slice(0, 40)}
             </option>
           ))}
         </select>

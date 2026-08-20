@@ -48,7 +48,7 @@ export default async function AgreementPage() {
 
         {!accepted && (
           <form action={acceptAgreementAction} className="mt-4">
-            <SubmitButton pendingText="Submitting...">I Agree — Accept Member Agreement</SubmitButton>
+            <SubmitButton pendingText="Submitting...">I Agree and Accept the Member Agreement</SubmitButton>
           </form>
         )}
       </Card>

@@ -2,7 +2,7 @@
 
 A working prototype implementing the SturdiHome IT/flow completion scope: separate
 authenticated flows for homeowners (members), vendors, and financing partners, plus an
-admin console — all with route-level access control.
+admin console, all with route-level access control.
 
 SturdiHome Network LLC is a **referral network**, not a lender or contractor. The app
 connects homeowners with independent financing partners and home-service vendors; it
@@ -32,7 +32,7 @@ Open http://localhost:3000.
 
 **Seeded admin account:** `admin@sturdihome.com` / `Admin123!`
 
-There's no signup form for admins by design — seed additional ones via
+There's no signup form for admins by design: seed additional ones via
 `prisma/seed.ts` or promote a user's `role` to `ADMIN` directly in the database.
 
 ## The three user flows
@@ -54,12 +54,12 @@ applications, and assign homeowner requests to approved vendors/financing partne
 by role, redirecting unauthenticated requests to `/login` and cross-role requests to
 the visitor's own dashboard. Layouts under those route groups (e.g.
 `src/app/vendor/layout.tsx`) re-check current DB state, so a vendor whose application
-is later rejected — or a member whose membership lapses — loses page-level access
+is later rejected, or a member whose membership lapses, loses page-level access
 immediately, without needing a new token.
 
 ## Notes on this being a prototype
 
 - Payment is simulated (`/member/membership` just flips membership status/billing
-  dates — no real payment processor is wired up).
+  dates; no real payment processor is wired up).
 - Uploaded documents are stored on local disk under `uploads/` (gitignored), served
   back only to their owner or an admin via `/api/documents/[id]`.

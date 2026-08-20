@@ -17,7 +17,7 @@ export default async function MembershipPage() {
         <h1 className="text-2xl font-bold text-brand-dark">Membership &amp; Payment</h1>
         <p className="text-sm text-gray-600">
           Activate your SturdiHome membership to unlock financing requests and
-          home-service booking. This is a demo payment flow — no real card is charged.
+          home-service booking. This is a demo payment flow; no real card is charged.
         </p>
       </div>
 
@@ -47,7 +47,7 @@ export default async function MembershipPage() {
         <div className="mt-5 flex gap-3">
           {status !== "ACTIVE" ? (
             <form action={activateMembershipAction}>
-              <SubmitButton pendingText="Activating...">Activate Membership — Pay Now</SubmitButton>
+              <SubmitButton pendingText="Activating...">Activate Membership and Pay Now</SubmitButton>
             </form>
           ) : (
             <form action={cancelMembershipAction}>

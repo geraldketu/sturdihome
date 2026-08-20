@@ -10,8 +10,8 @@ export default function HomePage() {
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
           SturdiHome Network connects homeowners with vetted home-service vendors and
-          financing partners. SturdiHome Network LLC is a referral network — not a lender
-          or a contractor — we make the introduction, our partners do the work.
+          financing partners. SturdiHome Network LLC is a referral network, not a lender
+          or a contractor. We make the introduction, our partners do the work.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
@@ -40,7 +40,7 @@ export default function HomePage() {
           <h2 className="text-lg font-semibold text-brand-dark">Homeowners</h2>
           <p className="mt-2 text-sm text-gray-600">
             Create a membership, submit financing requests, and book home-service
-            appointments — all from your member dashboard.
+            appointments, all from your member dashboard.
           </p>
         </Card>
         <Card>
