@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  HOMEOWNER
+  VENDOR
+  FINANCING_PARTNER
+  ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MembershipStatus {
+  NONE
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum RequestStatus {
+  NEW
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  passwordHash        String
+  name                String
+  phone               String?
+  role                Role
+  createdAt           DateTime  @default(now())
+  agreementAcceptedAt DateTime?
+
+  membership         Membership?
+  documents          Document[]
+  financingRequests  FinancingRequest[]
+  serviceRequests    ServiceRequest[]
+  appointments       Appointment[]
+  vendorProfile      VendorProfile?
+  financingProfile   FinancingPartnerProfile?
+}
+
+model Membership {
+  id              String            @id @default(cuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id])
+  plan            String            @default("SturdiHome Membership - Standard")
+  priceCents      Int               @default(1900)
+  status          MembershipStatus  @default(NONE)
+  activatedAt     DateTime?
+  nextBillingDate DateTime?
+  canceledAt      DateTime?
+}
+
+model VendorProfile {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  user             User              @relation(fields: [userId], references: [id])
+  companyName      String
+  serviceArea      String
+  servicesOffered  String
+  status           ApplicationStatus @default(PENDING)
+  appliedAt        DateTime          @default(now())
+  reviewedAt       DateTime?
+  serviceRequests  ServiceRequest[]
+}
+
+model FinancingPartnerProfile {
+  id                String            @id @default(cuid())
+  userId            String            @unique
+  user              User              @relation(fields: [userId], references: [id])
+  companyName       String
+  licenseInfo       String
+  status            ApplicationStatus @default(PENDING)
+  appliedAt         DateTime          @default(now())
+  reviewedAt        DateTime?
+  financingRequests FinancingRequest[]
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  label      String
+  fileName   String
+  uploadedAt DateTime @default(now())
+}
+
+model FinancingRequest {
+  id                 String         @id @default(cuid())
+  homeownerId        String
+  homeowner          User           @relation(fields: [homeownerId], references: [id])
+  projectDescription String
+  amountRequested    Int
+  status             RequestStatus  @default(NEW)
+  assignedPartnerId  String?
+  assignedPartner    FinancingPartnerProfile? @relation(fields: [assignedPartnerId], references: [id])
+  notes              String?
+  createdAt          DateTime       @default(now())
+}
+
+model ServiceRequest {
+  id               String          @id @default(cuid())
+  homeownerId      String
+  homeowner        User            @relation(fields: [homeownerId], references: [id])
+  serviceType      String
+  description      String
+  status           RequestStatus   @default(NEW)
+  assignedVendorId String?
+  assignedVendor   VendorProfile?  @relation(fields: [assignedVendorId], references: [id])
+  createdAt        DateTime        @default(now())
+  appointment      Appointment?
+}
+
+model Appointment {
+  id               String          @id @default(cuid())
+  homeownerId      String
+  homeowner        User            @relation(fields: [homeownerId], references: [id])
+  serviceRequestId String?         @unique
+  serviceRequest   ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
+  scheduledFor     DateTime
+  status           String          @default("SCHEDULED")
+  createdAt        DateTime        @default(now())
+}
