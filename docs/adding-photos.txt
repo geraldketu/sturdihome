@@ -1,0 +1,97 @@
+HOW TO ADD A PHOTO TO THE STURDIHOME WEBSITE
+(No coding experience needed. You'll be using an AI assistant to make the
+actual changes - things like Claude Code, or a similar AI tool that can see
+and edit the project files. You just need to know how to find a file on
+your computer and type sentences.)
+
+
+STEP 1 - Get your photo ready
+
+Save the photo somewhere on your computer where you can find it again, like
+your Desktop or Downloads folder. JPG or PNG files both work fine. If the
+photo is huge (some phone photos are 5-10 MB), don't worry about shrinking
+it yourself - the assistant can do that for you.
+
+
+STEP 2 - Put the photo into the project folder
+
+Open the SturdiHome project folder on your computer. Look for a folder
+inside it called "public" - open that one up.
+
+Drag your photo file into the "public" folder (or into the "public/images"
+folder if there is one). That's it. You don't need to rename it, resize it,
+or do anything else. Just get it into that folder.
+
+
+STEP 3 - Tell your AI assistant what you did
+
+Open a chat with your AI assistant (the same kind of tool used to build
+this site) and just tell it, in plain English, what you did and what you
+want. You don't need any special wording. For example, you could say:
+
+    "I put a new photo in the public folder called family-photo.jpg.
+    Can you add it to the About section of the homepage?"
+
+or simply:
+
+    "I added a photo to the public folder. Please use it as the new
+    picture on the homepage."
+
+The assistant will find the file, move it wherever it needs to go, and
+write whatever code is needed to show it on the page. You do not need to
+know the exact file name or folder - just describe what you did and what
+you want, and the assistant will figure out the details and ask you if it
+needs anything else.
+
+
+STEP 4 - Check that it looks right
+
+Ask the assistant to show you the result. For example:
+
+    "Can you show me what that looks like before we publish it?"
+
+The assistant can start a local preview, or just describe/screenshot the
+change for you to review.
+
+
+STEP 5 - Publish it
+
+Once it looks good, ask the assistant to save and publish the change:
+
+    "That looks good. Please save this and push it live."
+
+Publishing (pushing to GitHub) automatically updates the live website
+within a minute or two, at https://sturdihome.vercel.app
+
+If nothing seems to happen after you ask, just ask directly - "did you
+push this?" - some assistants pause and wait for you to confirm before
+publishing.
+
+
+IF SOMETHING LOOKS WRONG
+
+- Photo doesn't show up at all:
+  Tell the assistant "the photo isn't showing up" - it can double check
+  the file made it into the right place.
+
+- Photo looks stretched, cropped oddly, or too big/small:
+  Tell the assistant exactly what looks off, e.g. "the photo looks
+  stretched" or "can you make that photo smaller."
+
+- Page feels slow after adding the photo:
+  Tell the assistant the photo feels slow to load and ask it to compress
+  or resize it.
+
+- You don't see the change on the live site yet:
+  Ask the assistant to confirm the change was actually published, then
+  give it a minute or two - it takes a little time to go live after
+  publishing.
+
+
+THAT'S THE WHOLE PROCESS
+
+1. Save the photo somewhere on your computer.
+2. Drag it into the project's "public" folder.
+3. Tell the AI assistant what you did and what you want.
+4. Look at the result.
+5. Ask the assistant to publish it.
