@@ -7,7 +7,7 @@ export default function HomePage() {
     <main>
       <section className="relative isolate overflow-hidden">
         <Image
-          src="/images/hero-living-room.jpg"
+          src="/images/hero-living-room.png"
           alt="A cozy living room with a stone fireplace"
           fill
           priority

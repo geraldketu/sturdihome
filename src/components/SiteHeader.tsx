@@ -9,18 +9,15 @@ export default async function SiteHeader() {
   return (
     <header className="bg-brand-gold-pale">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="rounded-md bg-white p-1.5 shadow-sm">
           <Image
             src="/images/sturdihome-logo.png"
-            alt="SturdiHome Network LLC"
-            width={52}
-            height={52}
-            className="h-11 w-11 object-contain"
+            alt="SturdiHome Network LLC. Strong Homes. Stronger Communities. Better Futures."
+            width={280}
+            height={320}
+            className="h-16 w-auto object-contain"
             priority
           />
-          <span className="hidden font-display text-lg font-semibold text-brand-navy sm:inline">
-            SturdiHome <span className="font-sans text-sm font-normal text-brand-navy/60">Network</span>
-          </span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           {!user && (
