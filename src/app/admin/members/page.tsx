@@ -4,7 +4,6 @@ import { Badge, Card } from "@/components/ui";
 export default async function AdminMembersPage() {
   const members = await prisma.user.findMany({
     where: { role: "HOMEOWNER" },
-    include: { membership: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -17,7 +16,6 @@ export default async function AdminMembersPage() {
             <tr>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Membership</th>
               <th className="px-4 py-2">Agreement</th>
               <th className="px-4 py-2">Joined</th>
             </tr>
@@ -28,11 +26,6 @@ export default async function AdminMembersPage() {
                 <td className="px-4 py-2 text-gray-900">{m.name}</td>
                 <td className="px-4 py-2 text-gray-600">{m.email}</td>
                 <td className="px-4 py-2">
-                  <Badge tone={m.membership?.status === "ACTIVE" ? "green" : "gray"}>
-                    {m.membership?.status ?? "NONE"}
-                  </Badge>
-                </td>
-                <td className="px-4 py-2">
                   <Badge tone={m.agreementAcceptedAt ? "green" : "gray"}>
                     {m.agreementAcceptedAt ? "Signed" : "Pending"}
                   </Badge>
@@ -42,7 +35,7 @@ export default async function AdminMembersPage() {
             ))}
             {members.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
+                <td colSpan={4} className="px-4 py-6 text-center text-gray-500">
                   No members yet.
                 </td>
               </tr>

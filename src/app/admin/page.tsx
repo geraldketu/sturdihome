@@ -4,7 +4,6 @@ import { Card } from "@/components/ui";
 export default async function AdminOverviewPage() {
   const [
     memberCount,
-    activeMembers,
     vendorCount,
     pendingVendors,
     financingPartnerCount,
@@ -14,7 +13,6 @@ export default async function AdminOverviewPage() {
     appointments,
   ] = await Promise.all([
     prisma.user.count({ where: { role: "HOMEOWNER" } }),
-    prisma.membership.count({ where: { status: "ACTIVE" } }),
     prisma.vendorProfile.count(),
     prisma.vendorProfile.count({ where: { status: "PENDING" } }),
     prisma.financingPartnerProfile.count(),
@@ -25,7 +23,7 @@ export default async function AdminOverviewPage() {
   ]);
 
   const stats = [
-    { label: "Homeowners", value: memberCount, sub: `${activeMembers} active membership(s)` },
+    { label: "Homeowners", value: memberCount },
     { label: "Vendors", value: vendorCount, sub: `${pendingVendors} pending approval` },
     { label: "Financing Partners", value: financingPartnerCount, sub: `${pendingFinancingPartners} pending approval` },
     { label: "Financing Requests", value: financingRequests },

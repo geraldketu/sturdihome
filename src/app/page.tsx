@@ -112,6 +112,18 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-4xl px-4 pb-16">
+        <div className="rounded-lg border border-brand-gold/40 bg-brand-gold-pale/50 p-6 text-center sm:p-8">
+          <h2 className="text-lg font-semibold text-brand-navy">We&apos;re Building Our Partner Network</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-brand-navy/80">
+            Heads up: we don&apos;t have home-service vendors or financing partners live
+            on the site yet. Homeowners can still create an account and submit requests
+            today; we&apos;ll hold them and reach out personally as soon as we have a
+            qualified, vetted partner in your area.
+          </p>
+        </div>
+      </section>
+
       <section className="bg-brand-navy py-14 text-center">
         <p className="text-2xl font-bold text-white">
           Your Home. Your Family. Your Future.

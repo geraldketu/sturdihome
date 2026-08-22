@@ -8,8 +8,8 @@ export default function SignupPage() {
         Create Your Homeowner Account
       </h1>
       <p className="mb-6 text-center text-sm text-gray-600">
-        Step 1 of your membership: after creating an account you&apos;ll set up
-        membership, sign the member agreement, and upload required documents.
+        After creating an account you&apos;ll sign the member agreement and upload any
+        required documents.
       </p>
       <Card>
         <SignupForm />

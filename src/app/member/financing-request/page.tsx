@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, NoticeBanner } from "@/components/ui";
 import FinancingRequestForm from "./FinancingRequestForm";
 
 export default async function FinancingRequestPage() {
@@ -22,6 +22,12 @@ export default async function FinancingRequestPage() {
           Submit a request to be matched with a vetted, independent financing partner.
         </p>
       </div>
+
+      <NoticeBanner>
+        We don&apos;t have financing partners live on the site yet. Submitting a request
+        below reserves your spot; we&apos;ll reach out personally as soon as we have a
+        qualified partner to match you with.
+      </NoticeBanner>
 
       <Card>
         <FinancingRequestForm />

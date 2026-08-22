@@ -39,7 +39,6 @@ export async function getSessionUser() {
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
     include: {
-      membership: true,
       vendorProfile: true,
       financingProfile: true,
     },

@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSessionUser, loginDestinationForRole } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions/auth-actions";
+import { MobileNavToggle } from "@/components/MobileNavToggle";
 
 export default async function SiteHeader() {
   const user = await getSessionUser();
 
   return (
-    <header className="bg-brand-gold-pale">
+    <header className="relative bg-brand-gold-pale">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="rounded-md bg-white p-1.5 shadow-sm">
           <Image
@@ -19,7 +20,8 @@ export default async function SiteHeader() {
             priority
           />
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
+
+        <nav className="hidden items-center gap-4 text-sm md:flex">
           {!user && (
             <>
               <Link href="/apply/vendor" className="text-brand-navy/80 hover:text-brand-navy">
@@ -41,7 +43,7 @@ export default async function SiteHeader() {
           )}
           {user && (
             <>
-              <span className="hidden text-brand-navy/70 sm:inline">
+              <span className="text-brand-navy/70">
                 {user.name} &middot; {roleLabel(user.role)}
               </span>
               <Link
@@ -61,6 +63,49 @@ export default async function SiteHeader() {
             </>
           )}
         </nav>
+
+        <MobileNavToggle>
+          {!user && (
+            <>
+              <Link href="/apply/vendor" className="rounded-md px-2 py-2 text-brand-navy/80 hover:bg-white/40">
+                Become a Vendor
+              </Link>
+              <Link href="/apply/financing" className="rounded-md px-2 py-2 text-brand-navy/80 hover:bg-white/40">
+                Become a Financing Partner
+              </Link>
+              <Link href="/login" className="rounded-md px-2 py-2 text-brand-navy/80 hover:bg-white/40">
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                className="mt-1 rounded-md bg-brand-navy px-3 py-2 text-center font-medium text-white hover:bg-brand-navy/90"
+              >
+                Join as a Homeowner
+              </Link>
+            </>
+          )}
+          {user && (
+            <>
+              <span className="px-2 py-1 text-brand-navy/70">
+                {user.name} &middot; {roleLabel(user.role)}
+              </span>
+              <Link
+                href={loginDestinationForRole(user.role)}
+                className="rounded-md px-2 py-2 text-brand-navy/80 hover:bg-white/40"
+              >
+                Dashboard
+              </Link>
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className="mt-1 w-full rounded-md border border-brand-navy/30 px-3 py-2 text-left font-medium text-brand-navy hover:bg-white/40"
+                >
+                  Log Out
+                </button>
+              </form>
+            </>
+          )}
+        </MobileNavToggle>
       </div>
     </header>
   );

@@ -97,6 +97,14 @@ export function Card({ children, className = "" }: { children: React.ReactNode; 
   );
 }
 
+export function NoticeBanner({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-md border border-brand-gold/40 bg-brand-gold-pale/50 px-4 py-3 text-sm text-brand-navy">
+      {children}
+    </div>
+  );
+}
+
 export function Badge({ tone, children }: { tone: "green" | "yellow" | "red" | "gray"; children: React.ReactNode }) {
   const tones: Record<string, string> = {
     green: "bg-green-100 text-green-800",

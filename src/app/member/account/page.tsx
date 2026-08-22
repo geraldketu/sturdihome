@@ -11,7 +11,7 @@ export default async function AccountPage() {
     <div className="max-w-xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-brand-dark">Account</h1>
-        <p className="text-sm text-gray-600">Your account and payment information.</p>
+        <p className="text-sm text-gray-600">Your account information.</p>
       </div>
 
       <Card>
@@ -31,14 +31,6 @@ export default async function AccountPage() {
           <div className="flex justify-between">
             <dt className="text-gray-500">Member since</dt>
             <dd className="text-gray-900">{user.createdAt.toLocaleDateString()}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-gray-500">Membership plan</dt>
-            <dd className="text-gray-900">{user.membership?.plan ?? "N/A"}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-gray-500">Membership status</dt>
-            <dd className="text-gray-900">{user.membership?.status ?? "NONE"}</dd>
           </div>
         </dl>
       </Card>

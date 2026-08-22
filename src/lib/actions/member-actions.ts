@@ -25,41 +25,6 @@ export async function acceptAgreementAction(): Promise<void> {
   revalidatePath("/member/agreement");
 }
 
-export async function activateMembershipAction(): Promise<void> {
-  const user = await requireHomeowner();
-  const now = new Date();
-  const nextBilling = new Date(now);
-  nextBilling.setMonth(nextBilling.getMonth() + 1);
-
-  await prisma.membership.upsert({
-    where: { userId: user.id },
-    create: {
-      userId: user.id,
-      status: "ACTIVE",
-      activatedAt: now,
-      nextBillingDate: nextBilling,
-    },
-    update: {
-      status: "ACTIVE",
-      activatedAt: now,
-      nextBillingDate: nextBilling,
-      canceledAt: null,
-    },
-  });
-  revalidatePath("/member");
-  revalidatePath("/member/membership");
-}
-
-export async function cancelMembershipAction(): Promise<void> {
-  const user = await requireHomeowner();
-  await prisma.membership.update({
-    where: { userId: user.id },
-    data: { status: "CANCELED", canceledAt: new Date(), nextBillingDate: null },
-  });
-  revalidatePath("/member");
-  revalidatePath("/member/membership");
-}
-
 const documentSchema = z.object({
   label: z.string().min(1, "Please label this document"),
 });

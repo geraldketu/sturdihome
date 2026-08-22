@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, NoticeBanner } from "@/components/ui";
 
 export default async function MemberDashboardPage() {
   const user = await getSessionUser();
@@ -15,12 +15,10 @@ export default async function MemberDashboardPage() {
     prisma.appointment.count({ where: { homeownerId: user.id } }),
   ]);
 
-  const membershipActive = user.membership?.status === "ACTIVE";
   const agreementAccepted = Boolean(user.agreementAcceptedAt);
 
   const steps = [
     { label: "Create account", done: true },
-    { label: "Activate membership", done: membershipActive, href: "/member/membership" },
     { label: "Sign member agreement", done: agreementAccepted, href: "/member/agreement" },
     { label: "Upload required documents", done: documentCount > 0, href: "/member/documents" },
   ];
@@ -30,12 +28,18 @@ export default async function MemberDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-brand-dark">Welcome back, {user.name}</h1>
-        <p className="text-sm text-gray-600">Here&apos;s what&apos;s happening with your SturdiHome membership.</p>
+        <p className="text-sm text-gray-600">Here&apos;s what&apos;s happening with your SturdiHome account.</p>
       </div>
+
+      <NoticeBanner>
+        We&apos;re still building our network of vendors and financing partners, so none
+        are live on the site yet. Any request you submit below will be held, and we&apos;ll
+        reach out personally as soon as we have a qualified partner for you.
+      </NoticeBanner>
 
       {remaining.length > 0 && (
         <Card className="border-yellow-200 bg-yellow-50">
-          <h2 className="font-semibold text-yellow-900">Finish setting up your membership</h2>
+          <h2 className="font-semibold text-yellow-900">Finish setting up your account</h2>
           <ul className="mt-3 space-y-2">
             {steps.map((step) => (
               <li key={step.label} className="flex items-center justify-between text-sm">
@@ -54,16 +58,7 @@ export default async function MemberDashboardPage() {
         </Card>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <p className="text-xs uppercase tracking-wide text-gray-500">Membership</p>
-          <p className="mt-1 text-lg font-semibold text-gray-900">
-            {user.membership?.status ?? "NONE"}
-          </p>
-          <Link href="/member/membership" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
-            Manage →
-          </Link>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Financing Requests</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{financingRequests}</p>
@@ -78,9 +73,6 @@ export default async function MemberDashboardPage() {
             View / Submit →
           </Link>
         </Card>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Appointments</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{appointments} scheduled</p>

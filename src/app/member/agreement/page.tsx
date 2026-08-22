@@ -32,8 +32,7 @@ export default async function AgreementPage() {
           <p className="mt-3">
             As a member, you authorize SturdiHome to share your request details with
             relevant vetted vendors and/or financing partners in order to fulfill your
-            requests. Membership benefits are contingent on an active, paid membership
-            plan.
+            requests.
           </p>
         </div>
 

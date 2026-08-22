@@ -39,7 +39,6 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
       phone,
       passwordHash,
       role: "HOMEOWNER",
-      membership: { create: {} },
     },
   });
 
