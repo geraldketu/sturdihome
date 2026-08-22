@@ -7,6 +7,7 @@
   --brand-dark: #234529;
   --brand-navy: #1b2a52;
   --brand-gold: #c79a2b;
+  --brand-gold-pale: #ead9a0;
 }
 
 @theme inline {
@@ -16,8 +17,10 @@
   --color-brand-dark: var(--brand-dark);
   --color-brand-navy: var(--brand-navy);
   --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-pale: var(--brand-gold-pale);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-playfair);
 }
 
 body {

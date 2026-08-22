@@ -7,7 +7,7 @@ export default async function SiteHeader() {
   const user = await getSessionUser();
 
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="bg-brand-gold-pale">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="flex items-center gap-2">
           <Image
@@ -18,25 +18,25 @@ export default async function SiteHeader() {
             className="h-11 w-11 object-contain"
             priority
           />
-          <span className="hidden text-lg font-bold text-brand-navy sm:inline">
-            SturdiHome <span className="font-normal text-gray-500">Network</span>
+          <span className="hidden font-display text-lg font-semibold text-brand-navy sm:inline">
+            SturdiHome <span className="font-sans text-sm font-normal text-brand-navy/60">Network</span>
           </span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           {!user && (
             <>
-              <Link href="/apply/vendor" className="text-gray-600 hover:text-brand-dark">
+              <Link href="/apply/vendor" className="text-brand-navy/80 hover:text-brand-navy">
                 Become a Vendor
               </Link>
-              <Link href="/apply/financing" className="text-gray-600 hover:text-brand-dark">
+              <Link href="/apply/financing" className="text-brand-navy/80 hover:text-brand-navy">
                 Become a Financing Partner
               </Link>
-              <Link href="/login" className="text-gray-600 hover:text-brand-dark">
+              <Link href="/login" className="text-brand-navy/80 hover:text-brand-navy">
                 Log In
               </Link>
               <Link
                 href="/signup"
-                className="rounded-md bg-brand px-3 py-1.5 font-medium text-white hover:bg-brand-dark"
+                className="rounded-md bg-brand-navy px-3 py-1.5 font-medium text-white hover:bg-brand-navy/90"
               >
                 Join as a Homeowner
               </Link>
@@ -44,19 +44,19 @@ export default async function SiteHeader() {
           )}
           {user && (
             <>
-              <span className="hidden text-gray-500 sm:inline">
+              <span className="hidden text-brand-navy/70 sm:inline">
                 {user.name} &middot; {roleLabel(user.role)}
               </span>
               <Link
                 href={loginDestinationForRole(user.role)}
-                className="text-gray-600 hover:text-brand-dark"
+                className="text-brand-navy/80 hover:text-brand-navy"
               >
                 Dashboard
               </Link>
               <form action={logoutAction}>
                 <button
                   type="submit"
-                  className="rounded-md border border-gray-300 px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-50"
+                  className="rounded-md border border-brand-navy/30 px-3 py-1.5 font-medium text-brand-navy hover:bg-white/40"
                 >
                   Log Out
                 </button>
