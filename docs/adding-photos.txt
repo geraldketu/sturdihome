@@ -4,6 +4,11 @@ actual changes - things like Claude Code, or a similar AI tool that can see
 and edit the project files. You just need to know how to find a file on
 your computer and type sentences.)
 
+This assumes you've already done the one-time setup in
+"collaborator-setup.txt" (making accounts, installing tools, and getting
+the project running on your computer). If you haven't done that yet,
+start there first.
+
 
 STEP 1 - Get your photo ready
 

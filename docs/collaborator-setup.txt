@@ -1,0 +1,114 @@
+GETTING SET UP TO WORK ON THE STURDIHOME WEBSITE
+(For someone who has never done this before, with no coding background.
+You will be using an AI assistant - like Claude Code - to do the technical
+work. This is a one-time setup. Once it's done, you can follow the
+separate "adding-photos.txt" guide any time you want to add a photo.)
+
+This looks like a lot of steps, but almost none of them require you to
+understand code. Most of it is clicking "Next" through installers and
+copying links. Take it one step at a time.
+
+
+PART 1 - Create your accounts
+
+1. Create a GitHub account (this is where the website's code lives).
+   Go to https://github.com/signup and follow the prompts.
+   Once you have an account, tell the site owner your GitHub username
+   and ask them to add you as a collaborator on the repository at:
+     https://github.com/geraldketu/sturdihome
+   (They do this from Settings > Collaborators on that page. You can't
+   do this step yourself - it has to come from them.)
+
+2. Create a Vercel account (this is what hosts the live website).
+   Go to https://vercel.com/signup and choose "Continue with GitHub" so
+   it's linked to the account you just made.
+   Then tell the site owner your Vercel account email and ask them to
+   invite you to the "sturdi-home" team on Vercel (Team Settings >
+   Members > Invite). Again, this step has to come from them.
+
+Wait until both invitations are accepted before moving on.
+
+
+PART 2 - Install the tools on your computer
+
+Do these in order. Each one is a normal installer - download it, open
+it, click through with the default options, like installing any other
+program.
+
+3. Install Git: https://git-scm.com/downloads
+   This is what lets your computer talk to GitHub.
+
+4. Install Node.js: https://nodejs.org
+   Pick the "LTS" (recommended) version. This is what actually runs the
+   website's code on your computer.
+
+5. Install a code editor - Visual Studio Code:
+   https://code.visualstudio.com
+   This is just a text editor, but it has nice built-in buttons for the
+   GitHub steps coming up, so you barely need to type any commands.
+
+6. Install an AI coding assistant inside VS Code, e.g. Claude Code.
+   Open VS Code, go to the Extensions panel, search for "Claude Code",
+   and install it. Sign in when prompted. (If you'd rather use a
+   different AI coding tool - Cursor, GitHub Copilot, etc. - that's
+   fine too; everything after this point works the same way, you'll
+   just be chatting with a different assistant.)
+
+   This is the assistant you'll actually talk to in Part 3 and in the
+   adding-photos.txt guide. From here on, most steps are things you ask
+   it to do rather than things you type yourself.
+
+
+PART 3 - Get the project onto your computer and running
+
+7. In VS Code, open the Source Control panel and choose "Clone
+   Repository". Paste in this address when asked:
+     https://github.com/geraldketu/sturdihome
+   Pick a folder on your computer to save it into (like your Desktop),
+   and open the project when VS Code offers to.
+
+8. Open a chat with your AI assistant (from step 6) and say something
+   like:
+
+       "This is a Next.js project. Can you install its dependencies
+       and get it running locally for me?"
+
+   It will run "npm install" for you - that downloads everything the
+   project needs.
+
+9. The site needs a couple of secret values (like the database
+   connection) to run. Ask your assistant:
+
+       "Can you connect this project to the Vercel project it's
+       linked to and pull down the environment variables?"
+
+   Behind the scenes this runs "vercel login", "vercel link", and
+   "vercel env pull" - the first one will open a browser link for you
+   to approve, since it's confirming it's really you.
+
+10. Ask your assistant to start the local preview:
+
+       "Can you start the dev server so I can see the site?"
+
+    Then open http://localhost:3000 in your browser. If you see the
+    SturdiHome homepage, everything worked.
+
+
+YOU'RE SET UP
+
+From here on, whenever you want to add a photo (or make any other small
+change), follow "adding-photos.txt". You won't need to repeat any of
+the steps above - just open the project in VS Code, open a chat with
+your AI assistant, and go.
+
+
+IF SOMETHING GOES WRONG
+
+- Stuck on any installer: just re-download from the links above and
+  run it again - it's safe to run twice.
+- "Permission denied" or "not a collaborator" errors on GitHub or
+  Vercel: this means an invitation from Part 1 hasn't been accepted
+  yet, or hasn't been sent - check with the site owner.
+- Anything else: describe exactly what you see (copy the error text if
+  there is one) to your AI assistant and ask it what's going wrong.
+  That's what it's there for.
