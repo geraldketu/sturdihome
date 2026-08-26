@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { setVendorStatusAction } from "@/lib/actions/admin-actions";
 import { Badge, Card } from "@/components/ui";
@@ -16,7 +17,9 @@ export default async function AdminVendorsPage() {
           <Card key={v.id}>
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-semibold text-gray-900">{v.companyName}</p>
+                <Link href={`/admin/vendors/${v.id}`} className="font-semibold text-gray-900 hover:text-brand-dark hover:underline">
+                  {v.companyName}
+                </Link>
                 <p className="text-sm text-gray-600">{v.user.name} · {v.user.email}</p>
                 <p className="mt-1 text-xs text-gray-500">Service area: {v.serviceArea}</p>
                 <p className="text-xs text-gray-500">Services: {v.servicesOffered}</p>

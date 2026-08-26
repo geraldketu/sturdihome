@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, NoticeBanner } from "@/components/ui";
+import { formatCentsRange } from "@/lib/format";
 import ServiceRequestForm from "./ServiceRequestForm";
 import PayButton from "./PayButton";
 
@@ -71,12 +72,19 @@ export default async function ServiceRequestPage({
                     Matched with {req.assignedVendor.companyName}
                   </p>
                 )}
-                {req.priceCents && (
+                {req.priceCents ? (
                   <div className="mt-2 flex items-center gap-2">
                     <Badge tone={req.paymentStatus === "PAID" ? "green" : "yellow"}>
                       ${(req.priceCents / 100).toFixed(2)} {req.paymentStatus}
                     </Badge>
                   </div>
+                ) : (
+                  req.estimateLowCents != null &&
+                  req.estimateHighCents != null && (
+                    <p className="mt-2 text-xs text-gray-500">
+                      Estimated: {formatCentsRange(req.estimateLowCents, req.estimateHighCents)} (vendor sets final price)
+                    </p>
+                  )
                 )}
                 {req.priceCents && req.paymentStatus === "UNPAID" && (
                   <PayButton requestId={req.id} priceCents={req.priceCents} />

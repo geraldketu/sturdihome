@@ -144,6 +144,9 @@ model ServiceRequest {
   stripeCheckoutSessionId String?
   stripePaymentIntentId   String?
   paidAt                  DateTime?
+
+  estimateLowCents  Int?
+  estimateHighCents Int?
 }
 
 model Appointment {

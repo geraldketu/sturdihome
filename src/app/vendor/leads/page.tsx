@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
+import { formatCentsRange } from "@/lib/format";
 import LeadStatusForm from "./LeadStatusForm";
 import SetPriceForm from "./SetPriceForm";
 
@@ -65,6 +66,11 @@ export default async function VendorLeadsPage() {
                     {lead.homeowner.name} · {lead.homeowner.email}
                     {lead.homeowner.phone ? ` · ${lead.homeowner.phone}` : ""}
                   </p>
+                  {lead.estimateLowCents != null && lead.estimateHighCents != null && !lead.priceCents && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Homeowner&apos;s estimate: {formatCentsRange(lead.estimateLowCents, lead.estimateHighCents)}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <Badge tone={lead.status === "COMPLETED" ? "green" : "yellow"}>{lead.status}</Badge>

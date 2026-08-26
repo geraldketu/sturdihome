@@ -24,6 +24,7 @@ export async function setVendorStatusAction(formData: FormData): Promise<void> {
     data: { status, reviewedAt: new Date() },
   });
   revalidatePath("/admin/vendors");
+  revalidatePath(`/admin/vendors/${vendorId}`);
 }
 
 export async function setFinancingPartnerStatusAction(formData: FormData): Promise<void> {
@@ -37,6 +38,7 @@ export async function setFinancingPartnerStatusAction(formData: FormData): Promi
     data: { status, reviewedAt: new Date() },
   });
   revalidatePath("/admin/financing-partners");
+  revalidatePath(`/admin/financing-partners/${partnerId}`);
 }
 
 export async function assignServiceRequestAction(formData: FormData): Promise<void> {
@@ -51,6 +53,7 @@ export async function assignServiceRequestAction(formData: FormData): Promise<vo
   });
   revalidatePath("/admin/requests");
   revalidatePath("/vendor/leads");
+  revalidatePath(`/admin/vendors/${vendorId}`);
 }
 
 export async function assignFinancingRequestAction(formData: FormData): Promise<void> {
@@ -65,6 +68,7 @@ export async function assignFinancingRequestAction(formData: FormData): Promise<
   });
   revalidatePath("/admin/requests");
   revalidatePath("/financing/referrals");
+  revalidatePath(`/admin/financing-partners/${partnerId}`);
 }
 
 export type AdminActionState = ActionState;

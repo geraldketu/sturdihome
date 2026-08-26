@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { assignFinancingRequestAction, assignServiceRequestAction } from "@/lib/actions/admin-actions";
 import { Badge, Card } from "@/components/ui";
+import { formatCentsRange } from "@/lib/format";
 
 export default async function AdminRequestsPage() {
   const [serviceRequests, financingRequests, vendors, partners] = await Promise.all([
@@ -41,6 +42,11 @@ export default async function AdminRequestsPage() {
                 </p>
                 {req.assignedVendor && (
                   <p className="mt-1 text-xs text-gray-500">Assigned: {req.assignedVendor.companyName}</p>
+                )}
+                {req.estimateLowCents != null && req.estimateHighCents != null && !req.priceCents && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Estimated: {formatCentsRange(req.estimateLowCents, req.estimateHighCents)}
+                  </p>
                 )}
               </div>
               <Badge tone={req.status === "COMPLETED" ? "green" : req.status === "NEW" ? "gray" : "yellow"}>

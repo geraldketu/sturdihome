@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { saveUpload } from "@/lib/uploads";
+import { calculateEstimate } from "@/lib/estimator";
 import type { ActionState } from "@/lib/actions/auth-actions";
 
 async function requireHomeowner() {
@@ -80,6 +81,12 @@ export async function submitFinancingRequestAction(_prev: ActionState, formData:
 const serviceRequestSchema = z.object({
   serviceType: z.string().min(1, "Select a service type"),
   description: z.string().min(1, "Please describe what you need"),
+  scope: z.enum(["small", "standard", "large"]).default("standard"),
+  urgency: z.enum(["standard", "urgent"]).default("standard"),
+  squareFootage: z.preprocess(
+    (v) => (v === null || v === "" ? undefined : v),
+    z.coerce.number().int().positive().optional(),
+  ),
 });
 
 export async function submitServiceRequestAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -87,16 +94,30 @@ export async function submitServiceRequestAction(_prev: ActionState, formData: F
   const parsed = serviceRequestSchema.safeParse({
     serviceType: formData.get("serviceType"),
     description: formData.get("description"),
+    scope: formData.get("scope") || undefined,
+    urgency: formData.get("urgency") || undefined,
+    squareFootage: formData.get("squareFootage"),
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
+
+  // Estimate is always recomputed server-side from the submitted job details --
+  // never trust a client-supplied price.
+  const estimate = calculateEstimate({
+    serviceType: parsed.data.serviceType,
+    scope: parsed.data.scope,
+    urgency: parsed.data.urgency,
+    squareFootage: parsed.data.squareFootage,
+  });
 
   await prisma.serviceRequest.create({
     data: {
       homeownerId: user.id,
       serviceType: parsed.data.serviceType,
       description: parsed.data.description,
+      estimateLowCents: estimate.lowCents,
+      estimateHighCents: estimate.highCents,
     },
   });
 
