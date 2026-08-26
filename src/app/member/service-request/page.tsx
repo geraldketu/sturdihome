@@ -3,10 +3,17 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, NoticeBanner } from "@/components/ui";
 import ServiceRequestForm from "./ServiceRequestForm";
+import PayButton from "./PayButton";
 
-export default async function ServiceRequestPage() {
+export default async function ServiceRequestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
   const user = await getSessionUser();
   if (!user) redirect("/login");
+
+  const { checkout } = await searchParams;
 
   const requests = await prisma.serviceRequest.findMany({
     where: { homeownerId: user.id },
@@ -22,6 +29,17 @@ export default async function ServiceRequestPage() {
           Submit a request to be matched with a vetted, independent home-service vendor.
         </p>
       </div>
+
+      {checkout === "success" && (
+        <p className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+          Payment received. Thanks!
+        </p>
+      )}
+      {checkout === "canceled" && (
+        <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+          Checkout was canceled. No charge was made.
+        </p>
+      )}
 
       <NoticeBanner>
         We don&apos;t have home-service vendors live on the site yet. Submitting a
@@ -52,6 +70,16 @@ export default async function ServiceRequestPage() {
                   <p className="mt-1 text-xs text-gray-500">
                     Matched with {req.assignedVendor.companyName}
                   </p>
+                )}
+                {req.priceCents && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <Badge tone={req.paymentStatus === "PAID" ? "green" : "yellow"}>
+                      ${(req.priceCents / 100).toFixed(2)} {req.paymentStatus}
+                    </Badge>
+                  </div>
+                )}
+                {req.priceCents && req.paymentStatus === "UNPAID" && (
+                  <PayButton requestId={req.id} priceCents={req.priceCents} />
                 )}
               </li>
             ))}

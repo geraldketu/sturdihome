@@ -33,3 +33,31 @@ export async function updateLeadStatusAction(_prev: ActionState, formData: FormD
 
   revalidatePath("/vendor/leads");
 }
+
+export async function setServiceRequestPriceAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await getSessionUser();
+  if (!user || (user.role !== "VENDOR" && user.role !== "ADMIN") || !user.vendorProfile) {
+    return { error: "Not authorized" };
+  }
+
+  const requestId = String(formData.get("requestId") ?? "");
+  const priceDollars = Number(formData.get("priceDollars"));
+  if (!Number.isFinite(priceDollars) || priceDollars <= 0) {
+    return { error: "Enter a valid price" };
+  }
+
+  const request = await prisma.serviceRequest.findFirst({
+    where: { id: requestId, assignedVendorId: user.vendorProfile.id },
+  });
+  if (!request) {
+    return { error: "Lead not found" };
+  }
+
+  await prisma.serviceRequest.update({
+    where: { id: requestId },
+    data: { priceCents: Math.round(priceDollars * 100), paymentStatus: "UNPAID" },
+  });
+
+  revalidatePath("/vendor/leads");
+  revalidatePath("/member/service-request");
+}

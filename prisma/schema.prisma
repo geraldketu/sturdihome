@@ -36,6 +36,12 @@ enum RequestStatus {
   CANCELED
 }
 
+enum PaymentStatus {
+  UNPRICED
+  UNPAID
+  PAID
+}
+
 model User {
   id                  String    @id @default(cuid())
   email               String    @unique
@@ -78,6 +84,13 @@ model VendorProfile {
   appliedAt        DateTime          @default(now())
   reviewedAt       DateTime?
   serviceRequests  ServiceRequest[]
+
+  membershipStatus             MembershipStatus @default(NONE)
+  stripeCustomerId             String?
+  stripeSubscriptionId         String?
+  membershipActivatedAt        DateTime?
+  membershipCurrentPeriodEnd   DateTime?
+  membershipCanceledAt         DateTime?
 }
 
 model FinancingPartnerProfile {
@@ -125,6 +138,12 @@ model ServiceRequest {
   assignedVendor   VendorProfile?  @relation(fields: [assignedVendorId], references: [id])
   createdAt        DateTime        @default(now())
   appointment      Appointment?
+
+  priceCents              Int?
+  paymentStatus           PaymentStatus @default(UNPRICED)
+  stripeCheckoutSessionId String?
+  stripePaymentIntentId   String?
+  paidAt                  DateTime?
 }
 
 model Appointment {

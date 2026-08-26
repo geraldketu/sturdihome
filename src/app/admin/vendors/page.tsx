@@ -21,9 +21,14 @@ export default async function AdminVendorsPage() {
                 <p className="mt-1 text-xs text-gray-500">Service area: {v.serviceArea}</p>
                 <p className="text-xs text-gray-500">Services: {v.servicesOffered}</p>
               </div>
-              <Badge tone={v.status === "APPROVED" ? "green" : v.status === "REJECTED" ? "red" : "yellow"}>
-                {v.status}
-              </Badge>
+              <div className="flex flex-col items-end gap-1">
+                <Badge tone={v.status === "APPROVED" ? "green" : v.status === "REJECTED" ? "red" : "yellow"}>
+                  {v.status}
+                </Badge>
+                <Badge tone={v.membershipStatus === "ACTIVE" ? "green" : "gray"}>
+                  Membership: {v.membershipStatus}
+                </Badge>
+              </div>
             </div>
             {v.status === "PENDING" && (
               <div className="mt-3 flex gap-2">

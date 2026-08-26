@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui";
+import { Badge, Card } from "@/components/ui";
 
 export default async function VendorDashboardPage() {
   const user = await getSessionUser();
@@ -26,9 +27,16 @@ export default async function VendorDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-dark">{user.vendorProfile.companyName}</h1>
-        <p className="text-sm text-gray-600">Service area: {user.vendorProfile.serviceArea}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-brand-dark">{user.vendorProfile.companyName}</h1>
+          <p className="text-sm text-gray-600">Service area: {user.vendorProfile.serviceArea}</p>
+        </div>
+        <Link href="/vendor/membership" className="flex items-center gap-2">
+          <Badge tone={user.vendorProfile.membershipStatus === "ACTIVE" ? "green" : "gray"}>
+            Membership: {user.vendorProfile.membershipStatus}
+          </Badge>
+        </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

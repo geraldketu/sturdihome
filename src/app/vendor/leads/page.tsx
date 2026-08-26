@@ -1,8 +1,10 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import LeadStatusForm from "./LeadStatusForm";
+import SetPriceForm from "./SetPriceForm";
 
 export default async function VendorLeadsPage() {
   const user = await getSessionUser();
@@ -12,6 +14,24 @@ export default async function VendorLeadsPage() {
     return (
       <Card>
         <p className="text-sm text-gray-600">No vendor profile attached to this account.</p>
+      </Card>
+    );
+  }
+
+  if (user.vendorProfile.membershipStatus !== "ACTIVE") {
+    return (
+      <Card className="border-yellow-200 bg-yellow-50">
+        <h2 className="font-semibold text-yellow-900">Membership required</h2>
+        <p className="mt-2 text-sm text-yellow-800">
+          Your vendor membership isn&apos;t active, so leads are on hold. Subscribe to
+          start receiving qualified homeowner leads.
+        </p>
+        <Link
+          href="/vendor/membership"
+          className="mt-3 inline-block rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark"
+        >
+          Go to Membership
+        </Link>
       </Card>
     );
   }
@@ -46,10 +66,20 @@ export default async function VendorLeadsPage() {
                     {lead.homeowner.phone ? ` · ${lead.homeowner.phone}` : ""}
                   </p>
                 </div>
-                <Badge tone={lead.status === "COMPLETED" ? "green" : "yellow"}>{lead.status}</Badge>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge tone={lead.status === "COMPLETED" ? "green" : "yellow"}>{lead.status}</Badge>
+                  {lead.priceCents && (
+                    <Badge tone={lead.paymentStatus === "PAID" ? "green" : "gray"}>
+                      ${(lead.priceCents / 100).toFixed(2)} {lead.paymentStatus}
+                    </Badge>
+                  )}
+                </div>
               </div>
-              <div className="mt-3">
+              <div className="mt-3 flex flex-wrap items-center gap-3">
                 <LeadStatusForm requestId={lead.id} currentStatus={lead.status} />
+                {lead.paymentStatus !== "PAID" && (
+                  <SetPriceForm requestId={lead.id} priceCents={lead.priceCents} />
+                )}
               </div>
             </Card>
           ))}

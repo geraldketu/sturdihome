@@ -5,6 +5,7 @@ import { SidebarNav } from "@/components/SidebarNav";
 const NAV = [
   { href: "/vendor", label: "Dashboard" },
   { href: "/vendor/leads", label: "Leads" },
+  { href: "/vendor/membership", label: "Membership" },
   { href: "/vendor/profile", label: "Company Profile" },
 ];
 
