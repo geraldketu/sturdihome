@@ -128,6 +128,9 @@ export async function submitServiceRequestAction(_prev: ActionState, formData: F
     if (!vendor) {
       return { error: "That vendor is no longer available. Please pick another." };
     }
+    if (!vendor.servicesOffered.toLowerCase().includes(parsed.data.serviceType.toLowerCase())) {
+      return { error: "That vendor doesn't list this service type. Please pick another." };
+    }
     assignedVendorId = vendor.id;
   }
 

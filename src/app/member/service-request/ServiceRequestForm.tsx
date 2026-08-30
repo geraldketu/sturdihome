@@ -15,7 +15,7 @@ import {
 } from "@/lib/estimator";
 import { formatCentsRange } from "@/lib/format";
 
-type VendorOption = { id: string; companyName: string; serviceArea: string };
+type VendorOption = { id: string; companyName: string; serviceArea: string; servicesOffered: string };
 
 export default function ServiceRequestForm({ vendors }: { vendors: VendorOption[] }) {
   const [state, formAction] = useActionState(submitServiceRequestAction, undefined);
@@ -35,6 +35,13 @@ export default function ServiceRequestForm({ vendors }: { vendors: VendorOption[
       squareFootage: sizeSensitive ? Number(squareFootage) || undefined : undefined,
     });
   }, [serviceType, scope, urgency, squareFootage, sizeSensitive]);
+
+  // Only offer vendors who actually list this service type -- picking a vendor
+  // shouldn't mean picking one that doesn't do the job the homeowner needs.
+  const matchingVendors = useMemo(() => {
+    if (!serviceType) return vendors;
+    return vendors.filter((v) => v.servicesOffered.toLowerCase().includes(serviceType.toLowerCase()));
+  }, [vendors, serviceType]);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -122,12 +129,13 @@ export default function ServiceRequestForm({ vendors }: { vendors: VendorOption[
       <label className="block text-sm font-medium text-gray-700">
         Preferred Vendor (optional)
         <select
+          key={serviceType}
           name="vendorId"
           defaultValue=""
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
         >
           <option value="">No preference, let SturdiHome match me</option>
-          {vendors.map((v) => (
+          {matchingVendors.map((v) => (
             <option key={v.id} value={v.id}>
               {v.companyName} ({v.serviceArea})
             </option>
@@ -137,6 +145,12 @@ export default function ServiceRequestForm({ vendors }: { vendors: VendorOption[
           <span className="mt-1 block text-xs text-gray-500">
             No vendors are approved and active yet. We&apos;ll match you personally once
             one is.
+          </span>
+        )}
+        {vendors.length > 0 && serviceType && matchingVendors.length === 0 && (
+          <span className="mt-1 block text-xs text-gray-500">
+            No approved vendors currently list {serviceType} as a service. Leave on no
+            preference and we&apos;ll help you find one.
           </span>
         )}
       </label>

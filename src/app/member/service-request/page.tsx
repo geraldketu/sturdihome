@@ -17,7 +17,7 @@ export default async function ServiceRequestPage() {
     }),
     prisma.vendorProfile.findMany({
       where: { status: "APPROVED", membershipStatus: "ACTIVE" },
-      select: { id: true, companyName: true, serviceArea: true },
+      select: { id: true, companyName: true, serviceArea: true, servicesOffered: true },
       orderBy: { companyName: "asc" },
     }),
   ]);
