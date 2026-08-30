@@ -25,7 +25,7 @@ export default async function AdminRequestsPage() {
       </div>
 
       <section className="space-y-3">
-        <h2 className="font-semibold text-gray-900">Home-Service Requests</h2>
+        <h2 className="font-semibold text-gray-900">Home Service Estimator Requests</h2>
         {serviceRequests.length === 0 && (
           <Card>
             <p className="text-sm text-gray-500">No service requests yet.</p>

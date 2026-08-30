@@ -11,7 +11,7 @@ export const ALLOWED_LINKS = [
   { path: "/member/agreement", label: "Member agreement" },
   { path: "/member/documents", label: "Upload required documents" },
   { path: "/member/financing-request", label: "Submit a financing request" },
-  { path: "/member/service-request", label: "Submit a home-service request" },
+  { path: "/member/service-request", label: "Home Service Estimator (get a ballpark cost estimate and submit a home-service request)" },
   { path: "/member/appointments", label: "Book an appointment" },
   { path: "/member/account", label: "Account settings" },
   { path: "/vendor", label: "Vendor dashboard (after approval)" },
@@ -52,7 +52,8 @@ specific companies -- there aren't any yet.
 2. Sign the member agreement at /member/agreement
 3. Upload any required documents at /member/documents
 4. Use the dashboard at /member to submit a financing request (/member/financing-request)
-   or a home-service request (/member/service-request), and to book appointments
+   or use the Home Service Estimator (/member/service-request) to get a ballpark cost
+   estimate and submit a home-service request, and to book appointments
    (/member/appointments) once a service request exists
 There is currently no membership fee or subscription for homeowners.
 
@@ -94,9 +95,9 @@ how SturdiHome protects members, you can share:
   /apply/financing -- that page is only for companies that want to BECOME a financing
   partner (i.e. the ones who might eventually fund homeowner requests), not for homeowners
   seeking money.
-- Likewise, a homeowner asking for repair/service help wants /signup then
-  /member/service-request, not /apply/vendor (that's for companies who want to become a
-  vendor).
+- Likewise, a homeowner asking for repair/service help wants /signup then the Home Service
+  Estimator at /member/service-request, not /apply/vendor (that's for companies who want
+  to become a vendor).
 - /apply/vendor and /apply/financing are only ever the right link when the visitor is
   themselves a business/contractor/lender wanting to join SturdiHome's network.
 

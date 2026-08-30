@@ -9,7 +9,7 @@ const NAV = [
   { href: "/member", label: "Dashboard" },
   { href: "/member/agreement", label: "Member Agreement" },
   { href: "/member/documents", label: "Documents" },
-  { href: "/member/service-request", label: "Home-Service Request" },
+  { href: "/member/service-request", label: "Home Service Estimator" },
   { href: "/member/financing-request", label: "Financing Request" },
   { href: "/member/appointments", label: "Appointments" },
   { href: "/member/account", label: "Account" },

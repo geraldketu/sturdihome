@@ -18,7 +18,7 @@ export default async function ServiceRequestPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-brand-dark">Home-Service Request</h1>
+        <h1 className="text-2xl font-bold text-brand-dark">Home Service Estimator</h1>
         <p className="text-sm text-gray-600">
           Submit a request to be matched with a vetted, independent home-service vendor.
         </p>

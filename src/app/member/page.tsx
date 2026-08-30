@@ -67,7 +67,7 @@ export default async function MemberDashboardPage() {
           </Link>
         </Card>
         <Card>
-          <p className="text-xs uppercase tracking-wide text-gray-500">Service Requests</p>
+          <p className="text-xs uppercase tracking-wide text-gray-500">Home Service Estimator</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{serviceRequests}</p>
           <Link href="/member/service-request" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
             View / Submit →
