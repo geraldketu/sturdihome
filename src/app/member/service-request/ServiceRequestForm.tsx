@@ -15,7 +15,9 @@ import {
 } from "@/lib/estimator";
 import { formatCentsRange } from "@/lib/format";
 
-export default function ServiceRequestForm() {
+type VendorOption = { id: string; companyName: string; serviceArea: string };
+
+export default function ServiceRequestForm({ vendors }: { vendors: VendorOption[] }) {
   const [state, formAction] = useActionState(submitServiceRequestAction, undefined);
   const [serviceType, setServiceType] = useState("");
   const [scope, setScope] = useState<Scope>("standard");
@@ -111,11 +113,33 @@ export default function ServiceRequestForm() {
             Estimated cost: {formatCentsRange(estimate.lowCents, estimate.highCents)}
           </p>
           <p className="mt-1 text-xs text-brand-navy/80">
-            Ballpark estimate only &mdash; your matched vendor sets the final price after
+            Ballpark estimate only. Your matched vendor sets the final price after
             reviewing the job.
           </p>
         </div>
       )}
+
+      <label className="block text-sm font-medium text-gray-700">
+        Preferred Vendor (optional)
+        <select
+          name="vendorId"
+          defaultValue=""
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+        >
+          <option value="">No preference, let SturdiHome match me</option>
+          {vendors.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.companyName} ({v.serviceArea})
+            </option>
+          ))}
+        </select>
+        {vendors.length === 0 && (
+          <span className="mt-1 block text-xs text-gray-500">
+            No vendors are approved and active yet. We&apos;ll match you personally once
+            one is.
+          </span>
+        )}
+      </label>
 
       <TextArea label="Description" name="description" required placeholder="Describe the work you need done" />
       <SubmitButton pendingText="Submitting...">Submit Service Request</SubmitButton>

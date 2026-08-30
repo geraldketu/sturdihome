@@ -9,11 +9,18 @@ export default async function ServiceRequestPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  const requests = await prisma.serviceRequest.findMany({
-    where: { homeownerId: user.id },
-    include: { assignedVendor: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const [requests, vendors] = await Promise.all([
+    prisma.serviceRequest.findMany({
+      where: { homeownerId: user.id },
+      include: { assignedVendor: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.vendorProfile.findMany({
+      where: { status: "APPROVED", membershipStatus: "ACTIVE" },
+      select: { id: true, companyName: true, serviceArea: true },
+      orderBy: { companyName: "asc" },
+    }),
+  ]);
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -24,14 +31,16 @@ export default async function ServiceRequestPage() {
         </p>
       </div>
 
-      <NoticeBanner>
-        We don&apos;t have home-service vendors live on the site yet. Submitting a
-        request below reserves your spot; we&apos;ll reach out personally as soon as we
-        have a qualified vendor to match you with.
-      </NoticeBanner>
+      {vendors.length === 0 && (
+        <NoticeBanner>
+          We don&apos;t have home-service vendors live on the site yet. Submitting a
+          request below reserves your spot; we&apos;ll reach out personally as soon as we
+          have a qualified vendor to match you with.
+        </NoticeBanner>
+      )}
 
       <Card>
-        <ServiceRequestForm />
+        <ServiceRequestForm vendors={vendors} />
       </Card>
 
       <Card>

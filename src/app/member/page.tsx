@@ -8,12 +8,16 @@ export default async function MemberDashboardPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  const [documentCount, financingRequests, serviceRequests, appointments] = await Promise.all([
-    prisma.document.count({ where: { userId: user.id } }),
-    prisma.financingRequest.count({ where: { homeownerId: user.id } }),
-    prisma.serviceRequest.count({ where: { homeownerId: user.id } }),
-    prisma.appointment.count({ where: { homeownerId: user.id } }),
-  ]);
+  const [documentCount, financingRequests, serviceRequests, appointments, activeVendorCount, paidPartnerCount] =
+    await Promise.all([
+      prisma.document.count({ where: { userId: user.id } }),
+      prisma.financingRequest.count({ where: { homeownerId: user.id } }),
+      prisma.serviceRequest.count({ where: { homeownerId: user.id } }),
+      prisma.appointment.count({ where: { homeownerId: user.id } }),
+      prisma.vendorProfile.count({ where: { status: "APPROVED", membershipStatus: "ACTIVE" } }),
+      prisma.financingPartnerProfile.count({ where: { status: "APPROVED", paymentStatus: "PAID" } }),
+    ]);
+  const noPartnersYet = activeVendorCount === 0 && paidPartnerCount === 0;
 
   const agreementAccepted = Boolean(user.agreementAcceptedAt);
 
@@ -31,11 +35,13 @@ export default async function MemberDashboardPage() {
         <p className="text-sm text-gray-600">Here&apos;s what&apos;s happening with your SturdiHome account.</p>
       </div>
 
-      <NoticeBanner>
-        We&apos;re still building our network of vendors and financing partners, so none
-        are live on the site yet. Any request you submit below will be held, and we&apos;ll
-        reach out personally as soon as we have a qualified partner for you.
-      </NoticeBanner>
+      {noPartnersYet && (
+        <NoticeBanner>
+          We&apos;re still building our network of vendors and financing partners, so none
+          are live on the site yet. Any request you submit below will be held, and
+          we&apos;ll reach out personally as soon as we have a qualified partner for you.
+        </NoticeBanner>
+      )}
 
       {remaining.length > 0 && (
         <Card className="border-yellow-200 bg-yellow-50">

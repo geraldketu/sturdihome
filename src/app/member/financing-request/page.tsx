@@ -8,11 +8,18 @@ export default async function FinancingRequestPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  const requests = await prisma.financingRequest.findMany({
-    where: { homeownerId: user.id },
-    include: { assignedPartner: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const [requests, partners] = await Promise.all([
+    prisma.financingRequest.findMany({
+      where: { homeownerId: user.id },
+      include: { assignedPartner: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.financingPartnerProfile.findMany({
+      where: { status: "APPROVED", paymentStatus: "PAID" },
+      select: { id: true, companyName: true },
+      orderBy: { companyName: "asc" },
+    }),
+  ]);
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -23,14 +30,16 @@ export default async function FinancingRequestPage() {
         </p>
       </div>
 
-      <NoticeBanner>
-        We don&apos;t have financing partners live on the site yet. Submitting a request
-        below reserves your spot; we&apos;ll reach out personally as soon as we have a
-        qualified partner to match you with.
-      </NoticeBanner>
+      {partners.length === 0 && (
+        <NoticeBanner>
+          We don&apos;t have financing partners live on the site yet. Submitting a request
+          below reserves your spot; we&apos;ll reach out personally as soon as we have a
+          qualified partner to match you with.
+        </NoticeBanner>
+      )}
 
       <Card>
-        <FinancingRequestForm />
+        <FinancingRequestForm partners={partners} />
       </Card>
 
       <Card>
