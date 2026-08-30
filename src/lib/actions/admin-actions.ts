@@ -71,4 +71,19 @@ export async function assignFinancingRequestAction(formData: FormData): Promise<
   revalidatePath(`/admin/financing-partners/${partnerId}`);
 }
 
+export async function setVendorFlyerStatusAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const flyerId = String(formData.get("flyerId") ?? "");
+  const vendorId = String(formData.get("vendorId") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (status !== "APPROVED" && status !== "REJECTED") return;
+
+  await prisma.vendorFlyer.update({
+    where: { id: flyerId },
+    data: { status, reviewedAt: new Date() },
+  });
+  revalidatePath(`/admin/vendors/${vendorId}`);
+  revalidatePath("/vendor/flyers");
+}
+
 export type AdminActionState = ActionState;

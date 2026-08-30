@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import { formatCentsRange } from "@/lib/format";
 import LeadStatusForm from "./LeadStatusForm";
-import SetPriceForm from "./SetPriceForm";
 
 export default async function VendorLeadsPage() {
   const user = await getSessionUser();
@@ -66,26 +65,16 @@ export default async function VendorLeadsPage() {
                     {lead.homeowner.name} · {lead.homeowner.email}
                     {lead.homeowner.phone ? ` · ${lead.homeowner.phone}` : ""}
                   </p>
-                  {lead.estimateLowCents != null && lead.estimateHighCents != null && !lead.priceCents && (
+                  {lead.estimateLowCents != null && lead.estimateHighCents != null && (
                     <p className="mt-1 text-xs text-gray-500">
                       Homeowner&apos;s estimate: {formatCentsRange(lead.estimateLowCents, lead.estimateHighCents)}
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <Badge tone={lead.status === "COMPLETED" ? "green" : "yellow"}>{lead.status}</Badge>
-                  {lead.priceCents && (
-                    <Badge tone={lead.paymentStatus === "PAID" ? "green" : "gray"}>
-                      ${(lead.priceCents / 100).toFixed(2)} {lead.paymentStatus}
-                    </Badge>
-                  )}
-                </div>
+                <Badge tone={lead.status === "COMPLETED" ? "green" : "yellow"}>{lead.status}</Badge>
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="mt-3">
                 <LeadStatusForm requestId={lead.id} currentStatus={lead.status} />
-                {lead.paymentStatus !== "PAID" && (
-                  <SetPriceForm requestId={lead.id} priceCents={lead.priceCents} />
-                )}
               </div>
             </Card>
           ))}

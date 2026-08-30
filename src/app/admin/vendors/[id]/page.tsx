@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { setVendorStatusAction } from "@/lib/actions/admin-actions";
+import { setVendorStatusAction, setVendorFlyerStatusAction } from "@/lib/actions/admin-actions";
 import { Badge, Card } from "@/components/ui";
 import { formatCents, formatCentsRange } from "@/lib/format";
-import { VENDOR_MEMBERSHIP_PRICE_CENTS } from "@/lib/stripe";
+import { getVendorMembershipTier } from "@/lib/stripe";
 
 function monthsElapsed(since: Date | null): number {
   if (!since) return 0;
@@ -22,19 +22,16 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
     include: {
       user: true,
       serviceRequests: { include: { homeowner: true }, orderBy: { createdAt: "desc" } },
+      flyers: { orderBy: { uploadedAt: "desc" } },
     },
   });
 
   if (!vendor) notFound();
 
-  const jobRevenueCents = vendor.serviceRequests.reduce(
-    (sum, r) => sum + (r.paymentStatus === "PAID" ? r.priceCents ?? 0 : 0),
-    0,
-  );
-
+  const tier = getVendorMembershipTier(vendor.membershipTier);
   const estimatedMembershipRevenueCents =
     vendor.membershipStatus === "ACTIVE" || vendor.membershipStatus === "PAST_DUE"
-      ? monthsElapsed(vendor.membershipActivatedAt) * VENDOR_MEMBERSHIP_PRICE_CENTS
+      ? monthsElapsed(vendor.membershipActivatedAt) * tier.priceCents
       : 0;
 
   return (
@@ -55,6 +52,7 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
         </Badge>
         <Badge tone={vendor.membershipStatus === "ACTIVE" ? "green" : "gray"}>
           Membership: {vendor.membershipStatus}
+          {vendor.membershipStatus === "ACTIVE" || vendor.membershipStatus === "PAST_DUE" ? ` (${tier.name})` : ""}
         </Badge>
         {vendor.status === "PENDING" && (
           <div className="flex gap-2">
@@ -76,11 +74,7 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <p className="text-xs uppercase tracking-wide text-gray-500">Job Revenue (Paid Leads)</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">{formatCents(jobRevenueCents)}</p>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Est. Membership Revenue</p>
           <p className="mt-1 text-2xl font-semibold text-gray-900">{formatCents(estimatedMembershipRevenueCents)}</p>
@@ -111,21 +105,61 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
                   {lead.homeowner.name} · {lead.homeowner.email}
                   {lead.homeowner.phone ? ` · ${lead.homeowner.phone}` : ""}
                 </p>
-                {lead.priceCents ? (
-                  <p className="mt-1 text-xs text-gray-500">Priced: {formatCents(lead.priceCents)}</p>
-                ) : (
-                  lead.estimateLowCents != null &&
-                  lead.estimateHighCents != null && (
-                    <p className="mt-1 text-xs text-gray-500">
-                      Homeowner&apos;s estimate: {formatCentsRange(lead.estimateLowCents, lead.estimateHighCents)}
-                    </p>
-                  )
+                {lead.estimateLowCents != null && lead.estimateHighCents != null && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Homeowner&apos;s estimate: {formatCentsRange(lead.estimateLowCents, lead.estimateHighCents)}
+                  </p>
                 )}
               </div>
-              <div className="flex flex-col items-end gap-1">
-                <Badge tone={lead.status === "COMPLETED" ? "green" : "yellow"}>{lead.status}</Badge>
-                {lead.priceCents && (
-                  <Badge tone={lead.paymentStatus === "PAID" ? "green" : "gray"}>{lead.paymentStatus}</Badge>
+              <Badge tone={lead.status === "COMPLETED" ? "green" : "yellow"}>{lead.status}</Badge>
+            </div>
+          </Card>
+        ))}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="font-semibold text-gray-900">Promotional Flyers</h2>
+        {vendor.flyers.length === 0 && (
+          <Card>
+            <p className="text-sm text-gray-500">No flyers submitted yet.</p>
+          </Card>
+        )}
+        {vendor.flyers.map((flyer) => (
+          <Card key={flyer.id}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-gray-900">{flyer.label}</p>
+                <p className="text-xs text-gray-500">Submitted {flyer.uploadedAt.toLocaleDateString()}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge tone={flyer.status === "APPROVED" ? "green" : flyer.status === "REJECTED" ? "red" : "yellow"}>
+                  {flyer.status}
+                </Badge>
+                <a
+                  href={`/api/vendor-flyers/${flyer.id}`}
+                  className="text-xs font-medium text-brand-dark hover:underline"
+                >
+                  View
+                </a>
+                {flyer.status === "PENDING" && (
+                  <>
+                    <form action={setVendorFlyerStatusAction}>
+                      <input type="hidden" name="flyerId" value={flyer.id} />
+                      <input type="hidden" name="vendorId" value={vendor.id} />
+                      <input type="hidden" name="status" value="APPROVED" />
+                      <button className="rounded-md bg-brand px-2 py-1 text-xs font-medium text-white hover:bg-brand-dark">
+                        Approve
+                      </button>
+                    </form>
+                    <form action={setVendorFlyerStatusAction}>
+                      <input type="hidden" name="flyerId" value={flyer.id} />
+                      <input type="hidden" name="vendorId" value={vendor.id} />
+                      <input type="hidden" name="status" value="REJECTED" />
+                      <button className="rounded-md border border-red-300 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50">
+                        Reject
+                      </button>
+                    </form>
+                  </>
                 )}
               </div>
             </div>

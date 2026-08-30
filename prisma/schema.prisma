@@ -84,13 +84,26 @@ model VendorProfile {
   appliedAt        DateTime          @default(now())
   reviewedAt       DateTime?
   serviceRequests  ServiceRequest[]
+  flyers           VendorFlyer[]
 
   membershipStatus             MembershipStatus @default(NONE)
+  membershipTier                String?
   stripeCustomerId             String?
   stripeSubscriptionId         String?
   membershipActivatedAt        DateTime?
   membershipCurrentPeriodEnd   DateTime?
   membershipCanceledAt         DateTime?
+}
+
+model VendorFlyer {
+  id              String            @id @default(cuid())
+  vendorProfileId String
+  vendorProfile   VendorProfile     @relation(fields: [vendorProfileId], references: [id])
+  fileName        String
+  label           String
+  status          ApplicationStatus @default(PENDING)
+  uploadedAt      DateTime          @default(now())
+  reviewedAt      DateTime?
 }
 
 model FinancingPartnerProfile {
@@ -103,6 +116,11 @@ model FinancingPartnerProfile {
   appliedAt         DateTime          @default(now())
   reviewedAt        DateTime?
   financingRequests FinancingRequest[]
+
+  paymentStatus         PaymentStatus @default(UNPAID)
+  stripeCustomerId      String?
+  stripePaymentIntentId String?
+  paidAt                DateTime?
 }
 
 model Document {
@@ -139,6 +157,9 @@ model ServiceRequest {
   createdAt        DateTime        @default(now())
   appointment      Appointment?
 
+  // Deprecated: homeowner-pays-vendor-directly flow has been removed from the app.
+  // Left in place (unused) rather than dropped, to avoid a destructive migration over
+  // what's currently just test data.
   priceCents              Int?
   paymentStatus           PaymentStatus @default(UNPRICED)
   stripeCheckoutSessionId String?

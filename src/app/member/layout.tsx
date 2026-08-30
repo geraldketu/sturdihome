@@ -2,12 +2,15 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { SidebarNav } from "@/components/SidebarNav";
 
+// Order mirrors the intended member flow: log in, agree to terms, upload documents,
+// submit a home-service request (with the cost estimator), then a financing request,
+// then book an appointment.
 const NAV = [
   { href: "/member", label: "Dashboard" },
   { href: "/member/agreement", label: "Member Agreement" },
   { href: "/member/documents", label: "Documents" },
-  { href: "/member/financing-request", label: "Financing Request" },
   { href: "/member/service-request", label: "Home-Service Request" },
+  { href: "/member/financing-request", label: "Financing Request" },
   { href: "/member/appointments", label: "Appointments" },
   { href: "/member/account", label: "Account" },
 ];

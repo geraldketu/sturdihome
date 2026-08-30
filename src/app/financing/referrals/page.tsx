@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -12,6 +13,23 @@ export default async function FinancingReferralsPage() {
     return (
       <Card>
         <p className="text-sm text-gray-600">No financing profile attached to this account.</p>
+      </Card>
+    );
+  }
+
+  if (user.financingProfile.paymentStatus !== "PAID") {
+    return (
+      <Card className="border-yellow-200 bg-yellow-50">
+        <h2 className="font-semibold text-yellow-900">Payment required</h2>
+        <p className="mt-2 text-sm text-yellow-800">
+          Your onboarding fee hasn&apos;t been paid yet, so referrals are on hold.
+        </p>
+        <Link
+          href="/financing/membership"
+          className="mt-3 inline-block rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark"
+        >
+          Go to Payment
+        </Link>
       </Card>
     );
   }

@@ -33,13 +33,18 @@ export async function POST(req: NextRequest) {
         const subscriptionId =
           typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
         if (subscriptionId) {
-          await syncVendorSubscription(session.metadata.vendorProfileId, subscriptionId);
+          await syncVendorSubscription(
+            session.metadata.vendorProfileId,
+            subscriptionId,
+            undefined,
+            session.metadata.tierId,
+          );
         }
       }
 
-      if (session.mode === "payment" && session.metadata?.serviceRequestId) {
-        await prisma.serviceRequest.update({
-          where: { id: session.metadata.serviceRequestId },
+      if (session.mode === "payment" && session.metadata?.financingPartnerProfileId) {
+        await prisma.financingPartnerProfile.update({
+          where: { id: session.metadata.financingPartnerProfileId },
           data: {
             paymentStatus: "PAID",
             paidAt: new Date(),
@@ -56,7 +61,7 @@ export async function POST(req: NextRequest) {
       const subscription = event.data.object as Stripe.Subscription;
       const vendorProfileId = subscription.metadata?.vendorProfileId;
       if (vendorProfileId) {
-        await syncVendorSubscription(vendorProfileId, subscription.id, subscription);
+        await syncVendorSubscription(vendorProfileId, subscription.id, subscription, subscription.metadata?.tierId);
       }
       break;
     }
@@ -72,6 +77,7 @@ async function syncVendorSubscription(
   vendorProfileId: string,
   subscriptionId: string,
   preloaded?: Stripe.Subscription,
+  tierId?: string,
 ) {
   const subscription = preloaded ?? (await getStripe().subscriptions.retrieve(subscriptionId));
 
@@ -96,6 +102,7 @@ async function syncVendorSubscription(
     data: {
       stripeSubscriptionId: subscription.id,
       membershipStatus: statusMap[subscription.status] ?? "NONE",
+      membershipTier: tierId ?? subscription.metadata?.tierId ?? undefined,
       membershipActivatedAt: subscription.status === "active" ? new Date() : undefined,
       membershipCurrentPeriodEnd: currentPeriodEnd,
       membershipCanceledAt:

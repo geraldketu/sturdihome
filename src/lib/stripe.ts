@@ -15,7 +15,55 @@ export function getStripe(): Stripe {
   return stripeClient;
 }
 
-export const VENDOR_MEMBERSHIP_PRICE_CENTS = 4900;
+export interface VendorMembershipTier {
+  id: string;
+  name: string;
+  priceCents: number;
+  blurb: string;
+}
+
+// Placeholder tiers/pricing -- adjust to whatever's actually approved.
+export const VENDOR_MEMBERSHIP_TIERS: VendorMembershipTier[] = [
+  { id: "standard", name: "Standard", priceCents: 4999, blurb: "Receive homeowner leads in your service area." },
+  { id: "pro", name: "Pro", priceCents: 19999, blurb: "Priority lead placement and higher monthly lead volume." },
+];
+
+export function getVendorMembershipTier(tierId: string | null | undefined): VendorMembershipTier {
+  return VENDOR_MEMBERSHIP_TIERS.find((t) => t.id === tierId) ?? VENDOR_MEMBERSHIP_TIERS[0];
+}
+
+// Placeholder one-time onboarding fee for financing partners -- adjust as needed.
+export const FINANCING_PARTNER_FEE_CENTS = 19999;
+
+const TAX_RATE_DISPLAY_NAME = "SturdiHome Estimated Sales Tax";
+const PLACEHOLDER_TAX_PERCENTAGE = 8;
+let cachedTaxRateId: string | null = null;
+
+// Stripe's automatic tax calculation (Stripe Tax) requires a business address to be
+// configured in the Stripe Dashboard's Tax settings, which isn't something this code can
+// set up on its own. Until that's done, checkout totals use this flat placeholder rate
+// instead, so "final price includes tax" is actually true today rather than only once
+// someone configures Stripe Tax. Swap to automatic_tax once the dashboard is configured.
+export async function getPlaceholderTaxRateId(): Promise<string> {
+  if (cachedTaxRateId) return cachedTaxRateId;
+
+  const stripe = getStripe();
+  const existing = await stripe.taxRates.list({ active: true, limit: 100 });
+  const found = existing.data.find((r) => r.display_name === TAX_RATE_DISPLAY_NAME);
+  if (found) {
+    cachedTaxRateId = found.id;
+    return found.id;
+  }
+
+  const created = await stripe.taxRates.create({
+    display_name: TAX_RATE_DISPLAY_NAME,
+    percentage: PLACEHOLDER_TAX_PERCENTAGE,
+    inclusive: false,
+    description: "Placeholder flat rate -- replace with Stripe Tax once a business address is configured.",
+  });
+  cachedTaxRateId = created.id;
+  return created.id;
+}
 
 export function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;

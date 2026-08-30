@@ -60,10 +60,10 @@ export default async function MemberDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <p className="text-xs uppercase tracking-wide text-gray-500">Financing Requests</p>
-          <p className="mt-1 text-lg font-semibold text-gray-900">{financingRequests}</p>
-          <Link href="/member/financing-request" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
-            View / Submit →
+          <p className="text-xs uppercase tracking-wide text-gray-500">Documents</p>
+          <p className="mt-1 text-lg font-semibold text-gray-900">{documentCount} uploaded</p>
+          <Link href="/member/documents" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
+            Manage →
           </Link>
         </Card>
         <Card>
@@ -74,17 +74,17 @@ export default async function MemberDashboardPage() {
           </Link>
         </Card>
         <Card>
+          <p className="text-xs uppercase tracking-wide text-gray-500">Financing Requests</p>
+          <p className="mt-1 text-lg font-semibold text-gray-900">{financingRequests}</p>
+          <Link href="/member/financing-request" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
+            View / Submit →
+          </Link>
+        </Card>
+        <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Appointments</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{appointments} scheduled</p>
           <Link href="/member/appointments" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
             View →
-          </Link>
-        </Card>
-        <Card>
-          <p className="text-xs uppercase tracking-wide text-gray-500">Documents</p>
-          <p className="mt-1 text-lg font-semibold text-gray-900">{documentCount} uploaded</p>
-          <Link href="/member/documents" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
-            Manage →
           </Link>
         </Card>
       </div>

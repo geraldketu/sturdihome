@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Card } from "@/components/ui";
+import { Badge, Card } from "@/components/ui";
 
 export default async function FinancingDashboardPage() {
   const user = await getSessionUser();
@@ -26,9 +27,16 @@ export default async function FinancingDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-dark">{user.financingProfile.companyName}</h1>
-        <p className="text-sm text-gray-600">Financing partner dashboard</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-brand-dark">{user.financingProfile.companyName}</h1>
+          <p className="text-sm text-gray-600">Financing partner dashboard</p>
+        </div>
+        <Link href="/financing/membership">
+          <Badge tone={user.financingProfile.paymentStatus === "PAID" ? "green" : "gray"}>
+            Payment: {user.financingProfile.paymentStatus}
+          </Badge>
+        </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

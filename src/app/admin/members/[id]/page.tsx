@@ -18,11 +18,6 @@ export default async function AdminMemberDetailPage({ params }: { params: Promis
 
   if (!member || member.role !== "HOMEOWNER") notFound();
 
-  const totalPaidCents = member.serviceRequests.reduce(
-    (sum, r) => sum + (r.paymentStatus === "PAID" ? r.priceCents ?? 0 : 0),
-    0,
-  );
-
   return (
     <div className="space-y-6">
       <div>
@@ -33,11 +28,7 @@ export default async function AdminMemberDetailPage({ params }: { params: Promis
         <p className="text-sm text-gray-600">{member.email}{member.phone ? ` · ${member.phone}` : ""}</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <p className="text-xs uppercase tracking-wide text-gray-500">Total Paid</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">{formatCents(totalPaidCents)}</p>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Agreement</p>
           <div className="mt-1">
@@ -68,28 +59,15 @@ export default async function AdminMemberDetailPage({ params }: { params: Promis
                 {req.assignedVendor && (
                   <p className="mt-1 text-xs text-gray-500">Assigned: {req.assignedVendor.companyName}</p>
                 )}
-                {req.priceCents ? (
+                {req.estimateLowCents != null && req.estimateHighCents != null && (
                   <p className="mt-1 text-xs text-gray-500">
-                    Price: {formatCents(req.priceCents)}
-                    {req.paidAt ? ` · Paid ${req.paidAt.toLocaleDateString()}` : ""}
+                    Estimated: {formatCentsRange(req.estimateLowCents, req.estimateHighCents)}
                   </p>
-                ) : (
-                  req.estimateLowCents != null &&
-                  req.estimateHighCents != null && (
-                    <p className="mt-1 text-xs text-gray-500">
-                      Estimated: {formatCentsRange(req.estimateLowCents, req.estimateHighCents)}
-                    </p>
-                  )
                 )}
               </div>
-              <div className="flex flex-col items-end gap-1">
-                <Badge tone={req.status === "COMPLETED" ? "green" : req.status === "NEW" ? "gray" : "yellow"}>
-                  {req.status}
-                </Badge>
-                {req.priceCents && (
-                  <Badge tone={req.paymentStatus === "PAID" ? "green" : "yellow"}>{req.paymentStatus}</Badge>
-                )}
-              </div>
+              <Badge tone={req.status === "COMPLETED" ? "green" : req.status === "NEW" ? "gray" : "yellow"}>
+                {req.status}
+              </Badge>
             </div>
           </Card>
         ))}

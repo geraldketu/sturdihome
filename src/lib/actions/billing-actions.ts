@@ -3,14 +3,22 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, VENDOR_MEMBERSHIP_PRICE_CENTS, getBaseUrl } from "@/lib/stripe";
-import type { ActionState } from "@/lib/actions/auth-actions";
+import {
+  getStripe,
+  getVendorMembershipTier,
+  getBaseUrl,
+  getPlaceholderTaxRateId,
+  FINANCING_PARTNER_FEE_CENTS,
+} from "@/lib/stripe";
 
-export async function createVendorMembershipCheckoutAction(): Promise<void> {
+export async function createVendorMembershipCheckoutAction(formData: FormData): Promise<void> {
   const user = await getSessionUser();
   if (!user || user.role !== "VENDOR" || !user.vendorProfile) {
     throw new Error("Not authorized");
   }
+
+  const tierId = String(formData.get("tierId") ?? "standard");
+  const tier = getVendorMembershipTier(tierId);
 
   const stripe = getStripe();
   const baseUrl = getBaseUrl();
@@ -29,6 +37,7 @@ export async function createVendorMembershipCheckoutAction(): Promise<void> {
     });
   }
 
+  const taxRateId = await getPlaceholderTaxRateId();
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
@@ -36,18 +45,19 @@ export async function createVendorMembershipCheckoutAction(): Promise<void> {
       {
         price_data: {
           currency: "usd",
-          product_data: { name: "SturdiHome Vendor Membership" },
+          product_data: { name: `SturdiHome Vendor Membership - ${tier.name}` },
           recurring: { interval: "month" },
-          unit_amount: VENDOR_MEMBERSHIP_PRICE_CENTS,
+          unit_amount: tier.priceCents,
         },
         quantity: 1,
+        tax_rates: [taxRateId],
       },
     ],
     success_url: `${baseUrl}/vendor/membership?checkout=success`,
     cancel_url: `${baseUrl}/vendor/membership?checkout=canceled`,
-    metadata: { vendorProfileId: user.vendorProfile.id },
+    metadata: { vendorProfileId: user.vendorProfile.id, tierId: tier.id },
     subscription_data: {
-      metadata: { vendorProfileId: user.vendorProfile.id },
+      metadata: { vendorProfileId: user.vendorProfile.id, tierId: tier.id },
     },
   });
 
@@ -70,47 +80,49 @@ export async function openVendorBillingPortalAction(): Promise<void> {
   redirect(session.url);
 }
 
-export async function createServicePaymentCheckoutAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+export async function createFinancingPartnerPaymentCheckoutAction(): Promise<void> {
   const user = await getSessionUser();
-  if (!user || user.role !== "HOMEOWNER") {
-    return { error: "Not authorized" };
-  }
-
-  const requestId = String(formData.get("requestId") ?? "");
-  const request = await prisma.serviceRequest.findFirst({
-    where: { id: requestId, homeownerId: user.id },
-  });
-  if (!request || !request.priceCents || request.paymentStatus === "PAID") {
-    return { error: "This request isn't payable right now." };
+  if (!user || user.role !== "FINANCING_PARTNER" || !user.financingProfile) {
+    throw new Error("Not authorized");
   }
 
   const stripe = getStripe();
   const baseUrl = getBaseUrl();
+  let customerId = user.financingProfile.stripeCustomerId;
+
+  if (!customerId) {
+    const customer = await stripe.customers.create({
+      email: user.email,
+      name: user.financingProfile.companyName,
+      metadata: { financingPartnerProfileId: user.financingProfile.id },
+    });
+    customerId = customer.id;
+    await prisma.financingPartnerProfile.update({
+      where: { id: user.financingProfile.id },
+      data: { stripeCustomerId: customerId },
+    });
+  }
+
+  const taxRateId = await getPlaceholderTaxRateId();
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    customer_email: user.email,
+    customer: customerId,
     line_items: [
       {
         price_data: {
           currency: "usd",
-          product_data: { name: `SturdiHome service: ${request.serviceType}` },
-          unit_amount: request.priceCents,
+          product_data: { name: "SturdiHome Financing Partner Onboarding Fee" },
+          unit_amount: FINANCING_PARTNER_FEE_CENTS,
         },
         quantity: 1,
+        tax_rates: [taxRateId],
       },
     ],
-    success_url: `${baseUrl}/member/service-request?checkout=success`,
-    cancel_url: `${baseUrl}/member/service-request?checkout=canceled`,
-    metadata: { serviceRequestId: request.id },
+    success_url: `${baseUrl}/financing/membership?checkout=success`,
+    cancel_url: `${baseUrl}/financing/membership?checkout=canceled`,
+    metadata: { financingPartnerProfileId: user.financingProfile.id },
   });
 
-  await prisma.serviceRequest.update({
-    where: { id: request.id },
-    data: { stripeCheckoutSessionId: session.id },
-  });
-
-  if (!session.url) {
-    return { error: "Stripe did not return a checkout URL." };
-  }
+  if (!session.url) throw new Error("Stripe did not return a checkout URL");
   redirect(session.url);
 }

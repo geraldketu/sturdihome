@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
-import { VENDOR_MEMBERSHIP_PRICE_CENTS } from "@/lib/stripe";
+import { VENDOR_MEMBERSHIP_TIERS, getVendorMembershipTier } from "@/lib/stripe";
 import { createVendorMembershipCheckoutAction, openVendorBillingPortalAction } from "@/lib/actions/billing-actions";
 import { Badge, Card, SubmitButton } from "@/components/ui";
 
@@ -23,13 +23,16 @@ export default async function VendorMembershipPage({
   const { checkout } = await searchParams;
   const status = user.vendorProfile.membershipStatus;
   const tone = status === "ACTIVE" ? "green" : status === "PAST_DUE" ? "yellow" : "gray";
+  const isSubscribed = status === "ACTIVE" || status === "PAST_DUE";
+  const currentTier = getVendorMembershipTier(user.vendorProfile.membershipTier);
 
   return (
-    <div className="max-w-xl space-y-6">
+    <div className="max-w-2xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-brand-dark">Membership &amp; Billing</h1>
         <p className="text-sm text-gray-600">
-          An active membership is required to receive homeowner leads.
+          An active membership is required to receive homeowner leads. Prices shown are
+          before tax; the checkout total includes any applicable sales tax.
         </p>
       </div>
 
@@ -44,41 +47,53 @@ export default async function VendorMembershipPage({
         </p>
       )}
 
-      <Card>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-semibold text-gray-900">SturdiHome Vendor Membership</p>
-            <p className="text-sm text-gray-500">
-              ${(VENDOR_MEMBERSHIP_PRICE_CENTS / 100).toFixed(2)} / month
-            </p>
+      {isSubscribed ? (
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">SturdiHome Vendor Membership - {currentTier.name}</p>
+              <p className="text-sm text-gray-500">${(currentTier.priceCents / 100).toFixed(2)} / month + tax</p>
+            </div>
+            <Badge tone={tone}>{status}</Badge>
           </div>
-          <Badge tone={tone}>{status}</Badge>
-        </div>
 
-        {status === "ACTIVE" && user.vendorProfile.membershipCurrentPeriodEnd && (
-          <p className="mt-3 text-sm text-gray-600">
-            Renews {user.vendorProfile.membershipCurrentPeriodEnd.toLocaleDateString()}
-          </p>
-        )}
-        {status === "CANCELED" && user.vendorProfile.membershipCanceledAt && (
-          <p className="mt-3 text-sm text-gray-600">
-            Canceled on {user.vendorProfile.membershipCanceledAt.toLocaleDateString()}. You
-            won&apos;t receive new leads until you resubscribe.
-          </p>
-        )}
+          {status === "ACTIVE" && user.vendorProfile.membershipCurrentPeriodEnd && (
+            <p className="mt-3 text-sm text-gray-600">
+              Renews {user.vendorProfile.membershipCurrentPeriodEnd.toLocaleDateString()}
+            </p>
+          )}
 
-        <div className="mt-5 flex gap-3">
-          {status === "ACTIVE" || status === "PAST_DUE" ? (
+          <div className="mt-5">
             <form action={openVendorBillingPortalAction}>
               <SubmitButton pendingText="Opening...">Manage Billing</SubmitButton>
             </form>
-          ) : (
-            <form action={createVendorMembershipCheckoutAction}>
-              <SubmitButton pendingText="Redirecting...">Subscribe for ${(VENDOR_MEMBERSHIP_PRICE_CENTS / 100).toFixed(2)}/mo</SubmitButton>
-            </form>
-          )}
+          </div>
+        </Card>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {VENDOR_MEMBERSHIP_TIERS.map((tier) => (
+            <Card key={tier.id}>
+              <p className="font-semibold text-gray-900">{tier.name}</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">
+                ${(tier.priceCents / 100).toFixed(2)}
+                <span className="text-sm font-normal text-gray-500"> / month + tax</span>
+              </p>
+              <p className="mt-2 text-sm text-gray-600">{tier.blurb}</p>
+              <form action={createVendorMembershipCheckoutAction} className="mt-4">
+                <input type="hidden" name="tierId" value={tier.id} />
+                <SubmitButton pendingText="Redirecting...">Subscribe to {tier.name}</SubmitButton>
+              </form>
+            </Card>
+          ))}
         </div>
-      </Card>
+      )}
+
+      {status === "CANCELED" && user.vendorProfile.membershipCanceledAt && (
+        <p className="text-sm text-gray-600">
+          Canceled on {user.vendorProfile.membershipCanceledAt.toLocaleDateString()}. You
+          won&apos;t receive new leads until you resubscribe.
+        </p>
+      )}
     </div>
   );
 }

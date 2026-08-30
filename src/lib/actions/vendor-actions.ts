@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { saveUpload } from "@/lib/uploads";
 import type { ActionState } from "@/lib/actions/auth-actions";
 
 const ALLOWED_STATUSES = ["ASSIGNED", "IN_PROGRESS", "COMPLETED", "CANCELED"] as const;
@@ -34,30 +35,26 @@ export async function updateLeadStatusAction(_prev: ActionState, formData: FormD
   revalidatePath("/vendor/leads");
 }
 
-export async function setServiceRequestPriceAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+export async function uploadFlyerAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await getSessionUser();
-  if (!user || (user.role !== "VENDOR" && user.role !== "ADMIN") || !user.vendorProfile) {
+  if (!user || user.role !== "VENDOR" || !user.vendorProfile) {
     return { error: "Not authorized" };
   }
 
-  const requestId = String(formData.get("requestId") ?? "");
-  const priceDollars = Number(formData.get("priceDollars"));
-  if (!Number.isFinite(priceDollars) || priceDollars <= 0) {
-    return { error: "Enter a valid price" };
+  const label = String(formData.get("label") ?? "").trim();
+  if (!label) {
+    return { error: "Please label this flyer" };
   }
 
-  const request = await prisma.serviceRequest.findFirst({
-    where: { id: requestId, assignedVendorId: user.vendorProfile.id },
-  });
-  if (!request) {
-    return { error: "Lead not found" };
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Please choose a file to upload." };
   }
 
-  await prisma.serviceRequest.update({
-    where: { id: requestId },
-    data: { priceCents: Math.round(priceDollars * 100), paymentStatus: "UNPAID" },
+  const storedName = await saveUpload(file, user.id);
+  await prisma.vendorFlyer.create({
+    data: { vendorProfileId: user.vendorProfile.id, label, fileName: storedName },
   });
 
-  revalidatePath("/vendor/leads");
-  revalidatePath("/member/service-request");
+  revalidatePath("/vendor/flyers");
 }

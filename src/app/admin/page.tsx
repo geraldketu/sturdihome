@@ -1,35 +1,38 @@
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui";
 import { formatCents } from "@/lib/format";
-import { VENDOR_MEMBERSHIP_PRICE_CENTS } from "@/lib/stripe";
+import { getVendorMembershipTier, FINANCING_PARTNER_FEE_CENTS } from "@/lib/stripe";
 
 export default async function AdminOverviewPage() {
   const [
     memberCount,
     vendorCount,
     pendingVendors,
-    activeVendorMemberships,
+    activeVendors,
     financingPartnerCount,
     pendingFinancingPartners,
+    paidFinancingPartners,
     financingRequests,
     serviceRequests,
     appointments,
-    paidServiceRequests,
   ] = await Promise.all([
     prisma.user.count({ where: { role: "HOMEOWNER" } }),
     prisma.vendorProfile.count(),
     prisma.vendorProfile.count({ where: { status: "PENDING" } }),
-    prisma.vendorProfile.count({ where: { membershipStatus: "ACTIVE" } }),
+    prisma.vendorProfile.findMany({ where: { membershipStatus: "ACTIVE" }, select: { membershipTier: true } }),
     prisma.financingPartnerProfile.count(),
     prisma.financingPartnerProfile.count({ where: { status: "PENDING" } }),
+    prisma.financingPartnerProfile.count({ where: { paymentStatus: "PAID" } }),
     prisma.financingRequest.count(),
     prisma.serviceRequest.count(),
     prisma.appointment.count(),
-    prisma.serviceRequest.findMany({ where: { paymentStatus: "PAID" }, select: { priceCents: true } }),
   ]);
 
-  const homeownerPaymentsCents = paidServiceRequests.reduce((sum, r) => sum + (r.priceCents ?? 0), 0);
-  const monthlyVendorMembershipRevenueCents = activeVendorMemberships * VENDOR_MEMBERSHIP_PRICE_CENTS;
+  const monthlyVendorMembershipRevenueCents = activeVendors.reduce(
+    (sum, v) => sum + getVendorMembershipTier(v.membershipTier).priceCents,
+    0,
+  );
+  const financingPartnerFeeRevenueCents = paidFinancingPartners * FINANCING_PARTNER_FEE_CENTS;
 
   const stats = [
     { label: "Homeowners", value: memberCount },
@@ -38,11 +41,15 @@ export default async function AdminOverviewPage() {
     { label: "Financing Requests", value: financingRequests },
     { label: "Service Requests", value: serviceRequests },
     { label: "Appointments", value: appointments },
-    { label: "Homeowner Payments Collected", value: formatCents(homeownerPaymentsCents) },
     {
       label: "Vendor Membership Revenue",
       value: formatCents(monthlyVendorMembershipRevenueCents),
-      sub: `${activeVendorMemberships} active memberships / mo`,
+      sub: `${activeVendors.length} active memberships / mo`,
+    },
+    {
+      label: "Financing Partner Fees Collected",
+      value: formatCents(financingPartnerFeeRevenueCents),
+      sub: `${paidFinancingPartners} paid onboarding fee(s)`,
     },
   ];
 

@@ -23,9 +23,14 @@ export default async function AdminFinancingPartnersPage() {
                 <p className="text-sm text-gray-600">{p.user.name} · {p.user.email}</p>
                 <p className="mt-1 text-xs text-gray-500">License: {p.licenseInfo}</p>
               </div>
-              <Badge tone={p.status === "APPROVED" ? "green" : p.status === "REJECTED" ? "red" : "yellow"}>
-                {p.status}
-              </Badge>
+              <div className="flex flex-col items-end gap-1">
+                <Badge tone={p.status === "APPROVED" ? "green" : p.status === "REJECTED" ? "red" : "yellow"}>
+                  {p.status}
+                </Badge>
+                <Badge tone={p.paymentStatus === "PAID" ? "green" : "gray"}>
+                  Payment: {p.paymentStatus}
+                </Badge>
+              </div>
             </div>
             {p.status === "PENDING" && (
               <div className="mt-3 flex gap-2">
