@@ -155,17 +155,17 @@ export default function ChatWidget() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close chat" : "Ask Sturdi Guy"}
-        title={open ? "Close chat" : "Ask Sturdi Guy"}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-navy text-white shadow-lg hover:bg-brand-navy/90"
+        className="flex h-11 items-center gap-1.5 rounded-full bg-brand-navy px-3.5 text-xs font-semibold text-white shadow-lg hover:bg-brand-navy/90"
       >
         {open ? (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M18 6 6 18" />
             <path d="M6 6l12 12" />
           </svg>
         ) : (
-          <SturdiGuyIcon className="h-6 w-6 text-brand-gold" />
+          <SturdiGuyIcon className="h-4 w-4 text-brand-gold" />
         )}
+        {open ? "Close" : "Sturdi Guy"}
       </button>
     </div>
   );

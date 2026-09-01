@@ -5,10 +5,10 @@ import HeroVideo from "@/components/HeroVideo";
 export default function HomePage() {
   return (
     <main>
-      <section className="relative isolate overflow-hidden">
+      <section className="relative isolate flex min-h-[480px] items-end overflow-hidden sm:min-h-[560px]">
         <HeroVideo />
         <div className="absolute inset-0 bg-black/10" />
-        <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
+        <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-10 text-center sm:pb-20">
           <p className="mx-auto max-w-2xl text-sm text-white/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
             SturdiHome Network LLC is a referral network, not a lender or a contractor.
             We make the introduction, our partners do the work.
