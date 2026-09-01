@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui";
 
@@ -6,12 +5,13 @@ export default function HomePage() {
   return (
     <main>
       <section className="relative isolate overflow-hidden">
-        <Image
-          src="/images/hero-living-room.png"
-          alt="A cozy living room with a stone fireplace"
-          fill
-          priority
-          className="object-cover"
+        <video
+          src="/videos/hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">

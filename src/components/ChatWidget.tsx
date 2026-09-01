@@ -6,7 +6,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 
 const GREETING =
-  "Hi! I'm the SturdiHome Assistant. I can help you find home services, learn about financing options, become a vendor, or find the right SturdiHome page.";
+  "Hi! I'm Sturdi Guy. I can help you find home services, learn about financing options, become a vendor, or find the right SturdiHome page.";
 
 const QUICK_LINKS = [
   { href: "/signup", label: "Join as a homeowner" },
@@ -49,7 +49,7 @@ export default function ChatWidget() {
       {open && (
         <div className="flex h-[70vh] max-h-[32rem] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl">
           <div className="flex items-center justify-between bg-brand-navy px-4 py-3">
-            <p className="text-sm font-semibold text-white">SturdiHome Assistant</p>
+            <p className="text-sm font-semibold text-white">Sturdi Guy</p>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -131,13 +131,13 @@ export default function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label={open ? "Close chat" : "Ask SturdiHome"}
+        aria-label={open ? "Close chat" : "Ask Sturdi Guy"}
         className="flex items-center gap-2 rounded-full bg-brand-navy px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-brand-navy/90"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
         </svg>
-        {open ? "Close" : "Ask SturdiHome"}
+        {open ? "Close" : "Ask Sturdi Guy"}
       </button>
     </div>
   );
