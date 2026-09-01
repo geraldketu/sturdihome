@@ -5,50 +5,50 @@ import HeroVideo from "@/components/HeroVideo";
 export default function HomePage() {
   return (
     <main>
-      <section className="relative isolate flex min-h-[560px] items-end overflow-hidden sm:min-h-[680px]">
+      <section className="relative isolate h-[360px] overflow-hidden sm:h-[440px]">
         <HeroVideo />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-10 text-center sm:pb-20">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
-            SturdiHome Network LLC
-          </p>
-          <h1 className="mx-auto mt-3 max-w-3xl font-display text-5xl font-semibold text-brand-navy drop-shadow-[0_2px_10px_rgba(255,255,255,0.85)] sm:text-6xl">
-            A place where homeowners find a solution.
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
-            We connect homeowners with trusted service providers and financing partners
-            to make home improvement simple, affordable, and stress-free.
-          </p>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-white/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
-            SturdiHome Network LLC is a referral network, not a lender or a contractor.
-            We make the introduction, our partners do the work.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className="rounded-md bg-brand-navy px-5 py-3 text-sm font-semibold text-white hover:bg-brand-navy/90"
-            >
-              Join as a Homeowner
-            </Link>
-            <Link
-              href="/apply/vendor"
-              className="rounded-md border border-brand-navy/15 bg-white px-5 py-3 text-sm font-semibold text-brand-navy hover:bg-brand-gold-pale"
-            >
-              Apply as a Vendor
-            </Link>
-            <Link
-              href="/apply/financing"
-              className="rounded-md border border-brand-navy/15 bg-white px-5 py-3 text-sm font-semibold text-brand-navy hover:bg-brand-gold-pale"
-            >
-              Apply as a Financing Partner
-            </Link>
-          </div>
-        </div>
       </section>
 
       <div className="bg-brand-gold-pale py-3 text-center text-sm font-semibold tracking-wide text-brand-navy">
         Strong Homes. Stronger Communities. Better Futures.
       </div>
+
+      <section className="mx-auto max-w-4xl px-4 py-16 text-center">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-navy/70">
+          SturdiHome Network LLC
+        </p>
+        <h1 className="mx-auto mt-3 max-w-3xl font-display text-4xl font-semibold text-brand-navy sm:text-5xl">
+          A place where homeowners find a solution.
+        </h1>
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-700">
+          We connect homeowners with trusted service providers and financing partners
+          to make home improvement simple, affordable, and stress-free.
+        </p>
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-500">
+          SturdiHome Network LLC is a referral network, not a lender or a contractor.
+          We make the introduction, our partners do the work.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/signup"
+            className="rounded-md bg-brand-navy px-5 py-3 text-sm font-semibold text-white hover:bg-brand-navy/90"
+          >
+            Join as a Homeowner
+          </Link>
+          <Link
+            href="/apply/vendor"
+            className="rounded-md border border-brand-navy/15 bg-white px-5 py-3 text-sm font-semibold text-brand-navy hover:bg-brand-gold-pale"
+          >
+            Apply as a Vendor
+          </Link>
+          <Link
+            href="/apply/financing"
+            className="rounded-md border border-brand-navy/15 bg-white px-5 py-3 text-sm font-semibold text-brand-navy hover:bg-brand-gold-pale"
+          >
+            Apply as a Financing Partner
+          </Link>
+        </div>
+      </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="grid gap-6 sm:grid-cols-3">
