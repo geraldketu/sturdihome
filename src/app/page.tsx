@@ -9,17 +9,7 @@ export default function HomePage() {
         <HeroVideo />
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
-            SturdiHome Network LLC
-          </p>
-          <h1 className="mx-auto mt-3 max-w-3xl font-display text-5xl font-semibold text-brand-navy drop-shadow-[0_2px_10px_rgba(255,255,255,0.85)] sm:text-6xl">
-            A place where homeowners find a solution.
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
-            We connect homeowners with trusted service providers and financing partners
-            to make home improvement simple, affordable, and stress-free.
-          </p>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-white/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
+          <p className="mx-auto max-w-2xl text-sm text-white/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
             SturdiHome Network LLC is a referral network, not a lender or a contractor.
             We make the introduction, our partners do the work.
           </p>
