@@ -1,20 +1,14 @@
 import Link from "next/link";
 import { Card } from "@/components/ui";
+import HeroVideo from "@/components/HeroVideo";
 
 export default function HomePage() {
   return (
     <main>
-      <section className="relative isolate overflow-hidden">
-        <video
-          src="/videos/hero.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
+      <section className="relative isolate flex min-h-[560px] items-end overflow-hidden sm:min-h-[680px]">
+        <HeroVideo />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent" />
+        <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-10 text-center sm:pb-20">
           <p className="text-xs font-semibold uppercase tracking-widest text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
             SturdiHome Network LLC
           </p>
