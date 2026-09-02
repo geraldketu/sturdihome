@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
             undefined,
             session.metadata.tierId,
           );
+          await prisma.vendorProfile.updateMany({
+            where: { id: session.metadata.vendorProfileId, applicationFeePaidAt: null },
+            data: { applicationFeePaidAt: new Date() },
+          });
         }
       }
 

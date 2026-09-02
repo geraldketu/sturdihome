@@ -32,6 +32,14 @@ export function getVendorMembershipTier(tierId: string | null | undefined): Vend
   return VENDOR_MEMBERSHIP_TIERS.find((t) => t.id === tierId) ?? VENDOR_MEMBERSHIP_TIERS[0];
 }
 
+// One-time application fee, charged once per vendor on their first membership checkout.
+export const VENDOR_APPLICATION_FEE_CENTS = 9900;
+
+// The first 100 vendors to check out still pay the application fee above, but their
+// monthly membership is free for their first 6 months.
+export const FOUNDING_VENDOR_LIMIT = 100;
+export const FOUNDING_VENDOR_TRIAL_DAYS = 180;
+
 // Placeholder one-time onboarding fee for financing partners -- adjust as needed.
 export const FINANCING_PARTNER_FEE_CENTS = 19999;
 

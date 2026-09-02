@@ -62,6 +62,12 @@ export default async function SiteHeader() {
               </form>
             </>
           )}
+          <a
+            href="mailto:Felicia@sturdihomenetwork.com"
+            className="rounded-md border border-brand-navy/30 px-3 py-1.5 font-medium text-brand-navy hover:bg-white/40"
+          >
+            Contact Us
+          </a>
         </nav>
 
         <MobileNavToggle>
@@ -105,6 +111,12 @@ export default async function SiteHeader() {
               </form>
             </>
           )}
+          <a
+            href="mailto:Felicia@sturdihomenetwork.com"
+            className="mt-1 rounded-md border border-brand-navy/30 px-2 py-2 text-brand-navy hover:bg-white/40"
+          >
+            Contact Us
+          </a>
         </MobileNavToggle>
       </div>
     </header>

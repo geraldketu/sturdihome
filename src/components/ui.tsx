@@ -105,12 +105,13 @@ export function NoticeBanner({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function Badge({ tone, children }: { tone: "green" | "yellow" | "red" | "gray"; children: React.ReactNode }) {
+export function Badge({ tone, children }: { tone: "green" | "yellow" | "red" | "gray" | "gold"; children: React.ReactNode }) {
   const tones: Record<string, string> = {
     green: "bg-green-100 text-green-800",
     yellow: "bg-yellow-100 text-yellow-800",
     red: "bg-red-100 text-red-800",
     gray: "bg-gray-100 text-gray-700",
+    gold: "bg-brand-gold-pale text-brand-navy",
   };
   return (
     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${tones[tone]}`}>

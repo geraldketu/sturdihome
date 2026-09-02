@@ -93,6 +93,9 @@ model VendorProfile {
   membershipActivatedAt        DateTime?
   membershipCurrentPeriodEnd   DateTime?
   membershipCanceledAt         DateTime?
+
+  applicationFeePaidAt          DateTime?
+  foundingVendor                Boolean          @default(false)
 }
 
 model VendorFlyer {
