@@ -64,9 +64,10 @@ export default async function SiteHeader() {
           )}
           <a
             href="mailto:Felicia@sturdihomenetwork.com"
-            className="rounded-md border border-brand-navy/30 px-3 py-1.5 font-medium text-brand-navy hover:bg-white/40"
+            className="flex flex-col items-center rounded-md border border-brand-navy/30 px-3 py-1.5 font-medium text-brand-navy hover:bg-white/40"
           >
-            Contact Us
+            <span>Contact Us</span>
+            <span className="text-xs font-normal text-brand-navy/70">Felicia@sturdihomenetwork.com</span>
           </a>
         </nav>
 
@@ -113,9 +114,10 @@ export default async function SiteHeader() {
           )}
           <a
             href="mailto:Felicia@sturdihomenetwork.com"
-            className="mt-1 rounded-md border border-brand-navy/30 px-2 py-2 text-brand-navy hover:bg-white/40"
+            className="mt-1 flex flex-col rounded-md border border-brand-navy/30 px-2 py-2 text-brand-navy hover:bg-white/40"
           >
-            Contact Us
+            <span>Contact Us</span>
+            <span className="text-xs font-normal text-brand-navy/70">Felicia@sturdihomenetwork.com</span>
           </a>
         </MobileNavToggle>
       </div>
