@@ -5,7 +5,7 @@ import HeroVideo from "@/components/HeroVideo";
 export default function HomePage() {
   return (
     <main>
-      <section className="relative isolate flex min-h-[600px] items-end overflow-hidden sm:min-h-[680px]">
+      <section className="hero-section relative isolate flex items-end overflow-hidden">
         <HeroVideo />
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-10 text-center sm:pb-20">

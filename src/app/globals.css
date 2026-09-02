@@ -28,3 +28,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.hero-section {
+  min-height: 600px;
+}
+
+@media (min-width: 640px) {
+  .hero-section {
+    min-height: 680px;
+  }
+}
