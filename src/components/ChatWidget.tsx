@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
@@ -16,19 +17,13 @@ const QUICK_LINKS = [
 
 function SturdiGuyIcon({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M4 16a8 8 0 0 1 16 0" />
-      <path d="M12 6v3" />
-      <rect x="2" y="16" width="20" height="3" rx="1.5" />
-    </svg>
+    <Image
+      src="/images/sturdiguy-icon.png"
+      alt=""
+      width={64}
+      height={64}
+      className={`rounded-full object-cover ${className ?? ""}`}
+    />
   );
 }
 
@@ -68,8 +63,8 @@ export default function ChatWidget() {
         <div className="flex h-[70vh] max-h-[32rem] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl">
           <div className="flex items-center justify-between bg-brand-navy px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-gold text-brand-navy">
-                <SturdiGuyIcon className="h-4 w-4" />
+              <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-brand-gold bg-brand-navy">
+                <SturdiGuyIcon className="h-full w-full" />
               </span>
               <p className="text-sm font-semibold text-white">Sturdi Guy</p>
             </div>
@@ -163,7 +158,7 @@ export default function ChatWidget() {
             <path d="M6 6l12 12" />
           </svg>
         ) : (
-          <SturdiGuyIcon className="h-5 w-5 text-brand-gold" />
+          <SturdiGuyIcon className="h-8 w-8 border border-brand-gold" />
         )}
         {open ? "Close" : "Ask Sturdi Guy"}
       </button>
