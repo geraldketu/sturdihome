@@ -17,7 +17,8 @@ export default function HeroVideo() {
     <>
       <video
         ref={videoRef}
-        src="/videos/hero.mp4"
+        src="/videos/sturdi-guy-welcome.mp4"
+        aria-label="SturdiHome Network welcome video"
         autoPlay
         muted
         loop
