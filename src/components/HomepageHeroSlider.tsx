@@ -26,7 +26,7 @@ export default function HomepageHeroSlider() {
         <video
           ref={videoRef}
           className="h-full w-full object-cover"
-          src="/videos/vendor-marketing.mp4"
+          src="/videos/bixy-video.mp4"
           autoPlay
           controls
           muted
