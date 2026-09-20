@@ -8,11 +8,9 @@ export const CHARACTER_PLANS = {
 export type CharacterPlanId = keyof typeof CHARACTER_PLANS;
 
 export const CHARACTER_VOICES = {
-  sturdiGirl: { label: "Sturdi Girl", browserVoiceHint: "female", rate: 0.94, pitch: 0.88, referenceAudioPath: "data/character-voices/sturdi-girl-approved.wav" },
   brixy: { label: "Brixy", browserVoiceHint: "male", rate: 0.86, pitch: 0.62, referenceAudioPath: "data/character-voices/brixy-approved.wav" },
 } as const;
 
 export const CHARACTER_TALKING_VIDEO_AVAILABLE = {
-  sturdiGirl: true,
   brixy: true,
 } as const;

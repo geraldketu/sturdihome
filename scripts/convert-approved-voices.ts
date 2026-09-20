@@ -3,7 +3,6 @@ import decodeAudio from "audio-decode";
 import { encode as encodeWav } from "wav-encoder";
 
 const voices = [
-  ["C:/Users/Aarons/Downloads/09-19-2026_00-21_msg5618052.mp3", "data/character-voices/sturdi-girl-approved.wav"],
   ["C:/Users/Aarons/Downloads/09-19-2026_00-26_msg5618064 (1) (3).mp3", "data/character-voices/brixy-approved.wav"],
 ] as const;
 

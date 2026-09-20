@@ -9,9 +9,7 @@ const speech = readFileSync(`${root}/src/components/ChatSpeech.tsx`, "utf8");
 const knowledge = readFileSync(`${root}/src/lib/ai/knowledge.ts`, "utf8");
 
 test("Task 3 animation stage has separated realistic asset and motion contracts", () => {
-  assert.match(stage, /sturdi-girl-talking\.mp4/);
   assert.match(stage, /brixy-talking\.mp4/);
-  assert.match(stage, /sturdi-girl-official\.png/);
   assert.match(stage, /bixy-official\.png/);
   assert.match(stage, /"loading" \| "ready" \| "failed"/);
   assert.match(stage, /specialSceneAudio/);
@@ -24,14 +22,9 @@ test("Task 3 animation stage has separated realistic asset and motion contracts"
   assert.match(stage, /"speaking"/);
   assert.match(stage, /poster=\{asset\.image\}/);
   assert.match(speech, /onSpeakingChange/);
-  assert.match(widget, /Sturdi Girl is your guide\./);
   assert.match(widget, /interactWith\("brixy"\)/);
-  assert.match(widget, /Interact with Sturdi Girl/);
-  assert.match(widget, /Stop Sturdi Girl/);
-  assert.match(widget, /Interact with Brixy/);
-  assert.match(widget, /Stop Brixy/);
-  assert.match(widget, /Interact with Sturdi Girl/);
-  assert.match(widget, /Interact with Brixy/);
+  assert.match(widget, /Interact with Bixy/);
+  assert.match(widget, /Stop Bixy/);
   assert.doesNotMatch(widget, /APPROVED_AUDIO/);
   assert.doesNotMatch(widget, /audioUrl=/);
   assert.match(widget, /placeholder="Ask your guide\.\.\."/);

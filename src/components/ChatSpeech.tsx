@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { CHARACTER_VOICES } from "@/lib/character-config";
 
 /** Dynamic TTS is intentionally unavailable until a real server-side voice provider is configured. */
-export default function ChatSpeech({ character = "sturdiGirl", resetToken = 0, onSpeakingChange }: { text: string; character?: "sturdiGirl" | "brixy"; resetToken?: number; onSpeakingChange?: (speaking: boolean) => void }) {
+export default function ChatSpeech({ character = "brixy", resetToken = 0, onSpeakingChange }: { text: string; character?: "brixy"; resetToken?: number; onSpeakingChange?: (speaking: boolean) => void }) {
 
   useEffect(() => {
     onSpeakingChange?.(false);

@@ -4,11 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CHARACTER_TALKING_VIDEO_AVAILABLE } from "@/lib/character-config";
 
-type Character = "sturdiGirl" | "brixy";
+type Character = "brixy";
 export type CharacterMotion = "hidden" | "enter" | "walk-left" | "walk-right" | "move-to-target" | "idle" | "speaking" | "listening" | "point-left" | "point-right" | "point-up" | "point-down" | "surprised" | "happy" | "thinking" | "return-home" | "exit";
 
 const assets = {
-  sturdiGirl: { image: "/images/sturdi-girl-official.png", video: "/videos/sturdi-girl-talking.mp4", label: "Sturdi Girl" },
   brixy: { image: "/images/bixy-official.png", video: "/videos/brixy-talking.mp4", label: "Brixy" },
 } as const;
 

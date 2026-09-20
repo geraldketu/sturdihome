@@ -10,7 +10,7 @@ export async function getCharacterStatus(userId: string) {
   return { freeSecondsRemaining: entitlement.freeSecondsRemaining, paidSecondsRemaining, plan: expired ? null : entitlement.plan, expiresAt: expired ? null : entitlement.expiresAt, status: expired ? "EXPIRED" : entitlement.status, hasAccess: entitlement.freeSecondsRemaining > 0 || paidSecondsRemaining > 0 };
 }
 
-export async function consumeCharacterAccess(userId: string, character: "sturdiGirl" | "brixy") {
+export async function consumeCharacterAccess(userId: string, character: "brixy") {
   return prisma.$transaction(async (tx) => {
     const entitlement = await tx.characterEntitlement.upsert({ where: { userId }, update: {}, create: { userId, freeSecondsRemaining: CHARACTER_FREE_SECONDS } });
     const now = new Date();

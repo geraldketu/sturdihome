@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   const chatModel=getChatModel();
   if(!chatModel)return NextResponse.json({error:"Chat assistant is not configured yet."},{status:503});
   try {
-    const characterPrompt = parsed.data.character === "brixy" ? "You are speaking as Brixy for this reply. Keep Sturdi Girl as the primary guide, and add only brief, warm grandfather-style family banter when natural." : "You are speaking as Sturdi Girl for this reply. Be the primary warm, confident, conversational guide.";
+    const characterPrompt = "You are speaking as Bixy, the warm, dependable SturdiHome guide. Use family-friendly humor and keep the conversation focused on helpful SturdiHome topics.";
     const result=streamText({model:chatModel.model,system:`${SYSTEM_PROMPT}\n\n${characterPrompt}`,messages:await convertToModelMessages(parsed.data.messages.slice(-20)),providerOptions:chatModel.providerOptions});
     return result.toUIMessageStreamResponse({onError:()=>"The assistant is temporarily unavailable. Please try again."});
   } catch {return NextResponse.json({error:"The assistant is temporarily unavailable."},{status:503});}
