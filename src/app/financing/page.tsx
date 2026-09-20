@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
+import PortalWelcome from "@/components/PortalWelcome";
 
 export default async function FinancingDashboardPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/financing");
   if (!user) redirect("/login");
 
   if (!user.financingProfile) {
@@ -27,9 +28,10 @@ export default async function FinancingDashboardPage() {
 
   return (
     <div className="space-y-8">
+      <PortalWelcome role="financing" name={user.name} />
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-brand-dark">{user.financingProfile.companyName}</h1>
+          <h2 className="text-2xl font-bold text-brand-dark">{user.financingProfile.companyName}</h2>
           <p className="text-sm text-gray-600">Financing partner dashboard</p>
         </div>
         <Link href="/financing/membership">

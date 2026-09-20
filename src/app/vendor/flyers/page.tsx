@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import UploadFlyerForm from "./UploadFlyerForm";
 
 export default async function VendorFlyersPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/vendor/flyers");
   if (!user) redirect("/login");
 
   if (!user.vendorProfile) {

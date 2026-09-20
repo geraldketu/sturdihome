@@ -1,0 +1,12 @@
+﻿import {createRequire} from 'node:module';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';
+const require=createRequire(new URL('../../node_modules/.cache/membership-tools/package.json',import.meta.url));const {chromium}=require('playwright');const base='http://127.0.0.1:3000';
+const query=async(sql,params=[])=>{const r=await fetch('http://127.0.0.1:55440',{method:'POST',body:JSON.stringify({sql,params})});if(!r.ok)throw Error(await r.text());return r.json()};
+const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+try{
+ const p=await browser.newPage();await p.goto(base+'/signup');const email='blocked-security@example.test';const key=createHash('sha256').update(`registration-email:${Math.floor(Date.now()/900000)}:${email}`).digest('hex');
+ await query('INSERT INTO "AuthThrottle" (key,count,"expiresAt") VALUES ($1,5,$2) ON CONFLICT (key) DO UPDATE SET count=5',[key,new Date(Date.now()+900000)]);
+ await p.getByLabel('Full Name',{exact:true}).fill('Synthetic');await p.getByLabel('Email',{exact:true}).fill(email);await p.getByLabel('Password',{exact:true}).fill('Review-only-Password42');await p.getByRole('button',{name:'Create Account',exact:true}).click();await p.getByText(/Too many registration/).waitFor();assert.equal((await query('SELECT count(*)::int as n FROM "User" WHERE email=$1',[email]))[0].n,0);console.log('PASS registration rate limit enforced before account creation');
+ for(const [id,table,field,value,path,text] of [['test-vendor','VendorProfile','membershipStatus','NONE','/vendor/leads','Membership required'],['test-finance','FinancingPartnerProfile','paymentStatus','UNPAID','/financing/referrals','Payment required']]){
+ await query(`UPDATE "${table}" SET "${field}"=$1 WHERE "userId"=$2`,[value,id]);await p.goto(base+'/login');await p.getByLabel('Email',{exact:true}).fill(id+'@example.test');await p.getByLabel('Password',{exact:true}).fill('Review-only-Password42');await p.getByRole('button',{name:'Sign In',exact:true}).click();await p.waitForURL('**/welcome');await p.getByRole('button',{name:'Continue now'}).click();await p.waitForURL(u=>u.pathname!='/welcome');await p.goto(base+path);await p.getByText(text,{exact:true}).waitFor();console.log('PASS',id,'restricted data blocked without required membership/payment');await query(`UPDATE "${table}" SET "${field}"=$1 WHERE "userId"=$2`,[id==='test-vendor'?'ACTIVE':'PAID',id]);
+ }
+}finally{await browser.close()}

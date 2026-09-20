@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { acceptAgreementAction } from "@/lib/actions/member-actions";
 import { Badge, Card, SubmitButton } from "@/components/ui";
 
 export default async function AgreementPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/member/agreement");
   if (!user) redirect("/login");
 
   const accepted = Boolean(user.agreementAcceptedAt);

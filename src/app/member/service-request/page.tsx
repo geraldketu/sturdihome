@@ -1,12 +1,14 @@
+
+import { approvedAccountWhere } from "@/lib/approval";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, NoticeBanner } from "@/components/ui";
 import { formatCentsRange } from "@/lib/format";
 import ServiceRequestForm from "./ServiceRequestForm";
 
 export default async function ServiceRequestPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/member/service-request");
   if (!user) redirect("/login");
 
   const [requests, vendors] = await Promise.all([
@@ -16,7 +18,7 @@ export default async function ServiceRequestPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.vendorProfile.findMany({
-      where: { status: "APPROVED", membershipStatus: "ACTIVE" },
+      where: { status: "APPROVED", membershipStatus: "ACTIVE", user: await approvedAccountWhere("VENDOR") },
       select: { id: true, companyName: true, serviceArea: true, servicesOffered: true },
       orderBy: { companyName: "asc" },
     }),

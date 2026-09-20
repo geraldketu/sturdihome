@@ -1,7 +1,9 @@
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui";
 
 export default async function AdminDocumentsPage() {
+  await requirePageAccess("/admin/documents");
   const documents = await prisma.document.findMany({
     include: { user: true },
     orderBy: { uploadedAt: "desc" },

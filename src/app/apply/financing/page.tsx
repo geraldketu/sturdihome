@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui";
 import FinancingApplicationForm from "./FinancingApplicationForm";
 
-export default function FinancingApplyPage() {
+export default async function FinancingApplyPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
   return (
     <main className="mx-auto max-w-md px-4 py-16">
       <h1 className="mb-2 text-center text-2xl font-bold text-brand-dark">
@@ -12,7 +13,7 @@ export default function FinancingApplyPage() {
         able to log in and receive qualified financing referrals from homeowners.
       </p>
       <Card>
-        <FinancingApplicationForm />
+        <FinancingApplicationForm next={next} />
       </Card>
     </main>
   );

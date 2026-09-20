@@ -1,38 +1,50 @@
 import Link from "next/link";
 import { Card } from "@/components/ui";
-import HeroVideo from "@/components/HeroVideo";
+import { MarketplaceSearch, CategoryGrid, ListingCard } from "@/components/Marketplace";
+import { getListingPreviews } from "@/lib/marketplace";
+import HomepageHeroSlider from "@/components/HomepageHeroSlider";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const directory = await getListingPreviews();
   return (
     <main>
+      <section className="bg-brand-navy px-4 py-14 text-white sm:py-20">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold-pale">Your home. Your neighborhood. Your choice.</p>
+          <h1 className="mt-5 max-w-3xl font-display text-4xl leading-tight sm:text-6xl">A stronger home starts with the right connection.</h1>
+          <p className="mb-8 mt-5 max-w-2xl text-base leading-7 text-white/85">Discover local service providers, compare their profiles, and contact the business you choose. You stay in control, from the first search to the first conversation.</p>
+          <MarketplaceSearch />
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Link href="/emergency-services" className="inline-flex min-h-11 items-center rounded-md border border-red-300 bg-red-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300">
+              Emergency Services
+            </Link>
+            <p className="text-sm text-white/75">Sign in to search and connect. Your search is never sent to vendors.</p>
+          </div>
+        </div>
+      </section>
+      <section className="mx-auto max-w-6xl px-4 py-14">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-3"><h2 className="font-display text-3xl text-brand-navy">Find help for every corner of home.</h2><Link href="/marketplace/vendors" className="font-semibold text-brand underline">Browse all vendors</Link></div>
+        <CategoryGrid />
+      </section>
+      <section className="mx-auto max-w-6xl px-4 pb-14">
+        <h2 className="mb-3 font-display text-3xl text-brand-navy">Meet businesses in the network.</h2>
+        <p className="mb-6 text-sm text-gray-600">A few published profiles, shown alphabetically. Search by location to find businesses serving your area.</p>
+        {directory.listings.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{directory.listings.slice(0, 3).map(listing => <ListingCard key={listing.id} listing={listing} />)}</div> : <p className="rounded-xl border border-brand-gold/30 bg-white p-6 text-gray-600">{directory.available ? "Published vendor profiles will appear here as our network grows." : "Vendor listings are temporarily unavailable. Please check back shortly."}</p>}
+      </section>
+      <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-14 sm:grid-cols-2">
+        <div className="rounded-2xl bg-white p-7"><h2 className="text-2xl font-semibold text-brand-navy">Search. Compare. Choose.</h2><p className="my-4 leading-7 text-gray-600">Review services, photos, and areas served. When you find the right fit, visit their website, call, or email directly. No bidding or automatic lead distribution.</p><Link href="/how-it-works" className="font-semibold text-brand underline">See how it works</Link></div>
+        <div className="rounded-2xl border border-brand-gold/30 bg-brand-gold-pale/30 p-7"><h2 className="text-2xl font-semibold text-brand-navy">Explore financing separately.</h2><p className="my-4 leading-7 text-gray-600">Connect with available financing partners. SturdiHome is not a lender, does not lend money, and does not make financing approval decisions.</p><Link href="/marketplace/financing" className="font-semibold text-brand underline">Browse financing options</Link></div>
+      </section>
       <section className="hero-section relative isolate flex items-end overflow-hidden">
-        <HeroVideo />
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-10 text-center sm:pb-20">
+        <HomepageHeroSlider />
+        <div className="pointer-events-none absolute inset-0 bg-black/10" />
+        <div className="pointer-events-none relative mx-auto max-w-6xl px-4 pb-14 pt-10 text-center sm:pb-20">
           <p className="mx-auto max-w-2xl text-sm text-white/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
             SturdiHome Network LLC is a referral network, not a lender or a contractor.
             We make the introduction, our partners do the work.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className="rounded-md bg-brand-navy px-5 py-3 text-sm font-semibold text-white hover:bg-brand-navy/90"
-            >
-              Join as a Homeowner
-            </Link>
-            <Link
-              href="/apply/vendor"
-              className="rounded-md border border-brand-navy/15 bg-white px-5 py-3 text-sm font-semibold text-brand-navy hover:bg-brand-gold-pale"
-            >
-              Apply as a Vendor
-            </Link>
-            <Link
-              href="/apply/financing"
-              className="rounded-md border border-brand-navy/15 bg-white px-5 py-3 text-sm font-semibold text-brand-navy hover:bg-brand-gold-pale"
-            >
-              Apply as a Financing Partner
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -100,10 +112,9 @@ export default function HomePage() {
         <div className="rounded-lg border border-brand-gold/40 bg-brand-gold-pale/50 p-6 text-center sm:p-8">
           <h2 className="text-lg font-semibold text-brand-navy">We&apos;re Building Our Partner Network</h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-brand-navy/80">
-            Heads up: we don&apos;t have home-service vendors or financing partners live
-            on the site yet. Homeowners can still create an account and submit requests
-            today; we&apos;ll hold them and reach out personally as soon as we have a
-            qualified, vetted partner in your area.
+            Availability varies by service and location as our network grows. Browse
+            published profiles to see who serves your area, then choose who to contact.
+            Searching never submits a request or sends your details to a vendor.
           </p>
         </div>
       </section>
@@ -113,14 +124,6 @@ export default function HomePage() {
           Your Home. Your Family. Your Future.
         </p>
         <p className="mt-1 text-brand-gold">We&apos;re here to help.</p>
-        <div className="mt-6">
-          <Link
-            href="/signup"
-            className="rounded-md bg-brand-gold px-6 py-3 text-sm font-semibold text-brand-navy hover:brightness-95"
-          >
-            Join as a Homeowner
-          </Link>
-        </div>
       </section>
     </main>
   );

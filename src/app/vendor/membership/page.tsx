@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import {
   VENDOR_MEMBERSHIP_TIERS,
   getVendorMembershipTier,
@@ -15,7 +15,7 @@ export default async function VendorMembershipPage({
 }: {
   searchParams: Promise<{ checkout?: string }>;
 }) {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/vendor/membership");
   if (!user) redirect("/login");
 
   if (!user.vendorProfile) {

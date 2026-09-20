@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import BookAppointmentForm from "./BookAppointmentForm";
 
 export default async function AppointmentsPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/member/appointments");
   if (!user) redirect("/login");
 
   const [appointments, serviceRequests] = await Promise.all([

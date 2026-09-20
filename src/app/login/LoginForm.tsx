@@ -14,11 +14,12 @@ export default function LoginForm({ next }: { next?: string }) {
       <FormError message={state?.error} />
       <Field label="Email" name="email" type="email" required />
       <Field label="Password" name="password" type="password" required />
-      <SubmitButton pendingText="Logging in...">Log In</SubmitButton>
+      <SubmitButton pendingText="Logging in...">Sign In</SubmitButton>
+      <Link href="/forgot-password" className="block text-sm font-medium text-brand underline">Forgot Password?</Link>
       <p className="text-sm text-gray-600">
         Not a member yet?{" "}
-        <Link href="/signup" className="font-medium text-brand-dark hover:underline">
-          Create a homeowner account
+        <Link href={next ? `/join-network?next=${encodeURIComponent(next)}` : "/join-network"} className="font-medium text-brand-dark hover:underline">
+          Join SturdiHome
         </Link>
       </p>
     </form>

@@ -2,16 +2,24 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { headers } from "next/headers";
+import { authRateLimited } from "@/lib/auth-throttle";
 import { prisma } from "@/lib/prisma";
-import { createSession, destroySession, hashPassword, loginDestinationForRole, verifyPassword } from "@/lib/auth";
+import { createSession, destroySession, hashPassword, verifyPassword } from "@/lib/auth";
+
+async function registrationLimited(email: string) {
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  return await authRateLimited("registration-ip", ip, 10) || await authRateLimited("registration-email", email, 5);
+}
 
 export type ActionState = { error?: string } | undefined;
 
 const signupSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Enter a valid email"),
-  phone: z.string().optional(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z.string().trim().min(1, "Name is required").max(120),
+  email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
+  phone: z.string().max(50).optional(),
+  password: z.string().min(8, "Password must be at least 8 characters").refine(v => new TextEncoder().encode(v).length <= 72, "Password must be no more than 72 UTF-8 bytes"),
+  homeownerAccountType: z.enum(["VERIFIED_HOMEOWNER", "SERVICE_ONLY"]).default("VERIFIED_HOMEOWNER"),
 });
 
 export async function signupAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -20,18 +28,23 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
     email: formData.get("email"),
     phone: formData.get("phone") || undefined,
     password: formData.get("password"),
+    homeownerAccountType: formData.get("homeownerAccountType") || undefined,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
-  const { name, email, phone, password } = parsed.data;
+  const { name, email, phone, password, homeownerAccountType } = parsed.data;
+  const referralCode = String(formData.get("referralCode") ?? "").trim();
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  if (await registrationLimited(email)) return { error: "Too many registration attempts. Please try again in 15 minutes." };
+  const existing = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
   if (existing) {
     return { error: "An account with that email already exists." };
   }
 
   const passwordHash = await hashPassword(password);
+  const referralCandidate = referralCode ? await prisma.vendorReferral.findUnique({ where: { code: referralCode } }) : null;
+  const referral = referralCandidate?.customerId === null ? referralCandidate : null;
   const user = await prisma.user.create({
     data: {
       name,
@@ -39,16 +52,19 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
       phone,
       passwordHash,
       role: "HOMEOWNER",
+      homeownerAccountType,
     },
   });
+  if (referral) await prisma.vendorReferral.update({ where: { id: referral.id }, data: { customerId: user.id, status: "ACCEPTED", acceptedAt: new Date() } });
 
-  await createSession(user.id, user.role);
-  redirect(loginDestinationForRole(user.role));
+  const destination = formData.get("next") ?? (homeownerAccountType === "SERVICE_ONLY" ? "/marketplace/vendors" : undefined);
+  await createSession(user.id, user.role, destination);
+  redirect("/welcome");
 }
 
 const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
+  password: z.string().min(1, "Password is required").max(1024),
 });
 
 export async function loginAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -60,19 +76,19 @@ export async function loginAction(_prev: ActionState, formData: FormData): Promi
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const { email, password } = parsed.data;
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (await authRateLimited("login-ip", ip, 100) || await authRateLimited("login-email", email, 20)) {
+    return { error: "Too many sign-in attempts. Please try again in 15 minutes." };
+  }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     return { error: "Incorrect email or password." };
   }
 
-  await createSession(user.id, user.role);
+  await createSession(user.id, user.role, formData.get("next"));
 
-  const next = formData.get("next");
-  if (typeof next === "string" && next.startsWith("/") && !next.startsWith("//")) {
-    redirect(next);
-  }
-  redirect(loginDestinationForRole(user.role));
+  redirect("/welcome");
 }
 
 export async function logoutAction() {
@@ -81,13 +97,13 @@ export async function logoutAction() {
 }
 
 const vendorApplicationSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Enter a valid email"),
-  phone: z.string().optional(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  companyName: z.string().min(1, "Company name is required"),
-  serviceArea: z.string().min(1, "Service area is required"),
-  servicesOffered: z.string().min(1, "Please describe the services you offer"),
+  name: z.string().trim().min(1, "Name is required").max(120),
+  email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
+  phone: z.string().max(50).optional(),
+  password: z.string().min(8, "Password must be at least 8 characters").refine(v => new TextEncoder().encode(v).length <= 72, "Password must be no more than 72 UTF-8 bytes"),
+  companyName: z.string().trim().min(1, "Company name is required").max(4000),
+  serviceArea: z.string().trim().min(1, "Service area is required").max(4000),
+  servicesOffered: z.string().trim().min(1, "Please describe the services you offer").max(4000),
 });
 
 export async function applyVendorAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -105,7 +121,8 @@ export async function applyVendorAction(_prev: ActionState, formData: FormData):
   }
   const { name, email, phone, password, companyName, serviceArea, servicesOffered } = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  if (await registrationLimited(email)) return { error: "Too many registration attempts. Please try again in 15 minutes." };
+  const existing = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
   if (existing) {
     return { error: "An account with that email already exists." };
   }
@@ -122,17 +139,17 @@ export async function applyVendorAction(_prev: ActionState, formData: FormData):
     },
   });
 
-  await createSession(user.id, user.role);
-  redirect("/pending-approval");
+  await createSession(user.id, user.role, formData.get("next"));
+  redirect("/welcome");
 }
 
 const financingApplicationSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Enter a valid email"),
-  phone: z.string().optional(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  companyName: z.string().min(1, "Company name is required"),
-  licenseInfo: z.string().min(1, "License / accreditation info is required"),
+  name: z.string().trim().min(1, "Name is required").max(120),
+  email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
+  phone: z.string().max(50).optional(),
+  password: z.string().min(8, "Password must be at least 8 characters").refine(v => new TextEncoder().encode(v).length <= 72, "Password must be no more than 72 UTF-8 bytes"),
+  companyName: z.string().trim().min(1, "Company name is required").max(4000),
+  licenseInfo: z.string().trim().min(1, "License / accreditation info is required").max(4000),
 });
 
 export async function applyFinancingAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -149,7 +166,8 @@ export async function applyFinancingAction(_prev: ActionState, formData: FormDat
   }
   const { name, email, phone, password, companyName, licenseInfo } = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  if (await registrationLimited(email)) return { error: "Too many registration attempts. Please try again in 15 minutes." };
+  const existing = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
   if (existing) {
     return { error: "An account with that email already exists." };
   }
@@ -166,6 +184,6 @@ export async function applyFinancingAction(_prev: ActionState, formData: FormDat
     },
   });
 
-  await createSession(user.id, user.role);
-  redirect("/pending-approval");
+  await createSession(user.id, user.role, formData.get("next"));
+  redirect("/welcome");
 }

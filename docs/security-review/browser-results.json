@@ -1,0 +1,11 @@
+[
+  "Member cannot download another user document",
+  "Browser token role tampering cannot enter admin",
+  "Malformed chat and cross-origin requests rejected before AI calls",
+  "Server action rejects executable upload",
+  "Database role changes invalidate old sessions",
+  "Pending vendor blocked from marketplace and chat by server",
+  "Pending finance partner blocked by direct URL",
+  "Assigned admin access and browser hardening headers verified",
+  "Forged Stripe webhook rejected with generic error"
+]

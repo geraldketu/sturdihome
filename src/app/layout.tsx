@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import ChatWidget from "@/components/ChatWidget";
+import { getSessionUser } from "@/lib/auth";
+import { getCharacterStatus } from "@/lib/character-entitlements";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,7 +26,9 @@ export const metadata: Metadata = {
   description: "Connecting homeowners with trusted financing partners and home-service vendors.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const user = await getSessionUser();
+  const characterStatus = user ? await getCharacterStatus(user.id) : null;
   return (
     <html
       lang="en"
@@ -33,7 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <SiteHeader />
         <div className="flex-1">{children}</div>
-        <ChatWidget />
+        <ChatWidget key={user?.id ?? "visitor"} authenticated={!!user} initialStatus={characterStatus} paymentsEnabled={process.env.CHARACTER_PAYMENTS_ENABLED === "true"} />
       </body>
     </html>
   );

@@ -1,0 +1,9 @@
+{
+  "testedAt": "2026-09-19T12:56:21.613Z",
+  "results": [
+    "VENDOR: forged admin approval request cannot bypass missing agreement",
+    "FINANCING_PARTNER: forged admin approval request cannot bypass missing agreement",
+    "Authenticated server-action replay fails after approval revocation or agreement removal",
+    "User approval/version fields without acceptance audit cannot unlock services"
+  ]
+}

@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { Badge, Card } from "@/components/ui";
+import MarketplaceProfileEditor from "@/components/MarketplaceProfileEditor";
 
 export default async function FinancingProfilePage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/financing/profile");
   if (!user) redirect("/login");
 
   if (!user.financingProfile) {
@@ -41,6 +42,7 @@ export default async function FinancingProfilePage() {
           </div>
         </dl>
       </Card>
+      {user.role === "FINANCING_PARTNER" && <MarketplaceProfileEditor ownerId={user.id} companyName={p.companyName} financing />}
     </div>
   );
 }

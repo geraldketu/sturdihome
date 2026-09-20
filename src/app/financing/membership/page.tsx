@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { FINANCING_PARTNER_FEE_CENTS } from "@/lib/stripe";
 import { createFinancingPartnerPaymentCheckoutAction } from "@/lib/actions/billing-actions";
 import { Badge, Card, SubmitButton } from "@/components/ui";
@@ -9,7 +9,7 @@ export default async function FinancingPartnerPaymentPage({
 }: {
   searchParams: Promise<{ checkout?: string }>;
 }) {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/financing/membership");
   if (!user) redirect("/login");
 
   if (!user.financingProfile) {

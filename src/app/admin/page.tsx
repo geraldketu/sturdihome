@@ -1,9 +1,11 @@
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui";
 import { formatCents } from "@/lib/format";
 import { getVendorMembershipTier, FINANCING_PARTNER_FEE_CENTS } from "@/lib/stripe";
 
 export default async function AdminOverviewPage() {
+  await requirePageAccess("/admin");
   const [
     memberCount,
     vendorCount,

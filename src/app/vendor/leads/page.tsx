@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import { formatCentsRange } from "@/lib/format";
 import LeadStatusForm from "./LeadStatusForm";
 
 export default async function VendorLeadsPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/vendor/leads");
   if (!user) redirect("/login");
 
   if (!user.vendorProfile) {

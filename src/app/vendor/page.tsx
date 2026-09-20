@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
+import PortalWelcome from "@/components/PortalWelcome";
 
 export default async function VendorDashboardPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/vendor");
   if (!user) redirect("/login");
 
   if (!user.vendorProfile) {
@@ -27,9 +28,10 @@ export default async function VendorDashboardPage() {
 
   return (
     <div className="space-y-8">
+      <PortalWelcome role="vendor" name={user.name} />
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-brand-dark">{user.vendorProfile.companyName}</h1>
+          <h2 className="text-2xl font-bold text-brand-dark">{user.vendorProfile.companyName}</h2>
           <p className="text-sm text-gray-600">Service area: {user.vendorProfile.serviceArea}</p>
         </div>
         <Link href="/vendor/membership" className="flex items-center gap-2">

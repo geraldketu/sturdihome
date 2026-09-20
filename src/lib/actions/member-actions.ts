@@ -1,39 +1,49 @@
 "use server";
 
+import { approvedAccountWhere } from "@/lib/approval";
+
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getSessionUser } from "@/lib/auth";
+import { getApprovedUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { UploadValidationError } from "@/lib/upload-validation";
+import { authRateLimited } from "@/lib/auth-throttle";
 import { saveUpload } from "@/lib/uploads";
 import { calculateEstimate } from "@/lib/estimator";
 import type { ActionState } from "@/lib/actions/auth-actions";
+import { hasMemberStandingAccess } from "@/lib/member-standing";
+import { HOMEOWNERSHIP_DOCUMENT_LABELS, isHomeownerVerified, isHomeownershipDocumentType } from "@/lib/homeowner-access";
 
 async function requireHomeowner() {
-  const user = await getSessionUser();
+  const user = await getApprovedUser();
   if (!user || (user.role !== "HOMEOWNER" && user.role !== "ADMIN")) {
     throw new Error("Not authorized");
   }
   return user;
 }
 
-export async function acceptAgreementAction(): Promise<void> {
+async function requireVerifiedHomeowner() {
   const user = await requireHomeowner();
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { agreementAcceptedAt: new Date() },
-  });
-  revalidatePath("/member");
-  revalidatePath("/member/agreement");
+  if (!isHomeownerVerified(user)) throw new Error("Homeownership verification required");
+  return user;
+}
+
+export async function acceptAgreementAction(): Promise<void> {
+  redirect("/agreement");
 }
 
 const documentSchema = z.object({
-  label: z.string().min(1, "Please label this document"),
+  label: z.string().trim().min(1, "Please label this document").max(160),
 });
 
 export async function uploadDocumentAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireHomeowner();
 
-  const parsed = documentSchema.safeParse({ label: formData.get("label") });
+  const documentType = formData.get("documentType");
+  if (user.homeownerAccountType === "SERVICE_ONLY") return { error: "Service-only accounts do not require document uploads." };
+  if (!isHomeownershipDocumentType(documentType)) return { error: "Choose one accepted proof of homeownership." };
+  const parsed = documentSchema.safeParse({ label: HOMEOWNERSHIP_DOCUMENT_LABELS[documentType] });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
@@ -43,22 +53,32 @@ export async function uploadDocumentAction(_prev: ActionState, formData: FormDat
     return { error: "Please choose a file to upload." };
   }
 
-  const storedName = await saveUpload(file, user.id);
+  if (await authRateLimited("uploads", user.id, 20)) return { error: "Too many uploads. Please try again in 15 minutes." };
+  const existingVerification = await prisma.document.findFirst({ where: { userId: user.id, documentType: { in: ["PROPERTY_TAX_BILL", "MORTGAGE_STATEMENT", "HOMEOWNERS_INSURANCE_DECLARATION_PAGE", "DEED"] } }, select: { id: true } });
+  if (existingVerification) return { error: "Only one proof of homeownership is required. Your uploaded document is already saved in My Documents." };
+  let storedName: string;
+  try { storedName = await saveUpload(file, user.id); }
+  catch (error) { return { error: error instanceof UploadValidationError ? error.message : "The file could not be saved. Please try again." }; }
   await prisma.document.create({
-    data: { userId: user.id, label: parsed.data.label, fileName: storedName },
+    data: { userId: user.id, label: parsed.data.label, documentType, fileName: storedName },
   });
+  await prisma.user.update({ where: { id: user.id }, data: { homeownerVerificationStatus: "VERIFIED" } });
 
   revalidatePath("/member/documents");
+  revalidatePath("/member");
 }
 
 const financingRequestSchema = z.object({
-  projectDescription: z.string().min(1, "Please describe the project"),
-  amountRequested: z.coerce.number().int().positive("Enter a valid amount"),
+  projectDescription: z.string().trim().min(1, "Please describe the project").max(10000),
+  amountRequested: z.coerce.number().int().positive("Enter a valid amount").max(2147483647),
   partnerId: z.string().optional(),
 });
 
 export async function submitFinancingRequestAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const user = await requireHomeowner();
+  const user = await requireVerifiedHomeowner();
+  if (!(await hasMemberStandingAccess(user.id))) return { error: "Please review and accept the Member Account Standing and Platform Access Agreement first." };
+  if (user.financingAccessStatus !== "ACTIVE") return { error: "New financing referrals are temporarily restricted while this account status is reviewed. Use the dispute option in Account Status." };
+  if (await authRateLimited("member-requests", user.id, 30)) return { error: "Too many requests. Please try again in 15 minutes." };
   const parsed = financingRequestSchema.safeParse({
     projectDescription: formData.get("projectDescription"),
     amountRequested: formData.get("amountRequested"),
@@ -71,7 +91,7 @@ export async function submitFinancingRequestAction(_prev: ActionState, formData:
   let assignedPartnerId: string | undefined;
   if (parsed.data.partnerId) {
     const partner = await prisma.financingPartnerProfile.findFirst({
-      where: { id: parsed.data.partnerId, status: "APPROVED", paymentStatus: "PAID" },
+      where: { id: parsed.data.partnerId, status: "APPROVED", paymentStatus: "PAID", user: await approvedAccountWhere("FINANCING_PARTNER") },
     });
     if (!partner) {
       return { error: "That financing partner is no longer available. Please pick another." };
@@ -95,8 +115,8 @@ export async function submitFinancingRequestAction(_prev: ActionState, formData:
 }
 
 const serviceRequestSchema = z.object({
-  serviceType: z.string().min(1, "Select a service type"),
-  description: z.string().min(1, "Please describe what you need"),
+  serviceType: z.string().trim().min(1, "Select a service type").max(120),
+  description: z.string().trim().min(1, "Please describe what you need").max(10000),
   scope: z.enum(["small", "standard", "large"]).default("standard"),
   urgency: z.enum(["standard", "urgent"]).default("standard"),
   squareFootage: z.preprocess(
@@ -108,6 +128,7 @@ const serviceRequestSchema = z.object({
 
 export async function submitServiceRequestAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireHomeowner();
+  if (await authRateLimited("member-requests", user.id, 30)) return { error: "Too many requests. Please try again in 15 minutes." };
   const parsed = serviceRequestSchema.safeParse({
     serviceType: formData.get("serviceType"),
     description: formData.get("description"),
@@ -123,7 +144,7 @@ export async function submitServiceRequestAction(_prev: ActionState, formData: F
   let assignedVendorId: string | undefined;
   if (parsed.data.vendorId) {
     const vendor = await prisma.vendorProfile.findFirst({
-      where: { id: parsed.data.vendorId, status: "APPROVED", membershipStatus: "ACTIVE" },
+      where: { id: parsed.data.vendorId, status: "APPROVED", membershipStatus: "ACTIVE", user: await approvedAccountWhere("VENDOR") },
     });
     if (!vendor) {
       return { error: "That vendor is no longer available. Please pick another." };
@@ -167,6 +188,7 @@ const appointmentSchema = z.object({
 
 export async function bookAppointmentAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireHomeowner();
+  if (await authRateLimited("member-requests", user.id, 30)) return { error: "Too many requests. Please try again in 15 minutes." };
   const parsed = appointmentSchema.safeParse({
     serviceRequestId: formData.get("serviceRequestId"),
     scheduledFor: formData.get("scheduledFor"),

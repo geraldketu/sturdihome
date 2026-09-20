@@ -1,0 +1,17 @@
+BEGIN;
+ALTER TABLE "NetworkAgreement" ADD COLUMN IF NOT EXISTS "effectiveDate" TIMESTAMP(3) NOT NULL DEFAULT TIMESTAMP '2026-09-19 00:00:00';
+ALTER TABLE "NetworkAgreement" ADD COLUMN IF NOT EXISTS "documentIdentifier" TEXT NOT NULL DEFAULT 'legacy-network-agreement';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "agreementType" TEXT NOT NULL DEFAULT 'LEGACY';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "agreementTitle" TEXT NOT NULL DEFAULT 'Legacy Network Agreement';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "effectiveDate" TIMESTAMP(3) NOT NULL DEFAULT TIMESTAMP '2026-09-19 00:00:00';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "documentIdentifier" TEXT NOT NULL DEFAULT 'legacy-network-agreement';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "fullLegalName" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "companyName" TEXT;
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "electronicSignature" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "consentToElectronicRecords" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "acceptanceStatus" TEXT NOT NULL DEFAULT 'ACCEPTED';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "signedCopyContent" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "ipAddress" TEXT;
+ALTER TABLE "AgreementAcceptance" ADD COLUMN IF NOT EXISTS "userAgent" TEXT;
+CREATE INDEX IF NOT EXISTS "AgreementAcceptance_role_version_idx" ON "AgreementAcceptance"("role", "version");
+COMMIT;

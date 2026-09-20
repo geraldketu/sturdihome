@@ -1,0 +1,6 @@
+"use client";
+import { useActionState } from "react";
+import { acceptFinanceReportingAction } from "@/lib/actions/account-actions";
+import { FINANCE_REPORTING_CONTENT } from "@/lib/finance-reporting-config";
+import { FormError, SubmitButton } from "@/components/ui";
+export default function ReportingAgreementForm() { const [state, action] = useActionState(acceptFinanceReportingAction, undefined); return <form action={action} className="mt-4 space-y-3"><div className="max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md bg-gray-50 p-3 text-sm text-gray-700">{FINANCE_REPORTING_CONTENT}</div><FormError message={state?.error} /><label className="flex gap-2 text-sm"><input type="checkbox" name="accepted" value="yes" required />I have read and acknowledge this reporting notice.</label><label className="flex gap-2 text-sm"><input type="checkbox" name="electronicConsent" value="yes" required />I consent to electronic records and signatures.</label><input name="fullLegalName" required placeholder="Full Legal Name" className="w-full rounded-md border border-gray-300 px-3 py-2" /><input name="electronicSignature" required placeholder="Electronic Signature" className="w-full rounded-md border border-gray-300 px-3 py-2" /><SubmitButton pendingText="Signing...">AGREE &amp; CONTINUE</SubmitButton></form>; }

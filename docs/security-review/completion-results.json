@@ -1,0 +1,14 @@
+{
+  "testedAt": "2026-09-19T16:04:37.097Z",
+  "results": [
+    "HOMEOWNER: agreement required, acceptance alone blocked, manual admin approval persisted/audited, revocation immediate",
+    "VENDOR: agreement required, acceptance alone blocked, manual admin approval persisted/audited, revocation immediate",
+    "FINANCING_PARTNER: agreement required, acceptance alone blocked, manual admin approval persisted/audited, revocation immediate",
+    "Ordinary member cannot replay an admin approval action",
+    "VENDOR: absent approved terms blocks dashboard, chat, approval UI and discovery",
+    "FINANCING_PARTNER: absent approved terms blocks dashboard, chat, approval UI and discovery",
+    "Changed agreement version requires renewed acceptance",
+    "Private S3 upload/download, exact bytes, owner/admin permissions, public bucket and infected verdict rejection",
+    "Reset email delivered through local provider, hashed token consumed once, sessions revoked, new password works, failed email token removed"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "testedAt": "2026-09-19T14:52:39.435Z",
+  "results": [
+    "Additive migration applies to old schema",
+    "Legacy user, password hash, acceptance timestamp and file record preserved",
+    "No auto-approval or invented partner agreements",
+    "Only one active agreement per role",
+    "Homeowner terms match existing text exactly"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "testedAt": "2026-09-19T19:22:32.320Z",
+  "results": [
+    "TEST 1: agreement saved and dashboard unlocked",
+    "TEST 2: agreement saved and dashboard unlocked",
+    "TEST 3: agreement saved and dashboard unlocked",
+    "TEST 4: logout/login preserves signed status",
+    "TEST 5: signed agreement appears in Member Documents and downloads",
+    "TEST 6: admin can view acceptance history",
+    "TEST 7: unsigned member cannot bypass agreement requirement",
+    "TEST 8: same agreement version is requested and recorded only once",
+    "TEST 9: new active version triggers re-acceptance without deleting prior signed copy",
+    "TEST 10: vendor referral creates a separate member account and exposes status only, not private financing access"
+  ]
+}

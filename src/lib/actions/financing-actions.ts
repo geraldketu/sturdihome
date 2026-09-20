@@ -1,15 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getSessionUser } from "@/lib/auth";
+import { getApprovedUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { ActionState } from "@/lib/actions/auth-actions";
 
 const ALLOWED_STATUSES = ["ASSIGNED", "IN_PROGRESS", "COMPLETED", "CANCELED"] as const;
 
 export async function updateReferralStatusAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const user = await getSessionUser();
-  if (!user || (user.role !== "FINANCING_PARTNER" && user.role !== "ADMIN") || !user.financingProfile) {
+  const user = await getApprovedUser();
+  if (!user || user.financingProfile?.status !== "APPROVED" || user.financingProfile.paymentStatus !== "PAID" || (user.role !== "FINANCING_PARTNER" && user.role !== "ADMIN")) {
     return { error: "Not authorized" };
   }
 

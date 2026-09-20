@@ -1,9 +1,12 @@
+import { approvedAccountWhere } from "@/lib/approval";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { assignFinancingRequestAction, assignServiceRequestAction } from "@/lib/actions/admin-actions";
 import { Badge, Card } from "@/components/ui";
 import { formatCentsRange } from "@/lib/format";
 
 export default async function AdminRequestsPage() {
+  await requirePageAccess("/admin/requests");
   const [serviceRequests, financingRequests, vendors, partners] = await Promise.all([
     prisma.serviceRequest.findMany({
       include: { homeowner: true, assignedVendor: true },
@@ -13,8 +16,8 @@ export default async function AdminRequestsPage() {
       include: { homeowner: true, assignedPartner: true },
       orderBy: { createdAt: "desc" },
     }),
-    prisma.vendorProfile.findMany({ where: { status: "APPROVED" } }),
-    prisma.financingPartnerProfile.findMany({ where: { status: "APPROVED" } }),
+    prisma.vendorProfile.findMany({ where: { status: "APPROVED", membershipStatus: "ACTIVE", user: await approvedAccountWhere("VENDOR") } }),
+    prisma.financingPartnerProfile.findMany({ where: { status: "APPROVED", paymentStatus: "PAID", user: await approvedAccountWhere("FINANCING_PARTNER") } }),
   ]);
 
   return (

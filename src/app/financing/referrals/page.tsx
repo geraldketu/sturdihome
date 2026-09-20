@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import ReferralStatusForm from "./ReferralStatusForm";
 
 export default async function FinancingReferralsPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/financing/referrals");
   if (!user) redirect("/login");
 
   if (!user.financingProfile) {

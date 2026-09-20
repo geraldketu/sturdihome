@@ -1,3 +1,5 @@
+import AdminApprovalControls from "@/components/AdminApprovalControls";
+import { requirePageAccess } from "@/lib/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -5,6 +7,7 @@ import { Badge, Card } from "@/components/ui";
 import { formatCents, formatCentsRange } from "@/lib/format";
 
 export default async function AdminMemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePageAccess("/admin/members/[id]");
   const { id } = await params;
 
   const member = await prisma.user.findUnique({
@@ -20,6 +23,7 @@ export default async function AdminMemberDetailPage({ params }: { params: Promis
 
   return (
     <div className="space-y-6">
+      <AdminApprovalControls userId={member.id} />
       <div>
         <Link href="/admin/members" className="text-xs text-gray-500 hover:underline">
           ← Back to Members

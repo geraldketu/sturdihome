@@ -1,0 +1,11 @@
+{
+  "testedAt": "2026-09-19T19:21:46.986Z",
+  "results": [
+    "First vendor registration has role-specific first welcome and preserves approval gate at 320px",
+    "First financing registration has role-specific first welcome and preserves approval gate at 320px",
+    "Existing assigned admin access remains intact",
+    "Sturdi Girl and Brixy introduction appears for guests and chat offers Join/Sign In",
+    "Homepage search preserves service and location through membership gate",
+    "Unknown email receives the same non-enumerating recovery response"
+  ]
+}

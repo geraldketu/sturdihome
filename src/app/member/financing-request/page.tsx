@@ -1,12 +1,19 @@
+
+import { approvedAccountWhere } from "@/lib/approval";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, NoticeBanner } from "@/components/ui";
 import FinancingRequestForm from "./FinancingRequestForm";
+import { getMemberStandingAcceptance } from "@/lib/member-standing";
+import { isHomeownerVerified } from "@/lib/homeowner-access";
 
 export default async function FinancingRequestPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/member/financing-request");
   if (!user) redirect("/login");
+  if (!isHomeownerVerified(user)) redirect("/member");
+  const standing = await getMemberStandingAcceptance(user.id);
+  if (!standing) redirect("/member/standing-agreement");
 
   const [requests, partners] = await Promise.all([
     prisma.financingRequest.findMany({
@@ -15,7 +22,7 @@ export default async function FinancingRequestPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.financingPartnerProfile.findMany({
-      where: { status: "APPROVED", paymentStatus: "PAID" },
+      where: { status: "APPROVED", paymentStatus: "PAID", user: await approvedAccountWhere("FINANCING_PARTNER") },
       select: { id: true, companyName: true },
       orderBy: { companyName: "asc" },
     }),
@@ -29,6 +36,8 @@ export default async function FinancingRequestPage() {
           Submit a request to be matched with a vetted, independent financing partner.
         </p>
       </div>
+
+      {user.financingAccessStatus !== "ACTIVE" && <NoticeBanner>New SturdiHome financing referrals are temporarily restricted while a reported account status is reviewed. You may dispute or report an error from Account Status.</NoticeBanner>}
 
       {partners.length === 0 && (
         <NoticeBanner>

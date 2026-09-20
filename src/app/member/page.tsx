@@ -1,11 +1,13 @@
+import { approvedAccountWhere } from "@/lib/approval";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, NoticeBanner } from "@/components/ui";
+import PortalWelcome from "@/components/PortalWelcome";
 
 export default async function MemberDashboardPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/member");
   if (!user) redirect("/login");
 
   const [documentCount, financingRequests, serviceRequests, appointments, activeVendorCount, paidPartnerCount] =
@@ -14,26 +16,30 @@ export default async function MemberDashboardPage() {
       prisma.financingRequest.count({ where: { homeownerId: user.id } }),
       prisma.serviceRequest.count({ where: { homeownerId: user.id } }),
       prisma.appointment.count({ where: { homeownerId: user.id } }),
-      prisma.vendorProfile.count({ where: { status: "APPROVED", membershipStatus: "ACTIVE" } }),
-      prisma.financingPartnerProfile.count({ where: { status: "APPROVED", paymentStatus: "PAID" } }),
+      prisma.vendorProfile.count({ where: { status: "APPROVED", membershipStatus: "ACTIVE", user: await approvedAccountWhere("VENDOR") } }),
+      prisma.financingPartnerProfile.count({ where: { status: "APPROVED", paymentStatus: "PAID", user: await approvedAccountWhere("FINANCING_PARTNER") } }),
     ]);
   const noPartnersYet = activeVendorCount === 0 && paidPartnerCount === 0;
 
   const agreementAccepted = Boolean(user.agreementAcceptedAt);
+  const serviceOnly = user.homeownerAccountType === "SERVICE_ONLY";
+  const verified = user.homeownerVerificationStatus === "VERIFIED";
 
-  const steps = [
+  const steps = serviceOnly ? [
+    { label: "Create service-only account", done: true },
+    { label: "Sign member agreement", done: agreementAccepted, href: "/member/agreement" },
+  ] : [
     { label: "Create account", done: true },
     { label: "Sign member agreement", done: agreementAccepted, href: "/member/agreement" },
-    { label: "Upload required documents", done: documentCount > 0, href: "/member/documents" },
+    { label: "Upload one proof of homeownership", done: verified, href: "/member/documents" },
   ];
   const remaining = steps.filter((s) => !s.done);
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-dark">Welcome back, {user.name}</h1>
-        <p className="text-sm text-gray-600">Here&apos;s what&apos;s happening with your SturdiHome account.</p>
-      </div>
+      <PortalWelcome role="homeowner" name={user.name} />
+
+      {serviceOnly && <NoticeBanner>Service-only account: search and connect with vendors without homeownership verification. Financing features that require homeowner verification are unavailable.</NoticeBanner>}
 
       {noPartnersYet && (
         <NoticeBanner>
@@ -65,20 +71,20 @@ export default async function MemberDashboardPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        {!serviceOnly && <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Documents</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{documentCount} uploaded</p>
           <Link href="/member/documents" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
             Manage →
           </Link>
-        </Card>
-        <Card>
+        </Card>}
+        {!serviceOnly && <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Home Service Estimator</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{serviceRequests}</p>
           <Link href="/member/service-request" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
             View / Submit →
           </Link>
-        </Card>
+        </Card>}
         <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Financing Requests</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{financingRequests}</p>

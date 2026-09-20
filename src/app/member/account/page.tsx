@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Card, SubmitButton } from "@/components/ui";
 
 export default async function AccountPage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/member/account");
   if (!user) redirect("/login");
 
   return (

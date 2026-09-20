@@ -1,0 +1,21 @@
+{
+  "testedAt": "2026-09-19T19:21:24.881Z",
+  "results": [
+    "All 36 protected page URLs reject logged-out visitors",
+    "Chat and private download APIs reject unauthenticated requests",
+    "Public information, registration and recovery pages remain accessible and fit a phone",
+    "Every rendered service-category link is gated",
+    "Member returns to selected service and location after dismissing personalized welcome",
+    "Welcome cannot replay after completion",
+    "Homeowners cannot enter vendor, finance-partner or admin portals",
+    "Mobile sign-out blocks pages and revokes the old cookie on the server",
+    "test-vendor auto-transitions to correct experience and ignores wrong-role return URL",
+    "test-finance auto-transitions to correct experience and ignores wrong-role return URL",
+    "test-pending auto-transitions to correct experience and ignores wrong-role return URL",
+    "First signup gets first-time welcome, reduced motion and selected-service return",
+    "Direct logged-out server-action replay cannot create a service request",
+    "Later login switches first-time member to Welcome Back",
+    "Password reset is single-use and revokes every existing session",
+    "New password signs in successfully"
+  ]
+}

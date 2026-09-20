@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { getApprovedUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   getStripe,
@@ -14,13 +14,16 @@ import {
   FOUNDING_VENDOR_TRIAL_DAYS,
 } from "@/lib/stripe";
 import type Stripe from "stripe";
+import { authRateLimited } from "@/lib/auth-throttle";
+import { characterPlan } from "@/lib/character-entitlements";
 
 export async function createVendorMembershipCheckoutAction(formData: FormData): Promise<void> {
-  const user = await getSessionUser();
-  if (!user || user.role !== "VENDOR" || !user.vendorProfile) {
+  const user = await getApprovedUser();
+  if (!user || user.role !== "VENDOR" || user.vendorProfile?.status !== "APPROVED") {
     throw new Error("Not authorized");
   }
 
+  if (await authRateLimited("billing", user.id, 10)) throw new Error("Too many billing requests. Please try again later.");
   const tierId = String(formData.get("tierId") ?? "standard");
   const tier = getVendorMembershipTier(tierId);
 
@@ -102,10 +105,11 @@ export async function createVendorMembershipCheckoutAction(formData: FormData): 
 }
 
 export async function openVendorBillingPortalAction(): Promise<void> {
-  const user = await getSessionUser();
+  const user = await getApprovedUser();
   if (!user || user.role !== "VENDOR" || !user.vendorProfile?.stripeCustomerId) {
     throw new Error("Not authorized");
   }
+  if (await authRateLimited("billing", user.id, 10)) throw new Error("Too many billing requests. Please try again later.");
 
   const stripe = getStripe();
   const session = await stripe.billingPortal.sessions.create({
@@ -117,10 +121,11 @@ export async function openVendorBillingPortalAction(): Promise<void> {
 }
 
 export async function createFinancingPartnerPaymentCheckoutAction(): Promise<void> {
-  const user = await getSessionUser();
-  if (!user || user.role !== "FINANCING_PARTNER" || !user.financingProfile) {
+  const user = await getApprovedUser();
+  if (!user || user.role !== "FINANCING_PARTNER" || user.financingProfile?.status !== "APPROVED") {
     throw new Error("Not authorized");
   }
+  if (await authRateLimited("billing", user.id, 10)) throw new Error("Too many billing requests. Please try again later.");
 
   const stripe = getStripe();
   const baseUrl = getBaseUrl();
@@ -159,6 +164,26 @@ export async function createFinancingPartnerPaymentCheckoutAction(): Promise<voi
     metadata: { financingPartnerProfileId: user.financingProfile.id },
   });
 
+  if (!session.url) throw new Error("Stripe did not return a checkout URL");
+  redirect(session.url);
+}
+
+export async function createCharacterCheckoutAction(formData: FormData): Promise<void> {
+  const user = await getApprovedUser();
+  if (!user) throw new Error("Not authorized");
+  if (process.env.CHARACTER_PAYMENTS_ENABLED !== "true") throw new Error("Character payments are pending final review.");
+  if (await authRateLimited("character-billing", user.id, 5)) throw new Error("Too many billing requests. Please try again later.");
+  const plan = characterPlan(String(formData.get("plan") ?? ""));
+  if (!plan) throw new Error("Invalid character plan");
+  const stripe = getStripe();
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    customer_email: user.email,
+    line_items: [{ price_data: { currency: "usd", product_data: { name: `SturdiHome Character Access - ${plan.name}` }, unit_amount: plan.amountCents }, quantity: 1 }],
+    success_url: `${getBaseUrl()}/?character=success`,
+    cancel_url: `${getBaseUrl()}/?character=canceled`,
+    metadata: { characterUserId: user.id, characterPlanId: plan.id },
+  });
   if (!session.url) throw new Error("Stripe did not return a checkout URL");
   redirect(session.url);
 }

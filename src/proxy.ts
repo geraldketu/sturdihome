@@ -1,41 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE, verifySessionToken, type Role } from "@/lib/jwt";
-
-const ROLE_PREFIXES: { prefix: string; roles: Role[] }[] = [
-  { prefix: "/member", roles: ["HOMEOWNER", "ADMIN"] },
-  { prefix: "/vendor", roles: ["VENDOR", "ADMIN"] },
-  { prefix: "/financing", roles: ["FINANCING_PARTNER", "ADMIN"] },
-  { prefix: "/admin", roles: ["ADMIN"] },
-];
+﻿import { NextRequest, NextResponse } from "next/server";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/jwt";
+import { joinUrl, roleHome, routeRoles } from "@/lib/access";
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  const match = ROLE_PREFIXES.find((r) => pathname.startsWith(r.prefix));
-  if (!match) return NextResponse.next();
-
+  const { pathname, search } = request.nextUrl;
+  const roles = routeRoles(pathname);
+  if (!roles) return NextResponse.next();
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   const session = token ? await verifySessionToken(token) : null;
-
-  if (!session) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (!match.roles.includes(session.role)) {
-    const fallback: Record<Role, string> = {
-      HOMEOWNER: "/member",
-      VENDOR: "/vendor",
-      FINANCING_PARTNER: "/financing",
-      ADMIN: "/admin",
-    };
-    return NextResponse.redirect(new URL(fallback[session.role], request.url));
-  }
-
-  return NextResponse.next();
+  if (!session) return NextResponse.redirect(new URL(joinUrl(pathname + search), request.url));
+  if (!roles.includes(session.role)) return NextResponse.redirect(new URL(roleHome(session.role), request.url));
+  const response = NextResponse.next();
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
 }
-
 export const config = {
-  matcher: ["/member/:path*", "/vendor/:path*", "/financing/:path*", "/admin/:path*"],
+  matcher: ["/member/:path*", "/vendor/:path*", "/financing/:path*", "/admin/:path*", "/marketplace/:path*", "/welcome", "/pending-approval", "/agreement"],
 };

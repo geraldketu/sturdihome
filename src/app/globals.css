@@ -33,8 +33,265 @@ body {
   min-height: 600px;
 }
 
+.character-stage {
+  position: relative;
+  isolation: isolate;
+  background: #efe9d9;
+  transform-origin: 50% 85%;
+}
+
+.character-stage-static {
+  animation: none !important;
+  transform: none !important;
+}
+
+.character-stage-image,
+.character-stage-video {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+}
+
+.character-stage-video {
+  z-index: 1;
+}
+
+.character-stage-image {
+  z-index: 0;
+}
+
+.character-stage-eyeline {
+  position: absolute;
+  inset: 28% 22% auto;
+  z-index: 2;
+  height: 2px;
+  border-radius: 999px;
+  opacity: 0;
+  background: rgb(255 255 255 / 55%);
+}
+
+.character-panel-compact {
+  height: min(70vh, 38rem);
+  max-height: 38rem;
+  width: min(calc(100vw - 2rem), 24rem);
+}
+
+.character-panel-expanded {
+  height: min(88vh, 52rem);
+  max-height: 52rem;
+  width: min(calc(100vw - 2rem), 36rem);
+}
+
+@media (max-width: 639px) {
+  .character-panel-expanded { width: calc(100vw - 1rem); height: calc(100vh - 1rem); max-height: none; }
+  .character-widget { right: .5rem; bottom: .5rem; }
+}
+
+.character-motion-hidden,
+.character-motion-exit { opacity: 0; transform: translateX(20px) scale(.96); }
+.character-motion-enter { animation: character-enter 450ms ease-out both; }
+.character-motion-walk-left { animation: character-walk-left 900ms ease-in-out both; }
+.character-motion-walk-right { animation: character-walk-right 900ms ease-in-out both; }
+.character-motion-move-to-target { animation: character-move-target 700ms ease-in-out both; }
+.character-motion-point-left { transform: rotate(-3deg) translateX(-3px); }
+.character-motion-point-right { transform: rotate(3deg) translateX(3px); }
+.character-motion-point-up { transform: translateY(-4px) rotate(-1deg); }
+.character-motion-point-down { transform: translateY(3px) rotate(1deg); }
+.character-motion-surprised { transform: translateY(-3px) scale(1.035); }
+.character-motion-happy { transform: translateY(-2px) rotate(-1deg) scale(1.02); }
+.character-motion-thinking { transform: rotate(-2deg); }
+.character-motion-return-home { animation: character-return-home 650ms ease-in-out both; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .character-motion-idle {
+    animation: character-breathe 5s ease-in-out infinite;
+  }
+
+  .character-motion-listening {
+    animation: character-listen 2.8s ease-in-out infinite;
+  }
+
+  .character-motion-speaking {
+    animation: character-speak 1.7s ease-in-out infinite;
+  }
+
+  .character-motion-listening .character-stage-eyeline,
+  .character-motion-speaking .character-stage-eyeline {
+    animation: character-blink 4.6s ease-in-out infinite;
+  }
+}
+
+@keyframes character-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1px) scale(1.008); }
+}
+
+@keyframes character-listen {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-1px) rotate(-0.8deg); }
+}
+
+@keyframes character-speak {
+  0%, 100% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-1px) scale(1.012); }
+  70% { transform: translateY(0) scale(1.006); }
+}
+
+@keyframes character-blink {
+  0%, 44%, 48%, 100% { opacity: 0; transform: scaleX(1); }
+  46% { opacity: .65; transform: scaleX(.25); }
+}
+@keyframes character-enter { from { opacity: 0; transform: translateY(16px) scale(.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes character-walk-left { from { transform: translateX(18px); } to { transform: translateX(-6px); } }
+@keyframes character-walk-right { from { transform: translateX(-18px); } to { transform: translateX(6px); } }
+@keyframes character-move-target { from { transform: translateX(0); } to { transform: translateX(10px) translateY(-3px) scale(1.02); } }
+@keyframes character-return-home { from { transform: translateX(10px) translateY(-3px) scale(1.02); } to { transform: translateX(0) translateY(0) scale(1); } }
+
+/* Portal-only presentation. Existing layouts, control positions and status colors
+   stay intact; shared components outside these three portals are unaffected. */
+.portal-shell {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  color: #303b36;
+}
+
+.portal-shell :is(h1, h2, h3) {
+  text-wrap: pretty;
+  letter-spacing: -0.02em;
+}
+
+.portal-shell h1 {
+  color: var(--brand-navy);
+}
+
+.portal-shell .portal-welcome {
+  background: linear-gradient(120deg, #ffffff 35%, #fbf8f0 100%);
+  border-color: #e5dfd1;
+  box-shadow: 0 6px 24px -16px rgb(27 42 82 / 24%);
+}
+
+.portal-shell .portal-welcome h1 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.portal-shell .portal-card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px -12px rgb(41 49 39 / 18%);
+}
+
+.portal-shell .portal-card.border-gray-200 {
+  border-color: #e5e1d8;
+}
+
+.portal-shell .portal-card > p.uppercase {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #626960;
+}
+
+.portal-shell .portal-card > p.text-gray-900 {
+  color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.portal-shell .portal-notice {
+  border-radius: 0.875rem;
+  background: #f6f0df;
+  border-color: #e7d8af;
+  line-height: 1.65;
+}
+
+.portal-shell aside > p {
+  color: #646b60;
+  letter-spacing: 0.12em;
+}
+
+.portal-shell aside nav a {
+  border-radius: 0.75rem;
+  color: #344b3c;
+  background-color: #fffdf8;
+  box-shadow: inset 0 0 0 1px #e8e3d8;
+}
+
+.portal-shell aside nav a:hover {
+  background-color: #eeeadd;
+  color: var(--brand-dark);
+  box-shadow: inset 0 0 0 1px #d7c9a8;
+}
+
+.portal-shell :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]), select, textarea) {
+  border-radius: 0.625rem;
+  background-color: #fffefb;
+  border-color: #d8d9cf;
+}
+
+.portal-shell :is(input, select, textarea)::placeholder {
+  color: #747a72;
+}
+
+.portal-shell :is(button, a.bg-brand, a.bg-brand-navy) {
+  border-radius: 0.625rem;
+}
+
+.portal-shell :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.portal-shell table {
+  border-color: #e5e1d8;
+}
+
+.portal-shell thead {
+  background-color: #f4f1e9;
+  color: var(--brand-navy);
+}
+
+.portal-shell tbody tr:hover {
+  background-color: #fbf9f3;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .portal-shell :is(a, button, input, select, textarea) {
+    transition: background-color 150ms ease, border-color 150ms ease,
+      box-shadow 150ms ease, color 150ms ease;
+  }
+}
+
 @media (min-width: 640px) {
   .hero-section {
     min-height: 680px;
   }
+}
+
+/* Keep the entire welcome video visible on phones, with its existing actions below. */
+@media (width < 640px) {
+  .hero-section {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: var(--brand-navy);
+  }
+}
+
+/* Brief login welcome only; existing portal welcome sections remain intact. */
+.welcome-heart { bottom: -2rem; font-size: 1.25rem; opacity: 0; animation: welcome-heart-rise 4s ease-out 1 both; }
+.welcome-member-heart { animation-name: welcome-member-heart-rise; }
+@keyframes welcome-member-heart-rise {
+  0% { opacity: 0; transform: translateY(0) scale(.8); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-22rem) scale(1.1); }
+}
+@keyframes welcome-heart-rise {
+  0% { opacity: 0; transform: translateY(0) scale(.8); }
+  25% { opacity: .35; }
+  100% { opacity: 0; transform: translateY(-22rem) scale(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-heart { animation: none; display: none; }
 }

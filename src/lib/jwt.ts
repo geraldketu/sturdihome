@@ -5,6 +5,7 @@ export type Role = "HOMEOWNER" | "VENDOR" | "FINANCING_PARTNER" | "ADMIN";
 export interface SessionPayload {
   sub: string;
   role: Role;
+  sid: string;
 }
 
 export const SESSION_COOKIE = "sh_session";
@@ -17,7 +18,7 @@ function getSecretKey() {
 }
 
 export async function signSessionToken(payload: SessionPayload): Promise<string> {
-  return new SignJWT({ role: payload.role })
+  return new SignJWT({ role: payload.role, sid: payload.sid })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.sub)
     .setIssuedAt()
@@ -27,9 +28,9 @@ export async function signSessionToken(payload: SessionPayload): Promise<string>
 
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecretKey());
-    if (typeof payload.sub !== "string" || typeof payload.role !== "string") return null;
-    return { sub: payload.sub, role: payload.role as Role };
+    const { payload } = await jwtVerify(token, getSecretKey(), { algorithms: ["HS256"], requiredClaims: ["sub", "iat", "exp"] });
+    if (typeof payload.sub !== "string" || typeof payload.sid !== "string" || !["HOMEOWNER", "VENDOR", "FINANCING_PARTNER", "ADMIN"].includes(String(payload.role))) return null;
+    return { sub: payload.sub, role: payload.role as Role, sid: payload.sid };
   } catch {
     return null;
   }

@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { requirePageAccess } from "@/lib/auth";
 import { Badge, Card } from "@/components/ui";
+import MarketplaceProfileEditor from "@/components/MarketplaceProfileEditor";
 
 export default async function VendorProfilePage() {
-  const user = await getSessionUser();
+  const user = await requirePageAccess("/vendor/profile");
   if (!user) redirect("/login");
 
   if (!user.vendorProfile) {
@@ -45,6 +46,7 @@ export default async function VendorProfilePage() {
           </div>
         </dl>
       </Card>
+      {user.role === "VENDOR" && <MarketplaceProfileEditor ownerId={user.id} companyName={p.companyName} services={p.servicesOffered} area={p.serviceArea} />}
     </div>
   );
 }

@@ -1,0 +1,556 @@
+▲ Next.js 16.3.5 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+- Environments: .env.local, .env
+✓ Ready in 2.3s
+✓ Running next.config.ts took 111ms
+- Experiments (use with caution):
+  · serverActions
+
+○ Compiling /login ...
+ GET /login 200 in 8.1s (next.js: 7.4s, application-code: 703ms)
+ GET /welcome 200 in 1593ms (next.js: 1218ms, proxy.ts: 173ms, application-code: 202ms)
+ POST /login 200 in 1956ms (next.js: 33ms, application-code: 1923ms)
+  └─ ƒ loginAction(undefined, {}) in 214ms src/lib/actions/auth-actions.ts
+ POST /welcome 200 in 228ms (next.js: 41ms, proxy.ts: 35ms, application-code: 152ms)
+  └─ ƒ acknowledgeWelcome() in 48ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 158ms (next.js: 31ms, proxy.ts: 21ms, application-code: 105ms)
+  └─ ƒ acknowledgeWelcome() in 35ms src/lib/actions/welcome-actions.ts
+ GET /api/character/status 200 in 1811ms (next.js: 1360ms, application-code: 452ms)
+ GET /api/character/status 200 in 1831ms (next.js: 1562ms, application-code: 269ms)
+ GET /api/character/status 200 in 1828ms (next.js: 1633ms, application-code: 194ms)
+ GET /api/character/status 200 in 1821ms (next.js: 1685ms, application-code: 136ms)
+ GET /member 200 in 1759ms (next.js: 1498ms, proxy.ts: 31ms, application-code: 231ms)
+ POST /welcome 200 in 1883ms (next.js: 18ms, proxy.ts: 17ms, application-code: 1849ms)
+  └─ ƒ finishWelcome() in 35ms src/lib/actions/welcome-actions.ts
+ GET /api/documents/other-doc 403 in 3.3s (next.js: 3.0s, application-code: 282ms)
+ GET /join-network?next=%2Fadmin 200 in 1720ms (next.js: 1346ms, application-code: 374ms)
+ POST /api/chat 400 in 1955ms (next.js: 1807ms, application-code: 147ms)
+ POST /api/chat 400 in 66ms (next.js: 11ms, application-code: 55ms)
+ POST /api/chat 403 in 46ms (next.js: 5ms, application-code: 41ms)
+ GET /member/documents 200 in 1460ms (next.js: 1162ms, proxy.ts: 15ms, application-code: 284ms)
+ GET /api/character/status 200 in 195ms (next.js: 18ms, application-code: 177ms)
+ GET /api/character/status 200 in 193ms (next.js: 37ms, application-code: 156ms)
+ GET /api/character/status 200 in 206ms (next.js: 67ms, application-code: 139ms)
+ GET /api/character/status 200 in 172ms (next.js: 53ms, application-code: 119ms)
+ POST /member/documents 200 in 128ms (next.js: 24ms, proxy.ts: 18ms, application-code: 86ms)
+  └─ ƒ uploadDocumentAction(undefined, {}) in 43ms src/lib/actions/member-actions.ts
+ GET /api/documents/other-doc 401 in 65ms (next.js: 26ms, application-code: 39ms)
+ GET /login 200 in 237ms (next.js: 36ms, application-code: 201ms)
+ GET /welcome 200 in 104ms (next.js: 11ms, proxy.ts: 10ms, application-code: 82ms)
+ POST /login 200 in 314ms (next.js: 17ms, application-code: 297ms)
+  └─ ƒ loginAction(undefined, {}) in 158ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 135ms (next.js: 11ms, application-code: 124ms)
+ GET /api/character/status 200 in 163ms (next.js: 37ms, application-code: 126ms)
+ GET /api/character/status 200 in 179ms (next.js: 20ms, application-code: 159ms)
+ GET /api/character/status 200 in 181ms (next.js: 37ms, application-code: 144ms)
+ POST /welcome 200 in 210ms (next.js: 77ms, proxy.ts: 68ms, application-code: 65ms)
+  └─ ƒ acknowledgeWelcome() in 35ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 59ms (next.js: 11ms, proxy.ts: 11ms, application-code: 38ms)
+  └─ ƒ acknowledgeWelcome() in 16ms src/lib/actions/welcome-actions.ts
+ GET /pending-approval 200 in 879ms (next.js: 752ms, proxy.ts: 14ms, application-code: 113ms)
+ POST /welcome 200 in 974ms (next.js: 18ms, proxy.ts: 8ms, application-code: 949ms)
+  └─ ƒ finishWelcome() in 41ms src/lib/actions/welcome-actions.ts
+ GET /marketplace/vendors 307 in 930ms (next.js: 642ms, proxy.ts: 8ms, application-code: 280ms)
+ GET /pending-approval 200 in 407ms (next.js: 14ms, proxy.ts: 7ms, application-code: 387ms)
+ GET /api/character/status 200 in 152ms (next.js: 22ms, application-code: 130ms)
+ GET /api/character/status 200 in 152ms (next.js: 42ms, application-code: 111ms)
+ GET /api/character/status 200 in 124ms (next.js: 46ms, application-code: 77ms)
+ GET /api/character/status 200 in 130ms (next.js: 59ms, application-code: 71ms)
+ POST /api/chat 403 in 166ms (next.js: 55ms, application-code: 111ms)
+ GET /login 200 in 131ms (next.js: 13ms, application-code: 118ms)
+ GET /welcome 200 in 107ms (next.js: 10ms, proxy.ts: 7ms, application-code: 89ms)
+ POST /login 200 in 284ms (next.js: 13ms, application-code: 270ms)
+  └─ ƒ loginAction(undefined, {}) in 134ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 113ms (next.js: 8ms, application-code: 105ms)
+ GET /api/character/status 200 in 116ms (next.js: 25ms, application-code: 91ms)
+ GET /api/character/status 200 in 107ms (next.js: 14ms, application-code: 93ms)
+ GET /api/character/status 200 in 118ms (next.js: 33ms, application-code: 86ms)
+ POST /welcome 200 in 136ms (next.js: 28ms, proxy.ts: 57ms, application-code: 51ms)
+  └─ ƒ acknowledgeWelcome() in 24ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 55ms (next.js: 12ms, proxy.ts: 8ms, application-code: 35ms)
+  └─ ƒ acknowledgeWelcome() in 16ms src/lib/actions/welcome-actions.ts
+ GET /pending-approval 200 in 142ms (next.js: 34ms, proxy.ts: 10ms, application-code: 98ms)
+ POST /welcome 200 in 254ms (next.js: 11ms, proxy.ts: 8ms, application-code: 235ms)
+  └─ ƒ finishWelcome() in 50ms src/lib/actions/welcome-actions.ts
+ GET /financing/referrals 307 in 1005ms (next.js: 773ms, proxy.ts: 14ms, application-code: 218ms)
+ GET /pending-approval 200 in 170ms (next.js: 12ms, proxy.ts: 8ms, application-code: 149ms)
+ GET /api/character/status 200 in 153ms (next.js: 17ms, application-code: 137ms)
+ GET /api/character/status 200 in 163ms (next.js: 37ms, application-code: 126ms)
+ GET /api/character/status 200 in 124ms (next.js: 9ms, application-code: 115ms)
+ GET /api/character/status 200 in 104ms (next.js: 12ms, application-code: 91ms)
+ GET /marketplace/financing 307 in 1189ms (next.js: 901ms, proxy.ts: 15ms, application-code: 273ms)
+ GET /pending-approval 200 in 227ms (next.js: 14ms, proxy.ts: 10ms, application-code: 203ms)
+ GET /login 200 in 187ms (next.js: 17ms, application-code: 170ms)
+ GET /welcome 200 in 92ms (next.js: 10ms, proxy.ts: 5ms, application-code: 77ms)
+ POST /login 200 in 250ms (next.js: 10ms, application-code: 240ms)
+  └─ ƒ loginAction(undefined, {}) in 122ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 153ms (next.js: 13ms, application-code: 140ms)
+ GET /api/character/status 200 in 159ms (next.js: 38ms, application-code: 121ms)
+ GET /api/character/status 200 in 144ms (next.js: 20ms, application-code: 125ms)
+ GET /api/character/status 200 in 147ms (next.js: 44ms, application-code: 103ms)
+ POST /welcome 200 in 173ms (next.js: 33ms, proxy.ts: 86ms, application-code: 53ms)
+  └─ ƒ acknowledgeWelcome() in 30ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 71ms (next.js: 14ms, proxy.ts: 8ms, application-code: 48ms)
+  └─ ƒ acknowledgeWelcome() in 25ms src/lib/actions/welcome-actions.ts
+ GET /admin 200 in 753ms (next.js: 576ms, proxy.ts: 7ms, application-code: 170ms)
+ POST /welcome 200 in 880ms (next.js: 53ms, proxy.ts: 15ms, application-code: 812ms)
+  └─ ƒ finishWelcome() in 13ms src/lib/actions/welcome-actions.ts
+ GET /admin/vendors 200 in 989ms (next.js: 733ms, proxy.ts: 11ms, application-code: 244ms)
+ GET /login 200 in 281ms (next.js: 13ms, application-code: 268ms)
+ GET /api/character/status 200 in 134ms (next.js: 11ms, application-code: 124ms)
+ GET /api/character/status 200 in 143ms (next.js: 25ms, application-code: 118ms)
+ GET /api/character/status 200 in 150ms (next.js: 44ms, application-code: 107ms)
+ GET /api/character/status 200 in 159ms (next.js: 64ms, application-code: 95ms)
+ POST /api/webhooks/stripe 400 in 1533ms (next.js: 1493ms, application-code: 40ms)
+ GET /api/documents/fake 401 in 92ms (next.js: 33ms, application-code: 59ms)
+ GET /api/vendor-flyers/fake 401 in 3.2s (next.js: 3.2s, application-code: 23ms)
+ POST /api/chat 401 in 44ms (next.js: 26ms, application-code: 19ms)
+ GET / 200 in 1499ms (next.js: 1101ms, application-code: 398ms)
+ GET /services 200 in 1168ms (next.js: 963ms, application-code: 204ms)
+ GET /how-it-works 200 in 870ms (next.js: 690ms, application-code: 181ms)
+ GET /join-network 200 in 176ms (next.js: 14ms, application-code: 162ms)
+ GET /apply/vendor 200 in 997ms (next.js: 748ms, application-code: 248ms)
+ GET /apply/financing 200 in 897ms (next.js: 734ms, application-code: 163ms)
+ GET /signup 200 in 993ms (next.js: 622ms, application-code: 372ms)
+ GET /login 200 in 228ms (next.js: 30ms, application-code: 198ms)
+ GET /forgot-password 200 in 1087ms (next.js: 916ms, application-code: 171ms)
+ GET /services 200 in 166ms (next.js: 20ms, application-code: 146ms)
+ GET /join-network?next=%2Fmarketplace%2Fvendors%3Fcategory%3DPlumbing%26location%3DAtlanta 200 in 176ms (next.js: 11ms, application-code: 165ms)
+ GET /login?next=%2Fmarketplace%2Fvendors%3Fcategory%3DPlumbing%26location%3DAtlanta 200 in 88ms (next.js: 19ms, application-code: 69ms)
+ GET /welcome 200 in 165ms (next.js: 18ms, proxy.ts: 13ms, application-code: 134ms)
+ POST /login?next=%2Fmarketplace%2Fvendors%3Fcategory%3DPlumbing%26location%3DAtlanta 200 in 427ms (next.js: 14ms, application-code: 413ms)
+  └─ ƒ loginAction(undefined, {}) in 215ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 357ms (next.js: 54ms, application-code: 303ms)
+ GET /api/character/status 200 in 363ms (next.js: 112ms, application-code: 252ms)
+ GET /api/character/status 200 in 419ms (next.js: 170ms, application-code: 249ms)
+ GET /api/character/status 200 in 442ms (next.js: 230ms, application-code: 212ms)
+ POST /welcome 200 in 455ms (next.js: 90ms, proxy.ts: 284ms, application-code: 80ms)
+  └─ ƒ acknowledgeWelcome() in 42ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 101ms (next.js: 24ms, proxy.ts: 12ms, application-code: 64ms)
+  └─ ƒ acknowledgeWelcome() in 27ms src/lib/actions/welcome-actions.ts
+ GET /marketplace/vendors?category=Plumbing&location=Atlanta 200 in 352ms (next.js: 66ms, proxy.ts: 20ms, application-code: 266ms)
+ POST /welcome 200 in 507ms (next.js: 18ms, proxy.ts: 12ms, application-code: 478ms)
+  └─ ƒ finishWelcome() in 80ms src/lib/actions/welcome-actions.ts
+ GET /welcome 307 in 263ms (next.js: 14ms, proxy.ts: 10ms, application-code: 239ms)
+ GET /marketplace/vendors?category=Plumbing&location=Atlanta 200 in 290ms (next.js: 14ms, proxy.ts: 8ms, application-code: 268ms)
+ GET /api/character/status 200 in 223ms (next.js: 17ms, application-code: 206ms)
+ GET /api/character/status 200 in 225ms (next.js: 37ms, application-code: 188ms)
+ GET /api/character/status 200 in 228ms (next.js: 62ms, application-code: 167ms)
+ GET /api/character/status 200 in 229ms (next.js: 81ms, application-code: 147ms)
+ GET /member 200 in 560ms (next.js: 31ms, proxy.ts: 25ms, application-code: 503ms)
+ GET /api/character/status 200 in 277ms (next.js: 18ms, application-code: 259ms)
+ GET /api/character/status 200 in 278ms (next.js: 42ms, application-code: 236ms)
+ GET /api/character/status 200 in 177ms (next.js: 32ms, application-code: 145ms)
+ GET /api/character/status 200 in 179ms (next.js: 54ms, application-code: 124ms)
+ GET /member 200 in 572ms (next.js: 18ms, proxy.ts: 11ms, application-code: 543ms)
+ GET /api/character/status 200 in 232ms (next.js: 14ms, application-code: 219ms)
+ GET /api/character/status 200 in 231ms (next.js: 27ms, application-code: 204ms)
+ GET /api/character/status 200 in 236ms (next.js: 54ms, application-code: 182ms)
+ GET /api/character/status 200 in 237ms (next.js: 74ms, application-code: 164ms)
+ GET /member 200 in 473ms (next.js: 17ms, proxy.ts: 17ms, application-code: 439ms)
+ GET /api/character/status 200 in 135ms (next.js: 9ms, application-code: 126ms)
+ GET /api/character/status 200 in 143ms (next.js: 37ms, application-code: 106ms)
+ GET /api/character/status 200 in 110ms (next.js: 15ms, application-code: 95ms)
+ GET /api/character/status 200 in 109ms (next.js: 27ms, application-code: 81ms)
+ GET /login 200 in 81ms (next.js: 12ms, application-code: 70ms)
+ POST /member 200 in 159ms (next.js: 16ms, proxy.ts: 20ms, application-code: 123ms)
+  └─ ƒ logoutAction() in 19ms src/lib/actions/auth-actions.ts
+ GET /join-network?next=%2Fmember 200 in 234ms (next.js: 16ms, application-code: 218ms)
+ POST /api/chat 401 in 38ms (next.js: 8ms, application-code: 30ms)
+ GET /login?next=%2Ffinancing 200 in 163ms (next.js: 17ms, application-code: 146ms)
+ GET /welcome 200 in 135ms (next.js: 15ms, proxy.ts: 8ms, application-code: 112ms)
+ POST /login?next=%2Ffinancing 200 in 347ms (next.js: 16ms, application-code: 331ms)
+  └─ ƒ loginAction(undefined, {}) in 157ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 142ms (next.js: 9ms, application-code: 133ms)
+ GET /api/character/status 200 in 121ms (next.js: 25ms, application-code: 96ms)
+ GET /api/character/status 200 in 126ms (next.js: 25ms, application-code: 101ms)
+ GET /api/character/status 200 in 130ms (next.js: 48ms, application-code: 82ms)
+ POST /welcome 200 in 183ms (next.js: 24ms, proxy.ts: 111ms, application-code: 48ms)
+  └─ ƒ acknowledgeWelcome() in 27ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 63ms (next.js: 9ms, proxy.ts: 9ms, application-code: 45ms)
+  └─ ƒ acknowledgeWelcome() in 27ms src/lib/actions/welcome-actions.ts
+ GET /vendor 200 in 1830ms (next.js: 1634ms, proxy.ts: 18ms, application-code: 179ms)
+ POST /welcome 200 in 2.1s (next.js: 79ms, proxy.ts: 70ms, application-code: 1924ms)
+  └─ ƒ finishWelcome() in 56ms src/lib/actions/welcome-actions.ts
+ GET /vendor 200 in 517ms (next.js: 36ms, proxy.ts: 37ms, application-code: 444ms)
+ GET /api/character/status 200 in 102ms (next.js: 22ms, application-code: 80ms)
+ GET /api/character/status 200 in 99ms (next.js: 71ms, application-code: 28ms)
+ GET /api/character/status 200 in 216ms (next.js: 54ms, application-code: 162ms)
+ GET /api/character/status 200 in 219ms (next.js: 16ms, application-code: 203ms)
+ GET /login?next=%2Fvendor 200 in 215ms (next.js: 31ms, application-code: 184ms)
+ GET /welcome 200 in 110ms (next.js: 12ms, proxy.ts: 7ms, application-code: 91ms)
+ POST /login?next=%2Fvendor 200 in 276ms (next.js: 15ms, application-code: 261ms)
+  └─ ƒ loginAction(undefined, {}) in 122ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 143ms (next.js: 9ms, application-code: 134ms)
+ GET /api/character/status 200 in 152ms (next.js: 30ms, application-code: 122ms)
+ GET /api/character/status 200 in 141ms (next.js: 17ms, application-code: 124ms)
+ GET /api/character/status 200 in 146ms (next.js: 40ms, application-code: 106ms)
+ POST /welcome 200 in 158ms (next.js: 33ms, proxy.ts: 76ms, application-code: 50ms)
+  └─ ƒ acknowledgeWelcome() in 25ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 83ms (next.js: 15ms, proxy.ts: 11ms, application-code: 56ms)
+  └─ ƒ acknowledgeWelcome() in 26ms src/lib/actions/welcome-actions.ts
+ GET /financing 200 in 1615ms (next.js: 1347ms, proxy.ts: 17ms, application-code: 251ms)
+ POST /welcome 200 in 1802ms (next.js: 76ms, proxy.ts: 18ms, application-code: 1708ms)
+  └─ ƒ finishWelcome() in 54ms src/lib/actions/welcome-actions.ts
+ GET /financing 200 in 593ms (next.js: 24ms, proxy.ts: 10ms, application-code: 559ms)
+ GET /api/character/status 200 in 89ms (next.js: 15ms, application-code: 74ms)
+ GET /api/character/status 200 in 91ms (next.js: 52ms, application-code: 39ms)
+ GET /login?next=%2Fadmin 200 in 246ms (next.js: 24ms, application-code: 223ms)
+ GET /welcome 200 in 109ms (next.js: 11ms, proxy.ts: 7ms, application-code: 92ms)
+ POST /login?next=%2Fadmin 200 in 293ms (next.js: 14ms, application-code: 279ms)
+  └─ ƒ loginAction(undefined, {}) in 134ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 164ms (next.js: 11ms, application-code: 153ms)
+ GET /api/character/status 200 in 175ms (next.js: 36ms, application-code: 139ms)
+ GET /api/character/status 200 in 169ms (next.js: 31ms, application-code: 138ms)
+ GET /api/character/status 200 in 172ms (next.js: 53ms, application-code: 119ms)
+ POST /welcome 200 in 209ms (next.js: 30ms, proxy.ts: 108ms, application-code: 70ms)
+  └─ ƒ acknowledgeWelcome() in 34ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 185ms (next.js: 68ms, proxy.ts: 16ms, application-code: 101ms)
+  └─ ƒ acknowledgeWelcome() in 29ms src/lib/actions/welcome-actions.ts
+ GET /pending-approval 200 in 139ms (next.js: 17ms, proxy.ts: 9ms, application-code: 112ms)
+ POST /welcome 200 in 222ms (next.js: 17ms, proxy.ts: 13ms, application-code: 192ms)
+  └─ ƒ finishWelcome() in 23ms src/lib/actions/welcome-actions.ts
+ GET /signup?next=%2Fmember%2Fservice-request 200 in 174ms (next.js: 17ms, application-code: 157ms)
+ GET /welcome 200 in 122ms (next.js: 13ms, proxy.ts: 11ms, application-code: 98ms)
+ POST /signup?next=%2Fmember%2Fservice-request 200 in 483ms (next.js: 14ms, application-code: 469ms)
+  └─ ƒ signupAction(undefined, {}) in 297ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 193ms (next.js: 12ms, application-code: 181ms)
+ GET /api/character/status 200 in 191ms (next.js: 47ms, application-code: 145ms)
+ GET /api/character/status 200 in 161ms (next.js: 45ms, application-code: 116ms)
+ GET /api/character/status 200 in 134ms (next.js: 34ms, application-code: 101ms)
+ POST /welcome 200 in 150ms (next.js: 19ms, proxy.ts: 69ms, application-code: 61ms)
+  └─ ƒ acknowledgeWelcome() in 32ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 71ms (next.js: 18ms, proxy.ts: 13ms, application-code: 40ms)
+  └─ ƒ acknowledgeWelcome() in 19ms src/lib/actions/welcome-actions.ts
+ GET /agreement 200 in 1157ms (next.js: 908ms, proxy.ts: 10ms, application-code: 239ms)
+ POST /welcome 200 in 1243ms (next.js: 15ms, proxy.ts: 13ms, application-code: 1215ms)
+  └─ ƒ finishWelcome() in 20ms src/lib/actions/welcome-actions.ts
+ GET /pending-approval 200 in 92ms (next.js: 11ms, proxy.ts: 7ms, application-code: 73ms)
+ POST /agreement 200 in 185ms (next.js: 11ms, proxy.ts: 11ms, application-code: 162ms)
+  └─ ƒ acceptNetworkAgreement(undefined, {}) in 48ms src/lib/actions/agreement-actions.ts
+ GET /pending-approval 307 in 379ms (next.js: 17ms, proxy.ts: 12ms, application-code: 350ms)
+ GET /member/service-request 200 in 1087ms (next.js: 762ms, proxy.ts: 11ms, application-code: 313ms)
+ GET /api/character/status 200 in 150ms (next.js: 12ms, application-code: 138ms)
+ GET /api/character/status 200 in 161ms (next.js: 36ms, application-code: 125ms)
+ GET /api/character/status 200 in 123ms (next.js: 27ms, application-code: 95ms)
+ GET /api/character/status 200 in 129ms (next.js: 52ms, application-code: 76ms)
+ POST /member/service-request 200 in 240ms (next.js: 27ms, proxy.ts: 23ms, application-code: 189ms)
+  └─ ƒ submitServiceRequestAction(undefined, {}) in 39ms src/lib/actions/member-actions.ts
+ POST / 200 in 48ms (next.js: 13ms, application-code: 35ms)
+ GET /login 200 in 83ms (next.js: 10ms, application-code: 73ms)
+ POST /member/service-request 200 in 160ms (next.js: 14ms, proxy.ts: 11ms, application-code: 134ms)
+  └─ ƒ logoutAction() in 16ms src/lib/actions/auth-actions.ts
+ GET /welcome 200 in 106ms (next.js: 13ms, proxy.ts: 6ms, application-code: 87ms)
+ POST /login 200 in 310ms (next.js: 14ms, application-code: 296ms)
+  └─ ƒ loginAction(undefined, {}) in 161ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 246ms (next.js: 21ms, application-code: 225ms)
+ GET /api/character/status 200 in 244ms (next.js: 73ms, application-code: 172ms)
+ GET /api/character/status 200 in 251ms (next.js: 120ms, application-code: 131ms)
+ GET /api/character/status 200 in 265ms (next.js: 158ms, application-code: 107ms)
+ POST /welcome 200 in 117ms (next.js: 26ms, proxy.ts: 24ms, application-code: 67ms)
+  └─ ƒ acknowledgeWelcome() in 39ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 76ms (next.js: 14ms, proxy.ts: 12ms, application-code: 50ms)
+  └─ ƒ acknowledgeWelcome() in 26ms src/lib/actions/welcome-actions.ts
+ GET /member 200 in 135ms (next.js: 10ms, proxy.ts: 7ms, application-code: 118ms)
+ POST /welcome 200 in 218ms (next.js: 12ms, proxy.ts: 6ms, application-code: 199ms)
+  └─ ƒ finishWelcome() in 24ms src/lib/actions/welcome-actions.ts
+ GET /reset-password?token=f4a51f579d473e2f38dc41c04a6fd3fce1229973b91250f6340390afb07db835 200 in 630ms (next.js: 495ms, application-code: 135ms)
+ GET /api/character/status 200 in 139ms (next.js: 11ms, application-code: 128ms)
+ GET /api/character/status 200 in 146ms (next.js: 45ms, application-code: 100ms)
+ GET /api/character/status 200 in 136ms (next.js: 18ms, application-code: 118ms)
+ GET /api/character/status 200 in 138ms (next.js: 48ms, application-code: 90ms)
+ GET /login?reset=success 200 in 71ms (next.js: 8ms, application-code: 63ms)
+ POST /reset-password?token=f4a51f579d473e2f38dc41c04a6fd3fce1229973b91250f6340390afb07db835 200 in 272ms (next.js: 16ms, application-code: 257ms)
+  └─ ƒ resetPassword(undefined, {}) in 148ms src/lib/actions/password-actions.ts
+ GET /reset-password?token=f4a51f579d473e2f38dc41c04a6fd3fce1229973b91250f6340390afb07db835 200 in 149ms (next.js: 16ms, application-code: 133ms)
+ POST /reset-password?token=f4a51f579d473e2f38dc41c04a6fd3fce1229973b91250f6340390afb07db835 200 in 42ms (next.js: 15ms, application-code: 27ms)
+  └─ ƒ resetPassword(undefined, {}) in 10ms src/lib/actions/password-actions.ts
+ GET /api/documents/fake 401 in 41ms (next.js: 18ms, application-code: 24ms)
+ GET /login 200 in 266ms (next.js: 19ms, application-code: 247ms)
+ GET /welcome 200 in 122ms (next.js: 14ms, proxy.ts: 10ms, application-code: 99ms)
+ POST /login 200 in 326ms (next.js: 12ms, application-code: 314ms)
+  └─ ƒ loginAction(undefined, {}) in 164ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 209ms (next.js: 10ms, application-code: 199ms)
+ GET /api/character/status 200 in 71ms (next.js: 33ms, application-code: 38ms)
+ GET /api/character/status 200 in 175ms (next.js: 38ms, application-code: 137ms)
+○ Compiling /_error ...
+ GET /apply/vendor 200 in 1571ms (next.js: 201ms, application-code: 1370ms)
+ GET /welcome 200 in 195ms (next.js: 20ms, proxy.ts: 20ms, application-code: 154ms)
+ POST /apply/vendor 200 in 489ms (next.js: 22ms, application-code: 468ms)
+  └─ ƒ applyVendorAction(undefined, {}) in 211ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 279ms (next.js: 13ms, application-code: 265ms)
+ GET /api/character/status 200 in 296ms (next.js: 83ms, application-code: 214ms)
+ GET /api/character/status 200 in 188ms (next.js: 67ms, application-code: 120ms)
+ GET /api/character/status 200 in 190ms (next.js: 91ms, application-code: 100ms)
+ POST /welcome 200 in 285ms (next.js: 44ms, proxy.ts: 170ms, application-code: 71ms)
+  └─ ƒ acknowledgeWelcome() in 20ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 98ms (next.js: 23ms, proxy.ts: 22ms, application-code: 53ms)
+  └─ ƒ acknowledgeWelcome() in 21ms src/lib/actions/welcome-actions.ts
+ GET /agreement 200 in 150ms (next.js: 17ms, proxy.ts: 10ms, application-code: 123ms)
+ POST /welcome 200 in 273ms (next.js: 48ms, proxy.ts: 16ms, application-code: 209ms)
+  └─ ƒ finishWelcome() in 20ms src/lib/actions/welcome-actions.ts
+ GET /apply/financing 200 in 240ms (next.js: 21ms, application-code: 219ms)
+ GET /welcome 200 in 140ms (next.js: 17ms, proxy.ts: 13ms, application-code: 110ms)
+ POST /apply/financing 200 in 362ms (next.js: 15ms, application-code: 346ms)
+  └─ ƒ applyFinancingAction(undefined, {}) in 165ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 152ms (next.js: 10ms, application-code: 141ms)
+ GET /api/character/status 200 in 164ms (next.js: 24ms, application-code: 140ms)
+ GET /api/character/status 200 in 170ms (next.js: 45ms, application-code: 125ms)
+ GET /api/character/status 200 in 179ms (next.js: 72ms, application-code: 107ms)
+ POST /welcome 200 in 218ms (next.js: 21ms, proxy.ts: 120ms, application-code: 76ms)
+  └─ ƒ acknowledgeWelcome() in 46ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 86ms (next.js: 19ms, proxy.ts: 16ms, application-code: 51ms)
+  └─ ƒ acknowledgeWelcome() in 23ms src/lib/actions/welcome-actions.ts
+ GET /agreement 200 in 238ms (next.js: 47ms, proxy.ts: 35ms, application-code: 157ms)
+ POST /welcome 200 in 342ms (next.js: 28ms, proxy.ts: 13ms, application-code: 301ms)
+  └─ ƒ finishWelcome() in 25ms src/lib/actions/welcome-actions.ts
+ GET /login 200 in 241ms (next.js: 24ms, application-code: 217ms)
+ GET /welcome 200 in 142ms (next.js: 21ms, proxy.ts: 9ms, application-code: 112ms)
+ POST /login 200 in 374ms (next.js: 16ms, application-code: 358ms)
+  └─ ƒ loginAction(undefined, {}) in 174ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 162ms (next.js: 13ms, application-code: 148ms)
+ GET /api/character/status 200 in 207ms (next.js: 36ms, application-code: 171ms)
+ GET /api/character/status 200 in 140ms (next.js: 24ms, application-code: 115ms)
+ GET /api/character/status 200 in 151ms (next.js: 52ms, application-code: 99ms)
+ POST /welcome 200 in 168ms (next.js: 28ms, proxy.ts: 75ms, application-code: 65ms)
+  └─ ƒ acknowledgeWelcome() in 37ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 69ms (next.js: 17ms, proxy.ts: 9ms, application-code: 43ms)
+  └─ ƒ acknowledgeWelcome() in 15ms src/lib/actions/welcome-actions.ts
+ GET /admin 200 in 205ms (next.js: 17ms, proxy.ts: 7ms, application-code: 180ms)
+ POST /welcome 200 in 287ms (next.js: 18ms, proxy.ts: 12ms, application-code: 258ms)
+  └─ ƒ finishWelcome() in 20ms src/lib/actions/welcome-actions.ts
+ GET /admin/members 200 in 889ms (next.js: 617ms, proxy.ts: 21ms, application-code: 251ms)
+ GET /api/character/status 200 in 250ms (next.js: 17ms, application-code: 233ms)
+ GET /api/character/status 200 in 261ms (next.js: 45ms, application-code: 216ms)
+ GET /api/character/status 200 in 192ms (next.js: 88ms, application-code: 104ms)
+ GET /api/character/status 200 in 195ms (next.js: 72ms, application-code: 123ms)
+ GET /admin/vendors 200 in 405ms (next.js: 20ms, proxy.ts: 11ms, application-code: 375ms)
+ GET /api/character/status 200 in 153ms (next.js: 13ms, application-code: 140ms)
+ GET /api/character/status 200 in 161ms (next.js: 37ms, application-code: 125ms)
+ GET /api/character/status 200 in 121ms (next.js: 16ms, application-code: 105ms)
+ GET /api/character/status 200 in 132ms (next.js: 43ms, application-code: 88ms)
+ GET /admin/financing-partners 200 in 1102ms (next.js: 804ms, proxy.ts: 14ms, application-code: 284ms)
+ GET /api/character/status 200 in 182ms (next.js: 15ms, application-code: 167ms)
+ GET /api/character/status 200 in 188ms (next.js: 48ms, application-code: 140ms)
+ GET /api/character/status 200 in 124ms (next.js: 15ms, application-code: 109ms)
+ GET /api/character/status 200 in 132ms (next.js: 43ms, application-code: 89ms)
+ GET /admin/documents 200 in 1084ms (next.js: 851ms, proxy.ts: 15ms, application-code: 218ms)
+ GET /api/character/status 200 in 132ms (next.js: 11ms, application-code: 122ms)
+ GET /api/character/status 200 in 139ms (next.js: 37ms, application-code: 102ms)
+ GET /api/character/status 200 in 105ms (next.js: 11ms, application-code: 94ms)
+ GET /api/character/status 200 in 111ms (next.js: 38ms, application-code: 74ms)
+ GET /admin/requests 200 in 1044ms (next.js: 761ms, proxy.ts: 8ms, application-code: 275ms)
+ GET / 200 in 525ms (next.js: 15ms, application-code: 510ms)
+ GET /join-network?next=%2Fmarketplace%2Fvendors%3Fcategory%3DRoofing%26location%3D30301 200 in 269ms (next.js: 18ms, application-code: 250ms)
+ GET /forgot-password 200 in 191ms (next.js: 22ms, application-code: 170ms)
+ POST /forgot-password 200 in 64ms (next.js: 15ms, application-code: 49ms)
+  └─ ƒ requestPasswordReset(undefined, {}) in 28ms src/lib/actions/password-actions.ts
+ GET /login 200 in 285ms (next.js: 18ms, application-code: 267ms)
+ GET /welcome 200 in 140ms (next.js: 13ms, proxy.ts: 12ms, application-code: 115ms)
+ POST /login 200 in 344ms (next.js: 18ms, application-code: 326ms)
+  └─ ƒ loginAction(undefined, {}) in 146ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 166ms (next.js: 13ms, application-code: 152ms)
+ GET /api/character/status 200 in 169ms (next.js: 39ms, application-code: 130ms)
+ GET /api/character/status 200 in 155ms (next.js: 24ms, application-code: 131ms)
+ GET /api/character/status 200 in 160ms (next.js: 50ms, application-code: 111ms)
+ POST /welcome 200 in 187ms (next.js: 28ms, proxy.ts: 93ms, application-code: 66ms)
+  └─ ƒ acknowledgeWelcome() in 43ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 74ms (next.js: 16ms, proxy.ts: 14ms, application-code: 44ms)
+  └─ ƒ acknowledgeWelcome() in 13ms src/lib/actions/welcome-actions.ts
+ GET /agreement 200 in 119ms (next.js: 14ms, proxy.ts: 7ms, application-code: 98ms)
+ POST /welcome 200 in 183ms (next.js: 12ms, proxy.ts: 11ms, application-code: 160ms)
+  └─ ƒ finishWelcome() in 14ms src/lib/actions/welcome-actions.ts
+ GET /member 307 in 243ms (next.js: 18ms, proxy.ts: 13ms, application-code: 211ms)
+ GET /agreement 200 in 170ms (next.js: 10ms, proxy.ts: 9ms, application-code: 151ms)
+ GET /api/character/status 200 in 206ms (next.js: 16ms, application-code: 189ms)
+ GET /api/character/status 200 in 201ms (next.js: 32ms, application-code: 169ms)
+ GET /api/character/status 200 in 210ms (next.js: 65ms, application-code: 145ms)
+ GET /api/character/status 200 in 203ms (next.js: 88ms, application-code: 115ms)
+ GET /pending-approval 200 in 154ms (next.js: 19ms, proxy.ts: 10ms, application-code: 125ms)
+ POST /agreement 200 in 290ms (next.js: 17ms, proxy.ts: 14ms, application-code: 259ms)
+  └─ ƒ acceptNetworkAgreement(undefined, {}) in 52ms src/lib/actions/agreement-actions.ts
+ GET /member 200 in 356ms (next.js: 22ms, proxy.ts: 15ms, application-code: 319ms)
+ GET /login 200 in 217ms (next.js: 21ms, application-code: 197ms)
+ GET /welcome 200 in 123ms (next.js: 15ms, proxy.ts: 7ms, application-code: 101ms)
+ POST /login 200 in 335ms (next.js: 15ms, application-code: 320ms)
+  └─ ƒ loginAction(undefined, {}) in 165ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 162ms (next.js: 13ms, application-code: 149ms)
+ GET /api/character/status 200 in 181ms (next.js: 43ms, application-code: 138ms)
+ GET /api/character/status 200 in 169ms (next.js: 25ms, application-code: 145ms)
+ GET /api/character/status 200 in 171ms (next.js: 50ms, application-code: 122ms)
+ POST /welcome 200 in 198ms (next.js: 47ms, proxy.ts: 91ms, application-code: 60ms)
+  └─ ƒ acknowledgeWelcome() in 26ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 71ms (next.js: 21ms, proxy.ts: 11ms, application-code: 39ms)
+  └─ ƒ acknowledgeWelcome() in 16ms src/lib/actions/welcome-actions.ts
+ GET /agreement 200 in 143ms (next.js: 18ms, proxy.ts: 9ms, application-code: 116ms)
+ POST /welcome 200 in 251ms (next.js: 23ms, proxy.ts: 10ms, application-code: 217ms)
+  └─ ƒ finishWelcome() in 25ms src/lib/actions/welcome-actions.ts
+ GET /vendor 307 in 267ms (next.js: 27ms, proxy.ts: 21ms, application-code: 219ms)
+ GET /agreement 200 in 199ms (next.js: 17ms, proxy.ts: 13ms, application-code: 169ms)
+ GET /api/character/status 200 in 145ms (next.js: 14ms, application-code: 132ms)
+ GET /api/character/status 200 in 152ms (next.js: 49ms, application-code: 103ms)
+ GET /api/character/status 200 in 281ms (next.js: 64ms, application-code: 217ms)
+ GET /api/character/status 200 in 292ms (next.js: 178ms, application-code: 114ms)
+ GET /pending-approval 200 in 139ms (next.js: 16ms, proxy.ts: 11ms, application-code: 112ms)
+ POST /agreement 200 in 265ms (next.js: 27ms, proxy.ts: 15ms, application-code: 223ms)
+  └─ ƒ acceptNetworkAgreement(undefined, {}) in 51ms src/lib/actions/agreement-actions.ts
+ GET /vendor 200 in 288ms (next.js: 15ms, proxy.ts: 11ms, application-code: 262ms)
+ GET /login 200 in 243ms (next.js: 22ms, application-code: 221ms)
+ GET /welcome 200 in 95ms (next.js: 11ms, proxy.ts: 6ms, application-code: 78ms)
+ POST /login 200 in 245ms (next.js: 13ms, application-code: 233ms)
+  └─ ƒ loginAction(undefined, {}) in 113ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 145ms (next.js: 9ms, application-code: 135ms)
+ GET /api/character/status 200 in 149ms (next.js: 34ms, application-code: 115ms)
+ GET /api/character/status 200 in 103ms (next.js: 19ms, application-code: 84ms)
+ GET /api/character/status 200 in 168ms (next.js: 36ms, application-code: 132ms)
+ POST /welcome 200 in 183ms (next.js: 21ms, proxy.ts: 97ms, application-code: 65ms)
+  └─ ƒ acknowledgeWelcome() in 29ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 72ms (next.js: 16ms, proxy.ts: 12ms, application-code: 44ms)
+  └─ ƒ acknowledgeWelcome() in 18ms src/lib/actions/welcome-actions.ts
+ GET /agreement 200 in 158ms (next.js: 15ms, proxy.ts: 7ms, application-code: 136ms)
+ POST /welcome 200 in 265ms (next.js: 24ms, proxy.ts: 23ms, application-code: 218ms)
+  └─ ƒ finishWelcome() in 19ms src/lib/actions/welcome-actions.ts
+ GET /financing 307 in 254ms (next.js: 16ms, proxy.ts: 19ms, application-code: 219ms)
+ GET /agreement 200 in 154ms (next.js: 13ms, proxy.ts: 7ms, application-code: 133ms)
+ GET /api/character/status 200 in 107ms (next.js: 14ms, application-code: 93ms)
+ GET /api/character/status 200 in 115ms (next.js: 35ms, application-code: 79ms)
+ GET /api/character/status 200 in 82ms (next.js: 12ms, application-code: 70ms)
+ GET /api/character/status 200 in 88ms (next.js: 28ms, application-code: 59ms)
+ GET /pending-approval 200 in 118ms (next.js: 14ms, proxy.ts: 7ms, application-code: 97ms)
+ POST /agreement 200 in 193ms (next.js: 13ms, proxy.ts: 11ms, application-code: 169ms)
+  └─ ƒ acceptNetworkAgreement(undefined, {}) in 29ms src/lib/actions/agreement-actions.ts
+ GET /financing 200 in 363ms (next.js: 16ms, proxy.ts: 14ms, application-code: 333ms)
+ GET /login 200 in 168ms (next.js: 16ms, application-code: 153ms)
+ GET /welcome 200 in 90ms (next.js: 11ms, proxy.ts: 6ms, application-code: 72ms)
+ POST /login 200 in 254ms (next.js: 14ms, application-code: 240ms)
+  └─ ƒ loginAction(undefined, {}) in 121ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 124ms (next.js: 11ms, application-code: 114ms)
+ GET /api/character/status 200 in 133ms (next.js: 32ms, application-code: 101ms)
+ GET /api/character/status 200 in 115ms (next.js: 19ms, application-code: 96ms)
+ GET /api/character/status 200 in 121ms (next.js: 37ms, application-code: 84ms)
+ POST /welcome 200 in 143ms (next.js: 30ms, proxy.ts: 66ms, application-code: 47ms)
+  └─ ƒ acknowledgeWelcome() in 25ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 60ms (next.js: 13ms, proxy.ts: 7ms, application-code: 39ms)
+  └─ ƒ acknowledgeWelcome() in 24ms src/lib/actions/welcome-actions.ts
+ GET /member 200 in 157ms (next.js: 8ms, proxy.ts: 8ms, application-code: 141ms)
+ POST /welcome 200 in 210ms (next.js: 10ms, proxy.ts: 9ms, application-code: 192ms)
+  └─ ƒ finishWelcome() in 16ms src/lib/actions/welcome-actions.ts
+ GET /member 200 in 402ms (next.js: 19ms, proxy.ts: 7ms, application-code: 376ms)
+ GET /api/character/status 401 in 77ms (next.js: 15ms, application-code: 62ms)
+ GET /api/character/status 401 in 78ms (next.js: 31ms, application-code: 47ms)
+ GET /api/character/status 401 in 81ms (next.js: 46ms, application-code: 35ms)
+ GET /api/character/status 401 in 83ms (next.js: 61ms, application-code: 23ms)
+ GET /login 200 in 265ms (next.js: 14ms, application-code: 251ms)
+ GET /login 200 in 182ms (next.js: 17ms, application-code: 165ms)
+ GET /welcome 200 in 115ms (next.js: 9ms, proxy.ts: 24ms, application-code: 82ms)
+ POST /login 200 in 289ms (next.js: 14ms, application-code: 275ms)
+  └─ ƒ loginAction(undefined, {}) in 136ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 117ms (next.js: 11ms, application-code: 106ms)
+ GET /api/character/status 200 in 127ms (next.js: 30ms, application-code: 97ms)
+ GET /api/character/status 200 in 115ms (next.js: 16ms, application-code: 99ms)
+ GET /api/character/status 200 in 116ms (next.js: 34ms, application-code: 82ms)
+ POST /welcome 200 in 133ms (next.js: 19ms, proxy.ts: 77ms, application-code: 37ms)
+  └─ ƒ acknowledgeWelcome() in 19ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 60ms (next.js: 13ms, proxy.ts: 7ms, application-code: 41ms)
+  └─ ƒ acknowledgeWelcome() in 27ms src/lib/actions/welcome-actions.ts
+ GET /member 200 in 204ms (next.js: 15ms, proxy.ts: 6ms, application-code: 184ms)
+ POST /welcome 200 in 263ms (next.js: 12ms, proxy.ts: 7ms, application-code: 244ms)
+  └─ ƒ finishWelcome() in 16ms src/lib/actions/welcome-actions.ts
+ GET /member/documents 200 in 330ms (next.js: 42ms, proxy.ts: 13ms, application-code: 276ms)
+ GET /api/character/status 200 in 125ms (next.js: 12ms, application-code: 113ms)
+ GET /api/character/status 200 in 127ms (next.js: 36ms, application-code: 91ms)
+ GET /api/character/status 200 in 97ms (next.js: 8ms, application-code: 89ms)
+ GET /api/character/status 200 in 81ms (next.js: 25ms, application-code: 56ms)
+ GET /api/agreements/cmu8rxadg00bcw9ocz0rwe7ol/copy 200 in 3.7s (next.js: 3.6s, application-code: 42ms)
+ GET /login 200 in 688ms (next.js: 21ms, application-code: 667ms)
+ GET /welcome 200 in 378ms (next.js: 54ms, proxy.ts: 62ms, application-code: 262ms)
+ POST /login 200 in 776ms (next.js: 13ms, application-code: 763ms)
+  └─ ƒ loginAction(undefined, {}) in 327ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 339ms (next.js: 19ms, application-code: 321ms)
+ GET /api/character/status 200 in 349ms (next.js: 139ms, application-code: 210ms)
+ GET /api/character/status 200 in 355ms (next.js: 231ms, application-code: 123ms)
+ GET /api/character/status 200 in 370ms (next.js: 264ms, application-code: 107ms)
+ POST /welcome 200 in 159ms (next.js: 68ms, proxy.ts: 37ms, application-code: 54ms)
+  └─ ƒ acknowledgeWelcome() in 20ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 65ms (next.js: 16ms, proxy.ts: 10ms, application-code: 39ms)
+  └─ ƒ acknowledgeWelcome() in 15ms src/lib/actions/welcome-actions.ts
+ GET /admin 200 in 218ms (next.js: 15ms, proxy.ts: 8ms, application-code: 195ms)
+ POST /welcome 200 in 301ms (next.js: 16ms, proxy.ts: 10ms, application-code: 275ms)
+  └─ ƒ finishWelcome() in 23ms src/lib/actions/welcome-actions.ts
+ GET /admin/agreements 200 in 2.4s (next.js: 1947ms, proxy.ts: 24ms, application-code: 436ms)
+ GET /api/character/status 200 in 270ms (next.js: 23ms, application-code: 246ms)
+ GET /api/character/status 200 in 271ms (next.js: 44ms, application-code: 227ms)
+ GET /api/character/status 200 in 272ms (next.js: 70ms, application-code: 203ms)
+ GET /api/character/status 200 in 273ms (next.js: 87ms, application-code: 186ms)
+ GET /member 307 in 515ms (next.js: 35ms, proxy.ts: 25ms, application-code: 455ms)
+ GET /agreement 200 in 258ms (next.js: 19ms, proxy.ts: 13ms, application-code: 226ms)
+ POST /api/chat 403 in 61ms (next.js: 14ms, application-code: 47ms)
+ GET /api/character/status 200 in 152ms (next.js: 17ms, application-code: 135ms)
+ GET /api/character/status 200 in 164ms (next.js: 45ms, application-code: 119ms)
+ GET /api/character/status 200 in 113ms (next.js: 19ms, application-code: 94ms)
+ GET /api/character/status 200 in 118ms (next.js: 45ms, application-code: 73ms)
+ GET /pending-approval 200 in 134ms (next.js: 17ms, proxy.ts: 10ms, application-code: 106ms)
+ POST /agreement 200 in 234ms (next.js: 15ms, proxy.ts: 8ms, application-code: 210ms)
+  └─ ƒ acceptNetworkAgreement(undefined, {}) in 45ms src/lib/actions/agreement-actions.ts
+ GET /member 200 in 574ms (next.js: 19ms, proxy.ts: 15ms, application-code: 539ms)
+ GET /api/character/status 200 in 228ms (next.js: 13ms, application-code: 216ms)
+ GET /api/character/status 200 in 230ms (next.js: 32ms, application-code: 198ms)
+ GET /api/character/status 200 in 232ms (next.js: 54ms, application-code: 178ms)
+ GET /api/character/status 200 in 234ms (next.js: 78ms, application-code: 156ms)
+ GET /member 307 in 429ms (next.js: 24ms, proxy.ts: 13ms, application-code: 391ms)
+ GET /agreement 200 in 243ms (next.js: 17ms, proxy.ts: 9ms, application-code: 217ms)
+ GET /api/character/status 200 in 186ms (next.js: 21ms, application-code: 164ms)
+ GET /api/character/status 200 in 191ms (next.js: 52ms, application-code: 139ms)
+ GET /api/character/status 200 in 142ms (next.js: 22ms, application-code: 119ms)
+ GET /api/character/status 200 in 152ms (next.js: 71ms, application-code: 81ms)
+ GET /pending-approval 200 in 159ms (next.js: 24ms, proxy.ts: 10ms, application-code: 126ms)
+ POST /agreement 200 in 291ms (next.js: 19ms, proxy.ts: 16ms, application-code: 256ms)
+  └─ ƒ acceptNetworkAgreement(undefined, {}) in 39ms src/lib/actions/agreement-actions.ts
+ GET /login 200 in 250ms (next.js: 25ms, application-code: 225ms)
+ GET /welcome 200 in 143ms (next.js: 18ms, proxy.ts: 8ms, application-code: 117ms)
+ POST /login 200 in 352ms (next.js: 16ms, application-code: 336ms)
+  └─ ƒ loginAction(undefined, {}) in 160ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 140ms (next.js: 12ms, application-code: 128ms)
+ GET /api/character/status 200 in 151ms (next.js: 38ms, application-code: 113ms)
+ GET /api/character/status 200 in 121ms (next.js: 21ms, application-code: 100ms)
+ GET /api/character/status 200 in 122ms (next.js: 43ms, application-code: 80ms)
+ POST /welcome 200 in 199ms (next.js: 63ms, proxy.ts: 88ms, application-code: 49ms)
+  └─ ƒ acknowledgeWelcome() in 22ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 72ms (next.js: 16ms, proxy.ts: 11ms, application-code: 46ms)
+  └─ ƒ acknowledgeWelcome() in 16ms src/lib/actions/welcome-actions.ts
+ GET /vendor 200 in 207ms (next.js: 39ms, proxy.ts: 12ms, application-code: 155ms)
+ POST /welcome 200 in 311ms (next.js: 18ms, proxy.ts: 13ms, application-code: 280ms)
+  └─ ƒ finishWelcome() in 24ms src/lib/actions/welcome-actions.ts
+ GET /vendor/referrals 200 in 828ms (next.js: 605ms, proxy.ts: 15ms, application-code: 208ms)
+ GET /api/character/status 200 in 158ms (next.js: 17ms, application-code: 141ms)
+ GET /api/character/status 200 in 163ms (next.js: 49ms, application-code: 114ms)
+ GET /api/character/status 200 in 143ms (next.js: 24ms, application-code: 119ms)
+ GET /api/character/status 200 in 148ms (next.js: 45ms, application-code: 103ms)
+ POST /vendor/referrals 200 in 274ms (next.js: 29ms, proxy.ts: 76ms, application-code: 169ms)
+  └─ ƒ createVendorReferralAction() in 38ms src/lib/actions/referral-actions.ts
+ GET /signup?referral=43BE665F27F8 200 in 273ms (next.js: 28ms, application-code: 245ms)
+ GET /welcome 200 in 100ms (next.js: 12ms, proxy.ts: 7ms, application-code: 81ms)
+ POST /signup?referral=43BE665F27F8 200 in 271ms (next.js: 12ms, application-code: 259ms)
+  └─ ƒ signupAction(undefined, {}) in 127ms src/lib/actions/auth-actions.ts
+ GET /api/character/status 200 in 129ms (next.js: 12ms, application-code: 118ms)
+ GET /api/character/status 200 in 184ms (next.js: 31ms, application-code: 153ms)
+ GET /api/character/status 200 in 135ms (next.js: 18ms, application-code: 117ms)
+ GET /api/character/status 200 in 172ms (next.js: 36ms, application-code: 136ms)
+ POST /welcome 200 in 192ms (next.js: 29ms, proxy.ts: 67ms, application-code: 97ms)
+  └─ ƒ acknowledgeWelcome() in 74ms src/lib/actions/welcome-actions.ts
+ POST /welcome 200 in 79ms (next.js: 17ms, proxy.ts: 11ms, application-code: 50ms)
+  └─ ƒ acknowledgeWelcome() in 22ms src/lib/actions/welcome-actions.ts
+ GET /agreement 200 in 141ms (next.js: 14ms, proxy.ts: 7ms, application-code: 120ms)
+ POST /welcome 200 in 230ms (next.js: 17ms, proxy.ts: 13ms, application-code: 200ms)
+  └─ ƒ finishWelcome() in 26ms src/lib/actions/welcome-actions.ts
+ GET /pending-approval 200 in 91ms (next.js: 11ms, proxy.ts: 6ms, application-code: 74ms)
+ POST /agreement 200 in 180ms (next.js: 13ms, proxy.ts: 7ms, application-code: 160ms)
+  └─ ƒ acceptNetworkAgreement(undefined, {}) in 33ms src/lib/actions/agreement-actions.ts
+ GET /vendor/referrals 200 in 238ms (next.js: 15ms, proxy.ts: 15ms, application-code: 208ms)
+ GET /api/character/status 200 in 273ms (next.js: 9ms, application-code: 264ms)
+ GET /api/character/status 200 in 99ms (next.js: 65ms, application-code: 34ms)
+ GET /api/character/status 200 in 102ms (next.js: 26ms, application-code: 76ms)
+ GET /api/character/status 200 in 239ms (next.js: 90ms, application-code: 148ms)
+prisma:error Error in PostgreSQL connection: Error { kind: Io, cause: Some(Os { code: 10054, kind: ConnectionReset, message: "An existing connection was forcibly closed by the remote host." }) }
+[?25h

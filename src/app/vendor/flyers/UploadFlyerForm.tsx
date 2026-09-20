@@ -1,5 +1,6 @@
 "use client";
 
+import { UPLOAD_ACCEPT } from "@/lib/upload-validation";
 import { useActionState, useRef } from "react";
 import { uploadFlyerAction } from "@/lib/actions/vendor-actions";
 import { Field, FormError, SubmitButton } from "@/components/ui";
@@ -25,7 +26,7 @@ export default function UploadFlyerForm() {
           type="file"
           name="file"
           required
-          accept="image/*,.pdf"
+          accept={UPLOAD_ACCEPT}
           className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-brand-dark"
         />
       </label>

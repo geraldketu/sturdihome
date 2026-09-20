@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { grantCharacterPlan } from "@/lib/character-entitlements";
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -20,13 +21,13 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Invalid signature";
-    return NextResponse.json({ error: `Webhook signature verification failed: ${message}` }, { status: 400 });
+  } catch {
+    return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
   }
 
   switch (event.type) {
-    case "checkout.session.completed": {
+    case "checkout.session.completed":
+    case "checkout.session.async_payment_succeeded": {
       const session = event.data.object as Stripe.Checkout.Session;
 
       if (session.mode === "subscription" && session.metadata?.vendorProfileId) {
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      if (session.mode === "payment" && session.metadata?.financingPartnerProfileId) {
+      if (session.mode === "payment" && session.payment_status === "paid" && session.metadata?.financingPartnerProfileId) {
         await prisma.financingPartnerProfile.update({
           where: { id: session.metadata.financingPartnerProfileId },
           data: {
@@ -56,6 +57,15 @@ export async function POST(req: NextRequest) {
               typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id,
           },
         });
+      }
+
+      if (session.mode === "payment" && session.payment_status === "paid" && session.metadata?.characterUserId && session.metadata?.characterPlanId) {
+        await grantCharacterPlan(
+          session.metadata.characterUserId,
+          session.metadata.characterPlanId,
+          session.id,
+          typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id ?? null,
+        );
       }
       break;
     }
