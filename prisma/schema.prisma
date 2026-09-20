@@ -15,6 +15,11 @@ enum Role {
   ADMIN
 }
 
+enum HomeownerAccountType {
+  VERIFIED_HOMEOWNER
+  SERVICE_ONLY
+}
+
 enum ApplicationStatus {
   PENDING
   APPROVED
@@ -43,59 +48,236 @@ enum PaymentStatus {
 }
 
 model User {
-  id                  String    @id @default(cuid())
-  email               String    @unique
-  passwordHash        String
-  name                String
-  phone               String?
-  role                Role
-  createdAt           DateTime  @default(now())
-  agreementAcceptedAt DateTime?
+  id                   String                @id @default(cuid())
+  email                String                @unique
+  passwordHash         String
+  name                 String
+  phone                String?
+  role                 Role
+  createdAt            DateTime              @default(now())
+  agreementAcceptedAt  DateTime?
+  agreementVersion     String?
+  approvalStatus       ApplicationStatus     @default(PENDING)
+  approvalReviewedAt   DateTime?
+  approvalReviewedBy   String?
+  firstLoginAt         DateTime?
+  sessions             AuthSession[]
+  passwordResets       PasswordReset[]
+  agreementAcceptances AgreementAcceptance[]
 
-  membership         Membership?
-  documents          Document[]
-  financingRequests  FinancingRequest[]
-  serviceRequests    ServiceRequest[]
-  appointments       Appointment[]
-  vendorProfile      VendorProfile?
-  financingProfile   FinancingPartnerProfile?
+  membership                Membership?
+  documents                 Document[]
+  financingRequests         FinancingRequest[]
+  serviceRequests           ServiceRequest[]
+  appointments              Appointment[]
+  vendorProfile             VendorProfile?
+  financingProfile          FinancingPartnerProfile?
+  marketplaceListing        MarketplaceListing?
+  vendorReferrals           VendorReferral[]                    @relation("VendorReferrals")
+  referredBy                VendorReferral?                     @relation("CustomerReferral")
+  characterEntitlement      CharacterEntitlement?
+  characterUsage            CharacterUsage[]
+  accountStatus             String                              @default("ACTIVE")
+  canceledAt                DateTime?
+  cancellationReason        String?
+  financingAccessStatus     String                              @default("ACTIVE")
+  homeownerAccountType      HomeownerAccountType                @default(VERIFIED_HOMEOWNER)
+  homeownerVerificationStatus String                            @default("UNVERIFIED")
+  memberStandingAcceptances MemberStandingAcceptance[]
+  lenderReportsSubmitted    FinancingStatusReport[]             @relation("ReportMember")
+  lenderReportsReceived     FinancingStatusReport[]             @relation("ReportPartner")
+  notifications             UserNotification[]
+  cancellationAudits        AccountCancellationAudit[]
+  financingDisputes         FinancingStatusDispute[]
+  reportingAcceptances      FinancePartnerReportingAcceptance[]
+}
+
+model AuthSession {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt      DateTime
+  welcomePending Boolean  @default(true)
+  firstLogin     Boolean  @default(false)
+  returnTo       String
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model CharacterEntitlement {
+  id                      String    @id @default(cuid())
+  userId                  String    @unique
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  freeSecondsRemaining    Int       @default(60)
+  paidSecondsRemaining    Int       @default(0)
+  plan                    String?
+  purchasedAt             DateTime?
+  expiresAt               DateTime?
+  status                  String    @default("FREE")
+  stripeCheckoutSessionId String?   @unique
+  stripePaymentIntentId   String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+}
+
+model CharacterUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character String
+  seconds   Int
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model VendorReferral {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  vendorUserId String
+  vendor       User      @relation("VendorReferrals", fields: [vendorUserId], references: [id], onDelete: Cascade)
+  customerId   String?   @unique
+  customer     User?     @relation("CustomerReferral", fields: [customerId], references: [id], onDelete: SetNull)
+  status       String    @default("SENT")
+  createdAt    DateTime  @default(now())
+  acceptedAt   DateTime?
+
+  @@index([vendorUserId, createdAt])
+}
+
+model NetworkAgreement {
+  id                 String   @id @default(cuid())
+  role               Role
+  version            String
+  title              String
+  content            String
+  effectiveDate      DateTime
+  documentIdentifier String
+  active             Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  @@unique([role, version])
+}
+
+model AgreementAcceptance {
+  id                         String   @id @default(cuid())
+  userId                     String
+  user                       User     @relation(fields: [userId], references: [id])
+  role                       Role
+  version                    String
+  agreementType              String
+  agreementTitle             String
+  effectiveDate              DateTime
+  documentIdentifier         String
+  fullLegalName              String
+  companyName                String?
+  electronicSignature        String
+  consentToElectronicRecords Boolean
+  acceptanceStatus           String   @default("ACCEPTED")
+  signedCopyContent          String
+  ipAddress                  String?
+  userAgent                  String?
+  acceptedAt                 DateTime @default(now())
+
+  @@unique([userId, role, version])
+  @@index([role, version])
+}
+
+model ApprovalAudit {
+  id         String            @id @default(cuid())
+  userId     String
+  adminId    String
+  status     ApplicationStatus
+  reviewedAt DateTime          @default(now())
+
+  @@index([userId])
+}
+
+model AdminAccountActionAudit {
+  id          String   @id @default(cuid())
+  userId      String
+  adminId     String
+  action      String
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([adminId, createdAt])
+}
+
+model PasswordReset {
+  tokenHash String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  @@index([userId])
+}
+
+model AuthThrottle {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
+// Published business information for authenticated network users. No homeowner leads.
+model MarketplaceListing {
+  id          String   @id @default(cuid())
+  ownerId     String   @unique
+  owner       User     @relation(fields: [ownerId], references: [id])
+  kind        String
+  companyName String
+  description String
+  services    String
+  categories  String[] @default([])
+  areas       String[] @default([])
+  website     String   @default("")
+  email       String   @default("")
+  phone       String   @default("")
+  logo        String   @default("")
+  photos      String[] @default([])
+  published   Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
 }
 
 model Membership {
-  id              String            @id @default(cuid())
-  userId          String            @unique
-  user            User              @relation(fields: [userId], references: [id])
-  plan            String            @default("SturdiHome Membership - Standard")
-  priceCents      Int               @default(1900)
-  status          MembershipStatus  @default(NONE)
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id])
+  plan            String           @default("SturdiHome Membership - Standard")
+  priceCents      Int              @default(1900)
+  status          MembershipStatus @default(NONE)
   activatedAt     DateTime?
   nextBillingDate DateTime?
   canceledAt      DateTime?
 }
 
 model VendorProfile {
-  id               String            @id @default(cuid())
-  userId           String            @unique
-  user             User              @relation(fields: [userId], references: [id])
-  companyName      String
-  serviceArea      String
-  servicesOffered  String
-  status           ApplicationStatus @default(PENDING)
-  appliedAt        DateTime          @default(now())
-  reviewedAt       DateTime?
-  serviceRequests  ServiceRequest[]
-  flyers           VendorFlyer[]
+  id              String            @id @default(cuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id])
+  companyName     String
+  serviceArea     String
+  servicesOffered String
+  status          ApplicationStatus @default(PENDING)
+  appliedAt       DateTime          @default(now())
+  reviewedAt      DateTime?
+  serviceRequests ServiceRequest[]
+  flyers          VendorFlyer[]
 
-  membershipStatus             MembershipStatus @default(NONE)
-  membershipTier                String?
-  stripeCustomerId             String?
-  stripeSubscriptionId         String?
-  membershipActivatedAt        DateTime?
-  membershipCurrentPeriodEnd   DateTime?
-  membershipCanceledAt         DateTime?
+  membershipStatus           MembershipStatus @default(NONE)
+  membershipTier             String?
+  stripeCustomerId           String?
+  stripeSubscriptionId       String?
+  membershipActivatedAt      DateTime?
+  membershipCurrentPeriodEnd DateTime?
+  membershipCanceledAt       DateTime?
 
-  applicationFeePaidAt          DateTime?
-  foundingVendor                Boolean          @default(false)
+  applicationFeePaidAt DateTime?
+  foundingVendor       Boolean   @default(false)
 }
 
 model VendorFlyer {
@@ -110,15 +292,17 @@ model VendorFlyer {
 }
 
 model FinancingPartnerProfile {
-  id                String            @id @default(cuid())
-  userId            String            @unique
-  user              User              @relation(fields: [userId], references: [id])
-  companyName       String
-  licenseInfo       String
-  status            ApplicationStatus @default(PENDING)
-  appliedAt         DateTime          @default(now())
-  reviewedAt        DateTime?
-  financingRequests FinancingRequest[]
+  id                   String                              @id @default(cuid())
+  userId               String                              @unique
+  user                 User                                @relation(fields: [userId], references: [id])
+  companyName          String
+  licenseInfo          String
+  status               ApplicationStatus                   @default(PENDING)
+  appliedAt            DateTime                            @default(now())
+  reviewedAt           DateTime?
+  financingRequests    FinancingRequest[]
+  statusReports        FinancingStatusReport[]             @relation("ReportPartnerProfile")
+  reportingAcceptances FinancePartnerReportingAcceptance[]
 
   paymentStatus         PaymentStatus @default(UNPAID)
   stripeCustomerId      String?
@@ -126,38 +310,155 @@ model FinancingPartnerProfile {
   paidAt                DateTime?
 }
 
+model MemberStandingAcceptance {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  version             String
+  effectiveDate       DateTime
+  documentIdentifier  String
+  fullLegalName       String
+  electronicSignature String
+  signedCopyContent   String
+  acceptedAt          DateTime @default(now())
+
+  @@unique([userId, version])
+  @@index([userId, acceptedAt])
+}
+
+model FinancePartnerReportingAcceptance {
+  id                        String                   @id @default(cuid())
+  userId                    String
+  user                      User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  version                   String
+  documentIdentifier        String
+  fullLegalName             String
+  electronicSignature       String
+  signedCopyContent         String
+  acceptedAt                DateTime                 @default(now())
+  financingPartnerProfile   FinancingPartnerProfile? @relation(fields: [financingPartnerProfileId], references: [id])
+  financingPartnerProfileId String?
+
+  @@unique([userId, version])
+}
+
+model FinancingStatusReport {
+  id                        String                   @id @default(cuid())
+  financePartnerUserId      String
+  financePartnerUser        User                     @relation("ReportPartner", fields: [financePartnerUserId], references: [id], onDelete: Restrict)
+  financePartnerProfileId   String
+  financePartnerProfile     FinancingPartnerProfile  @relation("ReportPartnerProfile", fields: [financePartnerProfileId], references: [id], onDelete: Restrict)
+  memberId                  String
+  member                    User                     @relation("ReportMember", fields: [memberId], references: [id], onDelete: Restrict)
+  financingRequestId        String
+  financingRequest          FinancingRequest         @relation(fields: [financingRequestId], references: [id], onDelete: Restrict)
+  status                    String
+  relationshipReference     String?
+  authorizationConfirmed    Boolean
+  accuracyConfirmed         Boolean
+  ownRelationshipConfirmed  Boolean
+  noCollectionConfirmed     Boolean
+  updateCommitmentConfirmed Boolean
+  active                    Boolean                  @default(true)
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+  resolvedAt                DateTime?
+  disputes                  FinancingStatusDispute[]
+  audits                    FinancingStatusAudit[]
+  notifications             UserNotification[]
+
+  @@index([memberId, active, createdAt])
+  @@index([financePartnerUserId, createdAt])
+}
+
+model FinancingStatusDispute {
+  id         String                @id @default(cuid())
+  reportId   String
+  report     FinancingStatusReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  memberId   String
+  member     User                  @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  response   String
+  status     String                @default("OPEN")
+  reviewedBy String?
+  reviewedAt DateTime?
+  adminNotes String?
+  createdAt  DateTime              @default(now())
+
+  @@index([memberId, createdAt])
+  @@index([reportId, createdAt])
+}
+
+model FinancingStatusAudit {
+  id          String                @id @default(cuid())
+  reportId    String
+  report      FinancingStatusReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  actorUserId String
+  action      String
+  reason      String?
+  createdAt   DateTime              @default(now())
+
+  @@index([reportId, createdAt])
+}
+
+model UserNotification {
+  id        String                 @id @default(cuid())
+  userId    String
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportId  String?
+  report    FinancingStatusReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  title     String
+  body      String
+  readAt    DateTime?
+  createdAt DateTime               @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model AccountCancellationAudit {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actorUserId String
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
 model Document {
   id         String   @id @default(cuid())
   userId     String
   user       User     @relation(fields: [userId], references: [id])
   label      String
+  documentType String?
   fileName   String
   uploadedAt DateTime @default(now())
 }
 
 model FinancingRequest {
-  id                 String         @id @default(cuid())
+  id                 String                   @id @default(cuid())
   homeownerId        String
-  homeowner          User           @relation(fields: [homeownerId], references: [id])
+  homeowner          User                     @relation(fields: [homeownerId], references: [id])
   projectDescription String
   amountRequested    Int
-  status             RequestStatus  @default(NEW)
+  status             RequestStatus            @default(NEW)
   assignedPartnerId  String?
   assignedPartner    FinancingPartnerProfile? @relation(fields: [assignedPartnerId], references: [id])
   notes              String?
-  createdAt          DateTime       @default(now())
+  createdAt          DateTime                 @default(now())
+  statusReports      FinancingStatusReport[]
 }
 
 model ServiceRequest {
-  id               String          @id @default(cuid())
+  id               String         @id @default(cuid())
   homeownerId      String
-  homeowner        User            @relation(fields: [homeownerId], references: [id])
+  homeowner        User           @relation(fields: [homeownerId], references: [id])
   serviceType      String
   description      String
-  status           RequestStatus   @default(NEW)
+  status           RequestStatus  @default(NEW)
   assignedVendorId String?
-  assignedVendor   VendorProfile?  @relation(fields: [assignedVendorId], references: [id])
-  createdAt        DateTime        @default(now())
+  assignedVendor   VendorProfile? @relation(fields: [assignedVendorId], references: [id])
+  createdAt        DateTime       @default(now())
   appointment      Appointment?
 
   // Deprecated: homeowner-pays-vendor-directly flow has been removed from the app.

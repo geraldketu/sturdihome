@@ -1,9 +1,11 @@
+import { requirePageAccess } from "@/lib/auth";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { setFinancingPartnerStatusAction } from "@/lib/actions/admin-actions";
+import AdminAccountActions from "@/components/AdminAccountActions";
 import { Badge, Card } from "@/components/ui";
 
 export default async function AdminFinancingPartnersPage() {
+  await requirePageAccess("/admin/financing-partners");
   const partners = await prisma.financingPartnerProfile.findMany({
     include: { user: true },
     orderBy: { appliedAt: "desc" },
@@ -32,24 +34,7 @@ export default async function AdminFinancingPartnersPage() {
                 </Badge>
               </div>
             </div>
-            {p.status === "PENDING" && (
-              <div className="mt-3 flex gap-2">
-                <form action={setFinancingPartnerStatusAction}>
-                  <input type="hidden" name="partnerId" value={p.id} />
-                  <input type="hidden" name="status" value="APPROVED" />
-                  <button className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-dark">
-                    Approve
-                  </button>
-                </form>
-                <form action={setFinancingPartnerStatusAction}>
-                  <input type="hidden" name="partnerId" value={p.id} />
-                  <input type="hidden" name="status" value="REJECTED" />
-                  <button className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">
-                    Reject
-                  </button>
-                </form>
-              </div>
-            )}
+            <div className="mt-3"><AdminAccountActions userId={p.userId} approvalStatus={p.user.approvalStatus} accountStatus={p.user.accountStatus} /></div>
           </Card>
         ))}
         {partners.length === 0 && (

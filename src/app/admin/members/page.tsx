@@ -1,8 +1,11 @@
+import { requirePageAccess } from "@/lib/auth";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
+import AdminAccountActions from "@/components/AdminAccountActions";
 
 export default async function AdminMembersPage() {
+  await requirePageAccess("/admin/members");
   const members = await prisma.user.findMany({
     where: { role: "HOMEOWNER" },
     orderBy: { createdAt: "desc" },
@@ -18,6 +21,8 @@ export default async function AdminMembersPage() {
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Email</th>
               <th className="px-4 py-2">Agreement</th>
+              <th className="px-4 py-2">Access</th>
+              <th className="px-4 py-2">Actions</th>
               <th className="px-4 py-2">Joined</th>
             </tr>
           </thead>
@@ -35,12 +40,14 @@ export default async function AdminMembersPage() {
                     {m.agreementAcceptedAt ? "Signed" : "Pending"}
                   </Badge>
                 </td>
+                <td className="px-4 py-2"><Badge tone={m.approvalStatus === "APPROVED" ? "green" : m.approvalStatus === "REJECTED" ? "red" : "yellow"}>{m.accountStatus === "REVOKED" ? "Revoked" : m.approvalStatus}</Badge></td>
+                <td className="px-4 py-2"><AdminAccountActions userId={m.id} approvalStatus={m.approvalStatus} accountStatus={m.accountStatus} /></td>
                 <td className="px-4 py-2 text-gray-500">{m.createdAt.toLocaleDateString()}</td>
               </tr>
             ))}
             {members.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-gray-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-gray-500">
                   No members yet.
                 </td>
               </tr>

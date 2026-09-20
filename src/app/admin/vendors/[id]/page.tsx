@@ -1,7 +1,9 @@
+import AdminApprovalControls from "@/components/AdminApprovalControls";
+import { requirePageAccess } from "@/lib/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { setVendorStatusAction, setVendorFlyerStatusAction } from "@/lib/actions/admin-actions";
+import { setVendorFlyerStatusAction } from "@/lib/actions/admin-actions";
 import { Badge, Card } from "@/components/ui";
 import { formatCents, formatCentsRange } from "@/lib/format";
 import { getVendorMembershipTier } from "@/lib/stripe";
@@ -15,6 +17,7 @@ function monthsElapsed(since: Date | null): number {
 }
 
 export default async function AdminVendorDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePageAccess("/admin/vendors/[id]");
   const { id } = await params;
 
   const vendor = await prisma.vendorProfile.findUnique({
@@ -36,6 +39,7 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
 
   return (
     <div className="space-y-6">
+      <AdminApprovalControls userId={vendor.userId} />
       <div>
         <Link href="/admin/vendors" className="text-xs text-gray-500 hover:underline">
           ← Back to Vendors
@@ -54,24 +58,6 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
           Membership: {vendor.membershipStatus}
           {vendor.membershipStatus === "ACTIVE" || vendor.membershipStatus === "PAST_DUE" ? ` (${tier.name})` : ""}
         </Badge>
-        {vendor.status === "PENDING" && (
-          <div className="flex gap-2">
-            <form action={setVendorStatusAction}>
-              <input type="hidden" name="vendorId" value={vendor.id} />
-              <input type="hidden" name="status" value="APPROVED" />
-              <button className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-dark">
-                Approve
-              </button>
-            </form>
-            <form action={setVendorStatusAction}>
-              <input type="hidden" name="vendorId" value={vendor.id} />
-              <input type="hidden" name="status" value="REJECTED" />
-              <button className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">
-                Reject
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

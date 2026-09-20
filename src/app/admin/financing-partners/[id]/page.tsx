@@ -1,11 +1,13 @@
+import AdminApprovalControls from "@/components/AdminApprovalControls";
+import { requirePageAccess } from "@/lib/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { setFinancingPartnerStatusAction } from "@/lib/actions/admin-actions";
 import { Badge, Card } from "@/components/ui";
 import { formatCents } from "@/lib/format";
 
 export default async function AdminFinancingPartnerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePageAccess("/admin/financing-partners/[id]");
   const { id } = await params;
 
   const partner = await prisma.financingPartnerProfile.findUnique({
@@ -22,6 +24,7 @@ export default async function AdminFinancingPartnerDetailPage({ params }: { para
 
   return (
     <div className="space-y-6">
+      <AdminApprovalControls userId={partner.userId} />
       <div>
         <Link href="/admin/financing-partners" className="text-xs text-gray-500 hover:underline">
           ← Back to Financing Partners
@@ -35,24 +38,6 @@ export default async function AdminFinancingPartnerDetailPage({ params }: { para
         <Badge tone={partner.status === "APPROVED" ? "green" : partner.status === "REJECTED" ? "red" : "yellow"}>
           {partner.status}
         </Badge>
-        {partner.status === "PENDING" && (
-          <div className="flex gap-2">
-            <form action={setFinancingPartnerStatusAction}>
-              <input type="hidden" name="partnerId" value={partner.id} />
-              <input type="hidden" name="status" value="APPROVED" />
-              <button className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-dark">
-                Approve
-              </button>
-            </form>
-            <form action={setFinancingPartnerStatusAction}>
-              <input type="hidden" name="partnerId" value={partner.id} />
-              <input type="hidden" name="status" value="REJECTED" />
-              <button className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">
-                Reject
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

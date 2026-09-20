@@ -1,46 +1,21 @@
-import { redirect } from "next/navigation";
-import { getSessionUser, loginDestinationForRole } from "@/lib/auth";
+﻿import { redirect } from "next/navigation";
+import { getAuthenticatedSession, loginDestinationForRole } from "@/lib/auth";
+import { accountGate } from "@/lib/approval";
+import { safeReturnTo } from "@/lib/access";
 import { Card } from "@/components/ui";
-
 export default async function PendingApprovalPage() {
-  const user = await getSessionUser();
-  if (!user) redirect("/login");
-
-  if (user.role === "VENDOR" && user.vendorProfile?.status === "APPROVED") {
-    redirect("/vendor");
-  }
-  if (user.role === "FINANCING_PARTNER" && user.financingProfile?.status === "APPROVED") {
-    redirect("/financing");
-  }
-  if (user.role === "HOMEOWNER" || user.role === "ADMIN") {
-    redirect(loginDestinationForRole(user.role));
-  }
-
-  const rejected =
-    (user.role === "VENDOR" && user.vendorProfile?.status === "REJECTED") ||
-    (user.role === "FINANCING_PARTNER" && user.financingProfile?.status === "REJECTED");
-
-  return (
-    <main className="mx-auto max-w-lg px-4 py-16">
-      <Card>
-        {rejected ? (
-          <>
-            <h1 className="text-xl font-bold text-red-700">Application Not Approved</h1>
-            <p className="mt-2 text-sm text-gray-600">
-              Unfortunately your application was not approved. If you believe this is a
-              mistake, please contact SturdiHome support.
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-xl font-bold text-brand-dark">Application Under Review</h1>
-            <p className="mt-2 text-sm text-gray-600">
-              Thanks for applying! Our team is reviewing your application. You&apos;ll
-              gain access to your dashboard as soon as you&apos;re approved.
-            </p>
-          </>
-        )}
-      </Card>
-    </main>
-  );
+  const session = await getAuthenticatedSession();
+  if (!session) redirect("/login");
+  const user = session.user;
+  const gate = await accountGate(user);
+  if (!gate) redirect(safeReturnTo(session.returnTo, user.role) ?? loginDestinationForRole(user.role));
+  if (gate === "agreement") redirect("/agreement");
+  if (gate === "cancelled") redirect("/account-cancelled");
+  if (gate === "revoked") redirect("/account-revoked");
+  const rejected = user.approvalStatus === "REJECTED";
+  return <main className="mx-auto w-full max-w-lg px-4 py-16"><Card>
+    <h1 className="text-xl font-bold text-brand-navy">{rejected ? "Application Not Approved" : "Application Under Review"}</h1>
+    <p className="mt-3 text-sm leading-6 text-gray-600">{rejected ? "Please contact SturdiHome support if you have questions about your application." : "Your agreement is complete. An administrator must approve your account before you can use SturdiHome services. Check back here for your approval status."}</p>
+    <a className="mt-5 inline-block text-brand underline" href="/pending-approval">Refresh status</a>
+  </Card></main>;
 }

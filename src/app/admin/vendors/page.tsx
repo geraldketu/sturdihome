@@ -1,9 +1,11 @@
+import { requirePageAccess } from "@/lib/auth";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { setVendorStatusAction } from "@/lib/actions/admin-actions";
+import AdminAccountActions from "@/components/AdminAccountActions";
 import { Badge, Card } from "@/components/ui";
 
 export default async function AdminVendorsPage() {
+  await requirePageAccess("/admin/vendors");
   const vendors = await prisma.vendorProfile.findMany({
     include: { user: true },
     orderBy: { appliedAt: "desc" },
@@ -33,24 +35,7 @@ export default async function AdminVendorsPage() {
                 </Badge>
               </div>
             </div>
-            {v.status === "PENDING" && (
-              <div className="mt-3 flex gap-2">
-                <form action={setVendorStatusAction}>
-                  <input type="hidden" name="vendorId" value={v.id} />
-                  <input type="hidden" name="status" value="APPROVED" />
-                  <button className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-dark">
-                    Approve
-                  </button>
-                </form>
-                <form action={setVendorStatusAction}>
-                  <input type="hidden" name="vendorId" value={v.id} />
-                  <input type="hidden" name="status" value="REJECTED" />
-                  <button className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">
-                    Reject
-                  </button>
-                </form>
-              </div>
-            )}
+            <div className="mt-3"><AdminAccountActions userId={v.userId} approvalStatus={v.user.approvalStatus} accountStatus={v.user.accountStatus} /></div>
           </Card>
         ))}
         {vendors.length === 0 && (
