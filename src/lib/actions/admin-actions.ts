@@ -7,6 +7,7 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { ActionState } from "@/lib/actions/auth-actions";
 import { reviewAccount, revokeAccount } from "@/lib/admin-approval";
+import { issueAccountSetupLink } from "@/lib/account-setup";
 
 async function requireAdmin() {
   const user = await getSessionUser();
@@ -26,6 +27,7 @@ export async function setVendorStatusAction(formData: FormData): Promise<void> {
   const profile = await prisma.vendorProfile.findUnique({ where: { id: vendorId } });
   if (!profile || profile.status !== "PENDING") return;
   await reviewAccount(admin.id, profile.userId, "VENDOR", status);
+  if (status === "APPROVED" && (await prisma.user.findUnique({ where: { id: profile.userId }, select: { passwordSetupRequired: true } }))?.passwordSetupRequired) { try { await issueAccountSetupLink(profile.userId); } catch { /* Approval remains recorded; resend is available in the detail view. */ } }
   revalidatePath("/admin/vendors");
   revalidatePath(`/admin/vendors/${vendorId}`);
 }
@@ -39,6 +41,7 @@ export async function setFinancingPartnerStatusAction(formData: FormData): Promi
   const profile = await prisma.financingPartnerProfile.findUnique({ where: { id: partnerId } });
   if (!profile || profile.status !== "PENDING") return;
   await reviewAccount(admin.id, profile.userId, "FINANCING_PARTNER", status);
+  if (status === "APPROVED" && (await prisma.user.findUnique({ where: { id: profile.userId }, select: { passwordSetupRequired: true } }))?.passwordSetupRequired) { try { await issueAccountSetupLink(profile.userId); } catch { /* Approval remains recorded; resend is available in the detail view. */ } }
   revalidatePath("/admin/financing-partners");
   revalidatePath(`/admin/financing-partners/${partnerId}`);
 }
@@ -98,6 +101,7 @@ async function reviewUserAccount(form: FormData, status: "APPROVED" | "REJECTED"
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || user.role === "ADMIN" || user.approvalStatus !== "PENDING") return;
   await reviewAccount(admin.id, userId, user.role, status);
+  if (status === "APPROVED" && user.passwordSetupRequired) { try { await issueAccountSetupLink(userId); } catch { /* Approval remains recorded; admin can resend once email configuration is available. */ } }
   revalidatePath("/admin", "layout");
 }
 
@@ -114,6 +118,28 @@ export async function revokeAccessAction(form: FormData): Promise<void> {
   const userId = String(form.get("userId") ?? "");
   if (!userId) return;
   await revokeAccount(admin.id, userId);
+  revalidatePath("/admin", "layout");
+}
+
+export async function resendAccountSetupLinkAction(form: FormData): Promise<void> {
+  const admin = await requireAdmin();
+  const userId = String(form.get("userId") ?? "");
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || user.role === "ADMIN" || !user.passwordSetupRequired || user.approvalStatus !== "APPROVED") return;
+  await issueAccountSetupLink(userId);
+  revalidatePath("/admin", "layout");
+  void admin;
+}
+
+export async function setAccountAvailabilityAction(form: FormData): Promise<void> {
+  const admin = await requireAdmin();
+  const userId = String(form.get("userId") ?? "");
+  const status = String(form.get("status") ?? "");
+  const reason = String(form.get("reason") ?? "").trim().slice(0, 500) || null;
+  if (!userId || !["PAUSED", "SUSPENDED", "ACTIVE"].includes(status)) return;
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || user.role === "ADMIN") return;
+  await prisma.$transaction([prisma.user.update({ where: { id: userId }, data: { accountStatus: status } }), prisma.adminAccountActionAudit.create({ data: { userId, adminId: admin.id, action: `${status}${reason ? `:${reason}` : ""}` } })]);
   revalidatePath("/admin", "layout");
 }
 

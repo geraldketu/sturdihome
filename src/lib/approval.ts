@@ -4,10 +4,12 @@ import { prisma } from "@/lib/prisma";
 type Account = { id: string; role: string; approvalStatus: string; agreementAcceptedAt: Date | null; agreementVersion: string | null; homeownerAccountType?: string;
   vendorProfile?: { status: string } | null; financingProfile?: { status: string } | null };
 
-export async function accountGate(user: Account): Promise<"agreement" | "approval" | "cancelled" | "revoked" | null> {
+export async function accountGate(user: Account): Promise<"agreement" | "approval" | "cancelled" | "revoked" | "paused" | "suspended" | null> {
   if (user.role === "ADMIN") return null;
   if ((user as Account & { accountStatus?: string }).accountStatus === "CANCELLED") return "cancelled";
   if ((user as Account & { accountStatus?: string }).accountStatus === "REVOKED") return "revoked";
+  if ((user as Account & { accountStatus?: string }).accountStatus === "PAUSED") return "paused";
+  if ((user as Account & { accountStatus?: string }).accountStatus === "SUSPENDED") return "suspended";
   const agreement = await prisma.networkAgreement.findFirst({ where: { role: user.role as "HOMEOWNER" | "VENDOR" | "FINANCING_PARTNER", active: true } });
   if (!agreement || !user.agreementAcceptedAt || user.agreementVersion !== agreement.version) return "agreement";
   const acceptance = await prisma.agreementAcceptance.findUnique({ where: { userId_role_version: { userId: user.id, role: agreement.role, version: agreement.version } } });

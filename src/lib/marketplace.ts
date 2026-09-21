@@ -18,7 +18,7 @@ export type ListingPreview = Pick<PublicListing, "id" | "companyName" | "logo" |
 export async function getListingPreviews() {
   try {
     const listings = await prisma.marketplaceListing.findMany({
-      where: await eligibility("vendor"), take: 3, orderBy: [{ companyName: "asc" }, { id: "asc" }],
+      where: await eligibility("vendor"), take: 3, orderBy: [{ featured: "desc" }, { sortOrder: "asc" }, { companyName: "asc" }, { id: "asc" }],
       select: { id: true, companyName: true, logo: true, categories: true, description: true, areas: true },
     });
     return { available: true, listings };

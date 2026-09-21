@@ -16,6 +16,7 @@ import {
 import type Stripe from "stripe";
 import { authRateLimited } from "@/lib/auth-throttle";
 import { characterPlan } from "@/lib/character-entitlements";
+import { getBixySettings } from "@/lib/bixy-settings";
 
 export async function createVendorMembershipCheckoutAction(formData: FormData): Promise<void> {
   const user = await getApprovedUser();
@@ -171,7 +172,8 @@ export async function createFinancingPartnerPaymentCheckoutAction(): Promise<voi
 export async function createCharacterCheckoutAction(formData: FormData): Promise<void> {
   const user = await getApprovedUser();
   if (!user) throw new Error("Not authorized");
-  if (process.env.CHARACTER_PAYMENTS_ENABLED !== "true") throw new Error("Character payments are pending final review.");
+  const bixySettings = await getBixySettings();
+  if (process.env.CHARACTER_PAYMENTS_ENABLED !== "true" || !bixySettings.paidAccessEnabled) throw new Error("Character payments are pending final review.");
   if (await authRateLimited("character-billing", user.id, 5)) throw new Error("Too many billing requests. Please try again later.");
   const plan = characterPlan(String(formData.get("plan") ?? ""));
   if (!plan) throw new Error("Invalid character plan");

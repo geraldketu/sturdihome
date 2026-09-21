@@ -30,7 +30,7 @@ test("Task 3 animation stage has separated realistic asset and motion contracts"
   assert.match(widget, /placeholder="Ask your guide\.\.\."/);
   assert.match(widget, /onSubmit=\{handleSubmit\}/);
   assert.match(widget, /setSpeechResetToken/);
-  assert.match(speech, /Dynamic voice is not configured yet/);
+  assert.match(speech, /is speaking/);
   assert.doesNotMatch(speech, /speechSynthesis\.speak/);
   assert.doesNotMatch(speech, /new Audio/);
   assert.match(knowledge, /family-friendly/);

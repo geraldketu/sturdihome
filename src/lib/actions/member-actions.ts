@@ -181,6 +181,40 @@ export async function submitServiceRequestAction(_prev: ActionState, formData: F
   if (assignedVendorId) revalidatePath("/vendor/leads");
 }
 
+export async function acceptFinalQuoteAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireHomeowner();
+  const requestId = String(formData.get("requestId") ?? "");
+  const request = await prisma.serviceRequest.findFirst({ where: { id: requestId, homeownerId: user.id, workflowStatus: "FINAL_QUOTE_SUBMITTED" }, include: { quoteItems: true, assignedVendor: true } });
+  if (!request) return { error: "Final quote not found or no longer available." };
+  const financing = await prisma.$transaction(async tx => {
+    const next = await tx.serviceRequest.update({ where: { id: requestId }, data: { workflowStatus: "FINANCING_REQUESTED", quoteAcceptedAt: new Date(), quoteAcceptedBy: user.id } });
+    const financingRequest = await tx.financingRequest.upsert({ where: { serviceRequestId: requestId }, update: { amountRequested: Math.ceil((request.finalQuoteTotalCents ?? 0) / 100), projectDescription: request.description, lenderStatus: "RECEIVED", financedLineItems: request.quoteItems }, create: { homeownerId: user.id, serviceRequestId: requestId, amountRequested: Math.ceil((request.finalQuoteTotalCents ?? 0) / 100), projectDescription: request.description, status: "NEW", lenderStatus: "RECEIVED", financedLineItems: request.quoteItems } });
+    await tx.serviceRequestAudit.create({ data: { serviceRequestId: requestId, actorUserId: user.id, previousStatus: request.workflowStatus, newStatus: "FINANCING_REQUESTED" } });
+    return { next, financingRequest };
+  });
+  if (request.assignedVendor?.userId) await prisma.userNotification.create({ data: { userId: request.assignedVendor.userId, title: "Homeowner accepted the final quote", body: "The project quote was accepted and is ready for the financing workflow." } });
+  void financing;
+  revalidatePath("/member");
+}
+
+export async function confirmServiceCompletionAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireHomeowner();
+  const requestId = String(formData.get("requestId") ?? "");
+  const request = await prisma.serviceRequest.findFirst({ where: { id: requestId, homeownerId: user.id, workflowStatus: "AWAITING_HOMEOWNER_CONFIRMATION" }, select: { id: true, workflowStatus: true } });
+  if (!request) return { error: "Completion confirmation is not available." };
+  await prisma.$transaction([prisma.serviceRequest.update({ where: { id: requestId }, data: { status: "COMPLETED", workflowStatus: "COMPLETED", completedAt: new Date(), completedBy: user.id } }), prisma.serviceRequestAudit.create({ data: { serviceRequestId: requestId, actorUserId: user.id, previousStatus: request.workflowStatus, newStatus: "COMPLETED" } })]);
+  revalidatePath("/member");
+}
+
+export async function approveChangeOrderAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireHomeowner();
+  const id = String(formData.get("changeOrderId") ?? "");
+  const change = await prisma.changeOrder.findFirst({ where: { id, serviceRequest: { homeownerId: user.id }, status: "PENDING_HOMEOWNER" } });
+  if (!change) return { error: "Change order not found." };
+  await prisma.$transaction([prisma.changeOrder.update({ where: { id }, data: { status: "APPROVED", approvedAt: new Date(), approvedBy: user.id } }), prisma.serviceRequest.update({ where: { id: change.serviceRequestId }, data: { workflowStatus: "HOMEOWNER_ACCEPTED" } })]);
+  revalidatePath("/member");
+}
+
 const appointmentSchema = z.object({
   serviceRequestId: z.string().min(1, "Select a service request"),
   scheduledFor: z.string().min(1, "Choose a date and time"),
@@ -208,6 +242,9 @@ export async function bookAppointmentAction(_prev: ActionState, formData: FormDa
   if (Number.isNaN(scheduledFor.getTime())) {
     return { error: "Invalid date/time." };
   }
+  if (scheduledFor <= new Date()) return { error: "Choose a future appointment time." };
+  const existingAppointment = await prisma.appointment.findUnique({ where: { serviceRequestId: serviceRequest.id }, select: { id: true } });
+  if (existingAppointment) return { error: "This service request already has an appointment. Use the existing appointment to update it." };
 
   await prisma.appointment.create({
     data: {

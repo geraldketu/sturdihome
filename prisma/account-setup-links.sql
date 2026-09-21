@@ -1,0 +1,11 @@
+BEGIN;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "passwordSetupRequired" BOOLEAN NOT NULL DEFAULT FALSE;
+CREATE TABLE IF NOT EXISTS "AccountSetupToken" (
+  "tokenHash" TEXT NOT NULL PRIMARY KEY,
+  "userId" TEXT NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
+  "expiresAt" TIMESTAMP(3) NOT NULL,
+  "usedAt" TIMESTAMP(3),
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "AccountSetupToken_userId_expiresAt_idx" ON "AccountSetupToken"("userId", "expiresAt");
+COMMIT;

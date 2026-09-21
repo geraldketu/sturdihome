@@ -29,6 +29,42 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.seasonal-experience { position: relative; min-height: 100%; isolation: isolate; }
+.seasonal-experience > *:not(.theme-effects):not(.character-widget) { position: relative; z-index: 1; }
+.theme-effects { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: .45; }
+.theme-particle { position: absolute; top: -8vh; pointer-events: none; color: var(--brand-gold); }
+.theme-snowflake { animation: theme-fall linear infinite; color: #fff; font-size: 1.25rem; text-shadow: 0 1px 4px rgb(27 42 82 / 20%); }
+.theme-raindrop { width: 1px; height: 18px; background: rgb(27 42 82 / 28%); animation: theme-rain linear infinite; }
+.theme-leaf { color: #c7792b; font-size: 1rem; animation: theme-leaf-fall linear infinite; }
+.theme-holiday-sparkle { position: absolute; right: 10%; top: 18%; color: var(--brand-gold); animation: theme-twinkle 2.4s ease-in-out infinite; }
+.seasonal-spring { --theme-tint: rgb(242 223 205 / 18%); background-image: linear-gradient(180deg, var(--theme-tint), transparent 30%); }
+.seasonal-summer { background-image: linear-gradient(180deg, rgb(250 226 157 / 12%), transparent 30%); }
+.seasonal-fall { background-image: linear-gradient(180deg, rgb(199 120 43 / 10%), transparent 30%); }
+.seasonal-winter { background-image: linear-gradient(180deg, rgb(214 229 240 / 18%), transparent 30%); }
+.holiday-valentines { background-image: linear-gradient(180deg, rgb(237 92 120 / 10%), transparent 28%); }
+.holiday-halloween { background-image: linear-gradient(180deg, rgb(92 62 98 / 10%), transparent 28%); }
+.holiday-thanksgiving { background-image: linear-gradient(180deg, rgb(191 113 45 / 10%), transparent 28%); }
+.holiday-christmas { background-image: linear-gradient(180deg, rgb(44 112 75 / 10%), transparent 28%); }
+.holiday-new-years { background-image: linear-gradient(180deg, rgb(199 154 43 / 12%), transparent 28%); }
+.seasonal-effects-disabled { background-image: none; }
+
+.bixy-accessory { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.bixy-accessory-hat, .bixy-accessory-scarf, .bixy-accessory-bow { display: none; position: absolute; }
+.bixy-accessory-winter .bixy-accessory-hat, .bixy-accessory-christmas .bixy-accessory-hat, .bixy-accessory-new-years .bixy-accessory-hat { display: block; top: 7%; left: 35%; width: 30%; height: 13%; border-radius: 45% 45% 18% 18%; background: #b53b37; box-shadow: 0 4px 0 #ead9a0; }
+.bixy-accessory-fall .bixy-accessory-scarf, .bixy-accessory-winter .bixy-accessory-scarf, .bixy-accessory-thanksgiving .bixy-accessory-scarf { display: block; left: 22%; top: 44%; width: 56%; height: 8%; border-radius: 999px; background: #c7792b; transform: rotate(-4deg); }
+.bixy-accessory-christmas .bixy-accessory-bow, .bixy-accessory-valentines .bixy-accessory-bow, .bixy-accessory-new-years .bixy-accessory-bow { display: block; left: 43%; top: 39%; width: 14%; height: 10%; border-radius: 50%; background: #b53b57; box-shadow: -7px 0 0 #b53b57, 7px 0 0 #b53b57; }
+.bixy-accessory-spring .bixy-accessory-scarf { display: block; left: 25%; top: 45%; width: 50%; height: 6%; border-radius: 999px; background: #8eaa63; }
+.bixy-accessory-summer .bixy-accessory-hat { display: block; top: 10%; left: 30%; width: 40%; height: 7%; border-radius: 50%; background: #ead9a0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-effects, .bixy-accessory { display: none; }
+}
+
+@keyframes theme-fall { to { transform: translate3d(12vw, 115vh, 0) rotate(180deg); } }
+@keyframes theme-rain { to { transform: translate3d(-5vw, 115vh, 0); } }
+@keyframes theme-leaf-fall { to { transform: translate3d(10vw, 115vh, 0) rotate(360deg); } }
+@keyframes theme-twinkle { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
 .hero-section {
   min-height: 600px;
 }
@@ -43,6 +79,22 @@ body {
 .character-stage-static {
   animation: none !important;
   transform: none !important;
+}
+
+.character-stage-brixy.character-motion-speaking {
+  animation: bixy-speak 1.2s ease-in-out infinite;
+}
+
+.character-stage-brixy.character-motion-listening {
+  animation: bixy-listen 2.8s ease-in-out infinite;
+}
+
+.character-stage-brixy.character-gesture-point-left {
+  animation: bixy-point-left 900ms ease-in-out both;
+}
+
+.character-stage-brixy.character-gesture-point-right {
+  animation: bixy-point-right 900ms ease-in-out both;
 }
 
 .character-stage-image,
@@ -148,6 +200,10 @@ body {
 @keyframes character-walk-right { from { transform: translateX(-18px); } to { transform: translateX(6px); } }
 @keyframes character-move-target { from { transform: translateX(0); } to { transform: translateX(10px) translateY(-3px) scale(1.02); } }
 @keyframes character-return-home { from { transform: translateX(10px) translateY(-3px) scale(1.02); } to { transform: translateX(0) translateY(0) scale(1); } }
+@keyframes bixy-speak { 0%, 100% { transform: translateY(0) scale(1); } 45% { transform: translateY(-2px) scale(1.015); } }
+@keyframes bixy-listen { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-1.2deg) translateY(-1px); } }
+@keyframes bixy-point-left { from { transform: translateX(3px) rotate(1deg); } to { transform: translateX(-4px) rotate(-2deg); } }
+@keyframes bixy-point-right { from { transform: translateX(-3px) rotate(-1deg); } to { transform: translateX(4px) rotate(2deg); } }
 
 /* Portal-only presentation. Existing layouts, control positions and status colors
    stay intact; shared components outside these three portals are unaffected. */

@@ -12,6 +12,7 @@ export default async function PendingApprovalPage() {
   if (gate === "agreement") redirect("/agreement");
   if (gate === "cancelled") redirect("/account-cancelled");
   if (gate === "revoked") redirect("/account-revoked");
+  if (gate === "paused" || gate === "suspended") redirect("/account-unavailable");
   const rejected = user.approvalStatus === "REJECTED";
   return <main className="mx-auto w-full max-w-lg px-4 py-16"><Card>
     <h1 className="text-xl font-bold text-brand-navy">{rejected ? "Application Not Approved" : "Application Under Review"}</h1>

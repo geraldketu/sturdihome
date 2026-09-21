@@ -18,6 +18,7 @@ export function safeReturnTo(value: unknown, role?: string): string | null {
     if (url.origin !== "https://sturdihome.invalid" || /%2f|%5c|%00/i.test(url.pathname)) return null;
     const roles = routeRoles(url.pathname);
     if (!roles || ["/welcome", "/pending-approval", "/agreement"].includes(url.pathname)) return null;
+    if (url.pathname.startsWith("/marketplace/financing") && role === "VENDOR") return null;
     if (role && !roles.includes(role)) return null;
     return url.pathname + url.search + url.hash;
   } catch { return null; }

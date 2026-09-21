@@ -1,0 +1,9 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionUser } from "@/lib/auth";
+import { getBixySettings, BIXY_ADMIN_SCHEMA } from "@/lib/bixy-settings";
+import { prisma } from "@/lib/prisma";
+
+async function requireAdminResponse() { const user = await getSessionUser(); if (!user) return { response: NextResponse.json({ error: "Not authenticated" }, { status: 401 }) }; if (user.role !== "ADMIN") return { response: NextResponse.json({ error: "Forbidden" }, { status: 403 }) }; return { user }; }
+export async function GET() { const auth = await requireAdminResponse(); if ("response" in auth) return auth.response; return NextResponse.json(await getBixySettings(), { headers: { "Cache-Control": "private, no-store" } }); }
+
+export async function PATCH(request: NextRequest) { const auth = await requireAdminResponse(); if ("response" in auth) return auth.response; const raw: unknown = await request.json().catch(() => null); const parsed = BIXY_ADMIN_SCHEMA.safeParse(raw); if (!parsed.success) return NextResponse.json({ error: "Invalid Bixy settings" }, { status: 400 }); const before = await getBixySettings(); const after = { ...parsed.data, id: "default" }; const changedKeys = Object.keys(after).filter(key => JSON.stringify((before as Record<string, unknown>)[key]) !== JSON.stringify((after as Record<string, unknown>)[key])); await prisma.$transaction([prisma.bixySettings.upsert({ where: { id: "default" }, update: parsed.data, create: after }), prisma.bixyConfigAudit.create({ data: { settingsId: "default", adminId: auth.user.id, changedKeys, beforeJson: before, afterJson: after } })]); return NextResponse.json({ ok: true }); }

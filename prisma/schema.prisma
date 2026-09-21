@@ -81,6 +81,7 @@ model User {
   canceledAt                DateTime?
   cancellationReason        String?
   financingAccessStatus     String                              @default("ACTIVE")
+  passwordSetupRequired     Boolean                             @default(false)
   homeownerAccountType      HomeownerAccountType                @default(VERIFIED_HOMEOWNER)
   homeownerVerificationStatus String                            @default("UNVERIFIED")
   memberStandingAcceptances MemberStandingAcceptance[]
@@ -90,6 +91,7 @@ model User {
   cancellationAudits        AccountCancellationAudit[]
   financingDisputes         FinancingStatusDispute[]
   reportingAcceptances      FinancePartnerReportingAcceptance[]
+  setupTokens               AccountSetupToken[]
 }
 
 model AuthSession {
@@ -206,6 +208,135 @@ model AdminAccountActionAudit {
   @@index([adminId, createdAt])
 }
 
+model SiteExperienceSettings {
+  id               String   @id
+  weatherEnabled   Boolean  @default(true)
+  seasonalEnabled  Boolean  @default(true)
+  holidayEnabled   Boolean  @default(true)
+  effectsDisabled  Boolean  @default(false)
+  previewTheme     String?
+  updatedAt        DateTime @updatedAt
+}
+
+model BixySettings {
+  id                    String   @id
+  enabled               Boolean  @default(true)
+  showOnPages           String[] @default(["*"])
+  maintenanceMode       Boolean  @default(false)
+  maintenanceMessage    String   @default("Bixy is taking a short break. Please use the SturdiHome navigation for help.")
+  voiceOutputEnabled    Boolean  @default(true)
+  voiceInputEnabled     Boolean  @default(true)
+  typedChatEnabled      Boolean  @default(true)
+  animationMode         String   @default("basic")
+  mouthAnimationEnabled Boolean  @default(true)
+  guidanceEnabled       Boolean  @default(true)
+  pageHelpEnabled       Boolean  @default(true)
+  sessionPersistence    Boolean  @default(true)
+  freePreviewSeconds    Int      @default(60)
+  paidAccessEnabled     Boolean  @default(false)
+  pricingJson           Json
+  greeting              String   @default("Well hello there. I am Bixy, your dependable SturdiHome guide.")
+  fallbackMessage       String   @default("I do not have that information. Please use the SturdiHome navigation or contact the SturdiHome team for help.")
+  personalityText       String   @default("You are Bixy, a male older-man SturdiHome guide. Always use he/him pronouns. Speak warmly, confidently, naturally, and with family-friendly humor.")
+  allowedDestinations   Json
+  updatedAt             DateTime @updatedAt
+  audits                BixyConfigAudit[]
+}
+
+model BixyConfigAudit {
+  id          String   @id @default(cuid())
+  settingsId  String
+  adminId     String
+  changedKeys String[]
+  beforeJson  Json
+  afterJson   Json
+  createdAt   DateTime @default(now())
+  settings    BixySettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@index([settingsId, createdAt])
+  @@index([adminId, createdAt])
+}
+
+model BixyRefundAudit {
+  id                    String   @id @default(cuid())
+  adminId               String
+  userId                String
+  paymentIntentId       String
+  stripeRefundId        String?  @unique
+  plan                  String?
+  originalAmountCents   Int
+  refundPercentage      Int
+  refundAmountCents     Int
+  remainingCents        Int?
+  status                String
+  errorMessage          String?
+  createdAt             DateTime @default(now())
+
+  @@index([paymentIntentId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model ServiceCategory {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  label       String
+  description String   @default("")
+  imageUrl    String   @default("")
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteAnnouncement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  ctaLabel  String?
+  ctaHref   String?
+  startsAt  DateTime?
+  endsAt    DateTime?
+  active    Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteMediaAsset {
+  id          String   @id @default(cuid())
+  label       String
+  description String   @default("")
+  mediaType   String
+  sourceUrl   String
+  storageKey  String?
+  altText     String   @default("")
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteContentPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  body        String
+  published   Boolean  @default(false)
+  protected   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteNavigationItem {
+  id        String   @id @default(cuid())
+  label     String
+  href      String
+  visible   Boolean  @default(true)
+  sortOrder Int      @default(0)
+  required  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model PasswordReset {
   tokenHash String   @id
   userId    String
@@ -213,6 +344,17 @@ model PasswordReset {
   expiresAt DateTime
 
   @@index([userId])
+}
+
+model AccountSetupToken {
+  tokenHash  String   @id
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, expiresAt])
 }
 
 model AuthThrottle {
@@ -240,6 +382,8 @@ model MarketplaceListing {
   logo        String   @default("")
   photos      String[] @default([])
   published   Boolean  @default(false)
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
   updatedAt   DateTime @updatedAt
 }
 
@@ -278,6 +422,8 @@ model VendorProfile {
 
   applicationFeePaidAt DateTime?
   foundingVendor       Boolean   @default(false)
+  maxActiveJobs        Int       @default(1)
+  availabilityStatus   String    @default("AVAILABLE")
 }
 
 model VendorFlyer {
@@ -445,6 +591,10 @@ model FinancingRequest {
   assignedPartnerId  String?
   assignedPartner    FinancingPartnerProfile? @relation(fields: [assignedPartnerId], references: [id])
   notes              String?
+  serviceRequestId   String? @unique
+  serviceRequest     ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
+  lenderStatus       String           @default("RECEIVED")
+  financedLineItems  Json?
   createdAt          DateTime                 @default(now())
   statusReports      FinancingStatusReport[]
 }
@@ -460,6 +610,20 @@ model ServiceRequest {
   assignedVendor   VendorProfile? @relation(fields: [assignedVendorId], references: [id])
   createdAt        DateTime       @default(now())
   appointment      Appointment?
+  financingRequests FinancingRequest[]
+  quoteItems       QuoteLineItem[]
+  changeOrders     ChangeOrder[]
+  workflowStatus   String         @default("ESTIMATE_SUBMITTED")
+  vendorResponse   String?
+  vendorResponseAt DateTime?
+  siteVisitScheduledFor DateTime?
+  siteVisitCompletedAt DateTime?
+  finalQuoteSubmittedAt DateTime?
+  quoteAcceptedAt DateTime?
+  quoteAcceptedBy String?
+  finalQuoteTotalCents Int?
+  completedAt DateTime?
+  completedBy String?
 
   // Deprecated: homeowner-pays-vendor-directly flow has been removed from the app.
   // Left in place (unused) rather than dropped, to avoid a destructive migration over
@@ -472,6 +636,45 @@ model ServiceRequest {
 
   estimateLowCents  Int?
   estimateHighCents Int?
+}
+
+model QuoteLineItem {
+  id               String         @id @default(cuid())
+  serviceRequestId String
+  serviceRequest   ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  category         String
+  description      String
+  amountCents      Int
+  createdAt        DateTime       @default(now())
+
+  @@index([serviceRequestId, createdAt])
+}
+
+model ChangeOrder {
+  id                   String         @id @default(cuid())
+  serviceRequestId     String
+  serviceRequest       ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  originalAmountCents  Int
+  requestedAmountCents Int
+  reason               String
+  status               String         @default("PENDING_HOMEOWNER")
+  approvedAt           DateTime?
+  approvedBy           String?
+  createdAt            DateTime       @default(now())
+
+  @@index([serviceRequestId, createdAt])
+}
+
+model ServiceRequestAudit {
+  id               String   @id @default(cuid())
+  serviceRequestId String
+  actorUserId      String
+  previousStatus   String?
+  newStatus        String
+  note             String?
+  createdAt        DateTime @default(now())
+
+  @@index([serviceRequestId, createdAt])
 }
 
 model Appointment {

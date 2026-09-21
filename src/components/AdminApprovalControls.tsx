@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requirePageAccess } from "@/lib/auth";
 import AdminAccountActions from "@/components/AdminAccountActions";
+import { resendAccountSetupLinkAction } from "@/lib/actions/admin-actions";
 
 export default async function AdminApprovalControls({ userId }: { userId: string }) {
   await requirePageAccess("/admin");
@@ -14,5 +15,6 @@ export default async function AdminApprovalControls({ userId }: { userId: string
     <p className="my-3 text-sm">Agreement: {accepted ? `Accepted (${user.agreementVersion})` : "Current agreement not accepted"}. Application: {user.approvalStatus}. Access: {user.accountStatus}.</p>
     {!terms && <p className="mb-3 text-sm text-gray-600">Approved agreement not yet available. Approval is blocked.</p>}
     <AdminAccountActions userId={user.id} approvalStatus={user.approvalStatus} accountStatus={user.accountStatus} approvalReady={accepted} />
+    {user.passwordSetupRequired && <div className="mt-3 flex items-center gap-3 text-sm"><span className="text-yellow-800">Activation: {user.approvalStatus === "APPROVED" ? "Setup required" : "Awaiting approval"}</span>{user.approvalStatus === "APPROVED" && <form action={resendAccountSetupLinkAction}><input type="hidden" name="userId" value={user.id} /><button className="font-semibold text-brand underline">Resend setup link</button></form>}</div>}
   </section>;
 }

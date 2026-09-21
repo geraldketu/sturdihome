@@ -7,6 +7,7 @@ import { getSessionUser } from "@/lib/auth";
 import { authRateLimited } from "@/lib/auth-throttle";
 import { chatInputSchema } from "@/lib/chat-validation";
 import { consumeCharacterAccess } from "@/lib/character-entitlements";
+import { getBixySettings } from "@/lib/bixy-settings";
 export const maxDuration = 30;
 export async function POST(req: NextRequest) {
   const user = await getSessionUser();
@@ -26,13 +27,16 @@ export async function POST(req: NextRequest) {
   try { body=JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { return NextResponse.json({error:"Invalid request"},{status:400}); }
   const parsed=chatInputSchema.safeParse(body);
   if(!parsed.success)return NextResponse.json({error:"Invalid conversation. Send text messages of up to 2,000 characters."},{status:400});
+  const settings = await getBixySettings();
+  const currentPath = parsed.data.currentPath && /^\/(?:[a-zA-Z0-9/_-]+)(?:\?[a-zA-Z0-9=&_%.-]+)?$/.test(parsed.data.currentPath) ? parsed.data.currentPath : "/";
+  if (!settings.enabled || settings.maintenanceMode || !settings.typedChatEnabled || !(settings.showOnPages.includes("*") || settings.showOnPages.some(page => currentPath === page || currentPath.startsWith(`${page}/`)))) return NextResponse.json({ error: settings.maintenanceMessage }, { status: 503 });
   const entitlement = await consumeCharacterAccess(user.id, parsed.data.character);
   if (!entitlement.allowed) return NextResponse.json({ error: "Character access purchased required", purchaseRequired: true }, { status: 402 });
   const chatModel=getChatModel();
   if(!chatModel)return NextResponse.json({error:"Chat assistant is not configured yet."},{status:503});
   try {
     const characterPrompt = "You are speaking as Bixy, the warm, dependable SturdiHome guide. Use family-friendly humor and keep the conversation focused on helpful SturdiHome topics.";
-    const result=streamText({model:chatModel.model,system:`${SYSTEM_PROMPT}\n\n${characterPrompt}`,messages:await convertToModelMessages(parsed.data.messages.slice(-20)),providerOptions:chatModel.providerOptions});
+    const result=streamText({model:chatModel.model,system:`${SYSTEM_PROMPT}\n\n${settings.personalityText}\n\n${characterPrompt}\n\nThe visitor is currently viewing ${currentPath}. Give page-specific help only when it is relevant. Use only the approved links from the system prompt and the configured allowed destinations; never invent destinations.`,messages:await convertToModelMessages(parsed.data.messages.slice(-20)),providerOptions:chatModel.providerOptions});
     return result.toUIMessageStreamResponse({onError:()=>"The assistant is temporarily unavailable. Please try again."});
   } catch {return NextResponse.json({error:"The assistant is temporarily unavailable."},{status:503});}
 }

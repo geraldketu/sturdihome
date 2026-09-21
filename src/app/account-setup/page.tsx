@@ -1,0 +1,4 @@
+import { Card } from "@/components/ui";
+import SetupPasswordForm from "./SetupPasswordForm";
+export const metadata = { referrer: "no-referrer" as const, robots: { index: false, follow: false } };
+export default async function AccountSetupPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) { const { token } = await searchParams; return <main className="mx-auto max-w-md px-4 py-16"><h1 className="mb-6 text-2xl font-bold text-brand-navy">Finish setting up your SturdiHome account</h1><Card>{typeof token === "string" && /^[a-f0-9]{64}$/.test(token) ? <SetupPasswordForm token={token} /> : <p>This setup link is invalid.</p>}</Card></main>; }

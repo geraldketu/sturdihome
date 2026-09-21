@@ -15,7 +15,6 @@ export default function SignupForm({ next, referralCode }: { next?: string; refe
       <Field label="Full Name" name="name" required />
       <Field label="Email" name="email" type="email" required />
       <Field label="Phone" name="phone" type="tel" />
-      <Field label="Password" name="password" type="password" required placeholder="At least 8 characters" />
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium text-gray-700">Choose your SturdiHome account</legend>
         <label className="flex gap-3 rounded-md border border-gray-200 p-3 text-sm">

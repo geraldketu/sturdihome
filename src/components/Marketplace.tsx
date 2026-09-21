@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/marketplace-shared";
 import type { ListingPreview } from "@/lib/marketplace";
+import { prisma } from "@/lib/prisma";
 
-export function MarketplaceSearch({ category = "", location = "", financing = false }: { category?: string; location?: string; financing?: boolean }) {
+async function activeCategories() {
+  try { const categories = await prisma.serviceCategory.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }], select: { label: true } }); return categories.length ? categories.map(category => category.label) : [...CATEGORIES]; } catch { return [...CATEGORIES]; }
+}
+
+export async function MarketplaceSearch({ category = "", location = "", financing = false }: { category?: string; location?: string; financing?: boolean }) {
+  const categories = await activeCategories();
   return <form action={financing ? "/marketplace/financing" : "/marketplace/vendors"} method="get" className="grid gap-4 rounded-2xl border border-brand-gold/30 bg-white p-5 text-brand-navy shadow-lg sm:grid-cols-[1fr_1fr_auto]">
     {!financing && <label className="text-sm font-semibold">What service do you need?
-      <select name="category" defaultValue={category} className="mt-2 block w-full rounded-lg border border-gray-300 bg-white p-3 font-normal"><option value="">All services</option>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select>
+      <select name="category" defaultValue={category} className="mt-2 block w-full rounded-lg border border-gray-300 bg-white p-3 font-normal"><option value="">All services</option>{categories.map(c => <option key={c}>{c}</option>)}</select>
     </label>}
     <label className={`text-sm font-semibold ${financing ? "sm:col-span-2" : ""}`}>City or ZIP code
       <input name="location" maxLength={100} defaultValue={location} placeholder="e.g. Atlanta or 30301" className="mt-2 block w-full rounded-lg border border-gray-300 p-3 font-normal" />
@@ -33,8 +39,9 @@ export function ListingCard({ listing: p }: { listing: ListingPreview }) {
   </article>;
 }
 
-export function CategoryGrid() {
-  return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{CATEGORIES.map((c, i) => <Link key={c} href={`/marketplace/vendors?category=${encodeURIComponent(c)}`} className="rounded-xl border border-brand-navy/10 bg-white p-5 font-semibold text-brand-navy shadow-sm hover:border-brand-gold"><span className="mb-3 block text-xs tracking-widest text-brand">{String(i + 1).padStart(2, "0")} / HOME SERVICES</span>{c}<span aria-hidden="true" className="float-right">↗</span></Link>)}</div>;
+export async function CategoryGrid() {
+  const categories = await activeCategories();
+  return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{categories.map((c, i) => <Link key={c} href={`/marketplace/vendors?category=${encodeURIComponent(c)}`} className="rounded-xl border border-brand-navy/10 bg-white p-5 font-semibold text-brand-navy shadow-sm hover:border-brand-gold"><span className="mb-3 block text-xs tracking-widest text-brand">{String(i + 1).padStart(2, "0")} / HOME SERVICES</span>{c}<span aria-hidden="true" className="float-right">↗</span></Link>)}</div>;
 }
 
 export function MarketplaceIntro({ title, children }: { title: string; children: React.ReactNode }) {

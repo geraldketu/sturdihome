@@ -17,7 +17,7 @@ import { formatCentsRange } from "@/lib/format";
 
 type VendorOption = { id: string; companyName: string; serviceArea: string; servicesOffered: string };
 
-export default function ServiceRequestForm({ vendors }: { vendors: VendorOption[] }) {
+export default function ServiceRequestForm({ vendors, initialVendorId }: { vendors: VendorOption[]; initialVendorId?: string }) {
   const [state, formAction] = useActionState(submitServiceRequestAction, undefined);
   const [serviceType, setServiceType] = useState("");
   const [scope, setScope] = useState<Scope>("standard");
@@ -131,7 +131,7 @@ export default function ServiceRequestForm({ vendors }: { vendors: VendorOption[
         <select
           key={serviceType}
           name="vendorId"
-          defaultValue=""
+          defaultValue={initialVendorId ?? ""}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
         >
           <option value="">No preference, let SturdiHome match me</option>

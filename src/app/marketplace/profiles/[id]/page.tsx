@@ -21,6 +21,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {p.website && <a href={p.website} target="_blank" rel="noopener noreferrer" className="rounded-lg bg-brand px-5 py-3 font-semibold text-white">Visit {p.kind === "vendor" ? "Vendor" : "Partner"} Website ↗</a>}
         {p.phone && <a href={`tel:${p.phone.replace(/[^+\d]/g, "")}`} className="rounded-lg border border-brand-navy/20 px-5 py-3 text-brand-navy">Call {p.phone}</a>}
         {p.email && <a href={`mailto:${p.email}`} className="break-all rounded-lg border border-brand-navy/20 px-5 py-3 text-brand-navy">Email {p.email}</a>}
+        {p.kind === "vendor" && <Link href={`/member/service-request?vendor=${encodeURIComponent(p.id)}`} className="rounded-lg bg-brand-navy px-5 py-3 font-semibold text-white">Request Estimate</Link>}
       </div>
       <p className="mt-4 text-sm leading-6 text-gray-600">You decide whether to make contact. SturdiHome does not send your details to this business when you view this page. Business information is supplied by the partner; confirm availability and details directly.</p>
       {p.kind === "financing" && <p className="mt-5 rounded-xl bg-brand-gold-pale/30 p-4 text-sm leading-6 text-brand-navy">SturdiHome is not a lender and does not make financing approval decisions. Financing providers determine eligibility, approval, rates, and terms.</p>}

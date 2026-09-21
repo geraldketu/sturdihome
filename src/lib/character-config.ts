@@ -8,7 +8,7 @@ export const CHARACTER_PLANS = {
 export type CharacterPlanId = keyof typeof CHARACTER_PLANS;
 
 export const CHARACTER_VOICES = {
-  brixy: { label: "Brixy", browserVoiceHint: "male", rate: 0.86, pitch: 0.62, referenceAudioPath: "data/character-voices/brixy-approved.wav" },
+  brixy: { label: "Brixy", gender: "male", pronouns: "he/him", voiceStyle: "deep, gravelly, raspy, warm older-man voice", browserVoiceHint: "male", rate: 0.86, pitch: 0.62, referenceAudioPath: "data/character-voices/brixy-approved.wav" },
 } as const;
 
 export const CHARACTER_TALKING_VIDEO_AVAILABLE = {

@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { authRateLimited } from "@/lib/auth-throttle";
 import { prisma } from "@/lib/prisma";
 import { createSession, destroySession, hashPassword, verifyPassword } from "@/lib/auth";
+import { randomBytes } from "node:crypto";
 
 async function registrationLimited(email: string) {
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
@@ -18,7 +19,6 @@ const signupSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120),
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
   phone: z.string().max(50).optional(),
-  password: z.string().min(8, "Password must be at least 8 characters").refine(v => new TextEncoder().encode(v).length <= 72, "Password must be no more than 72 UTF-8 bytes"),
   homeownerAccountType: z.enum(["VERIFIED_HOMEOWNER", "SERVICE_ONLY"]).default("VERIFIED_HOMEOWNER"),
 });
 
@@ -27,13 +27,12 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
     name: formData.get("name"),
     email: formData.get("email"),
     phone: formData.get("phone") || undefined,
-    password: formData.get("password"),
     homeownerAccountType: formData.get("homeownerAccountType") || undefined,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
-  const { name, email, phone, password, homeownerAccountType } = parsed.data;
+  const { name, email, phone, homeownerAccountType } = parsed.data;
   const referralCode = String(formData.get("referralCode") ?? "").trim();
 
   if (await registrationLimited(email)) return { error: "Too many registration attempts. Please try again in 15 minutes." };
@@ -42,7 +41,7 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
     return { error: "An account with that email already exists." };
   }
 
-  const passwordHash = await hashPassword(password);
+  const passwordHash = await hashPassword(randomBytes(48).toString("hex"));
   const referralCandidate = referralCode ? await prisma.vendorReferral.findUnique({ where: { code: referralCode } }) : null;
   const referral = referralCandidate?.customerId === null ? referralCandidate : null;
   const user = await prisma.user.create({
@@ -53,13 +52,12 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
       passwordHash,
       role: "HOMEOWNER",
       homeownerAccountType,
+      passwordSetupRequired: true,
     },
   });
   if (referral) await prisma.vendorReferral.update({ where: { id: referral.id }, data: { customerId: user.id, status: "ACCEPTED", acceptedAt: new Date() } });
 
-  const destination = formData.get("next") ?? (homeownerAccountType === "SERVICE_ONLY" ? "/marketplace/vendors" : undefined);
-  await createSession(user.id, user.role, destination);
-  redirect("/welcome");
+  redirect("/application-received");
 }
 
 const loginSchema = z.object({
@@ -82,6 +80,7 @@ export async function loginAction(_prev: ActionState, formData: FormData): Promi
   }
 
   const user = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
+  if (user?.passwordSetupRequired) return { error: "Your application is awaiting approval and password setup." };
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     return { error: "Incorrect email or password." };
   }
@@ -100,7 +99,6 @@ const vendorApplicationSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120),
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
   phone: z.string().max(50).optional(),
-  password: z.string().min(8, "Password must be at least 8 characters").refine(v => new TextEncoder().encode(v).length <= 72, "Password must be no more than 72 UTF-8 bytes"),
   companyName: z.string().trim().min(1, "Company name is required").max(4000),
   serviceArea: z.string().trim().min(1, "Service area is required").max(4000),
   servicesOffered: z.string().trim().min(1, "Please describe the services you offer").max(4000),
@@ -111,7 +109,6 @@ export async function applyVendorAction(_prev: ActionState, formData: FormData):
     name: formData.get("name"),
     email: formData.get("email"),
     phone: formData.get("phone") || undefined,
-    password: formData.get("password"),
     companyName: formData.get("companyName"),
     serviceArea: formData.get("serviceArea"),
     servicesOffered: formData.get("servicesOffered"),
@@ -119,7 +116,7 @@ export async function applyVendorAction(_prev: ActionState, formData: FormData):
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
-  const { name, email, phone, password, companyName, serviceArea, servicesOffered } = parsed.data;
+  const { name, email, phone, companyName, serviceArea, servicesOffered } = parsed.data;
 
   if (await registrationLimited(email)) return { error: "Too many registration attempts. Please try again in 15 minutes." };
   const existing = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
@@ -127,27 +124,26 @@ export async function applyVendorAction(_prev: ActionState, formData: FormData):
     return { error: "An account with that email already exists." };
   }
 
-  const passwordHash = await hashPassword(password);
-  const user = await prisma.user.create({
+  const passwordHash = await hashPassword(randomBytes(48).toString("hex"));
+  await prisma.user.create({
     data: {
       name,
       email,
       phone,
       passwordHash,
       role: "VENDOR",
+      passwordSetupRequired: true,
       vendorProfile: { create: { companyName, serviceArea, servicesOffered } },
     },
   });
 
-  await createSession(user.id, user.role, formData.get("next"));
-  redirect("/welcome");
+  redirect("/application-received");
 }
 
 const financingApplicationSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120),
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
   phone: z.string().max(50).optional(),
-  password: z.string().min(8, "Password must be at least 8 characters").refine(v => new TextEncoder().encode(v).length <= 72, "Password must be no more than 72 UTF-8 bytes"),
   companyName: z.string().trim().min(1, "Company name is required").max(4000),
   licenseInfo: z.string().trim().min(1, "License / accreditation info is required").max(4000),
 });
@@ -157,14 +153,13 @@ export async function applyFinancingAction(_prev: ActionState, formData: FormDat
     name: formData.get("name"),
     email: formData.get("email"),
     phone: formData.get("phone") || undefined,
-    password: formData.get("password"),
     companyName: formData.get("companyName"),
     licenseInfo: formData.get("licenseInfo"),
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
-  const { name, email, phone, password, companyName, licenseInfo } = parsed.data;
+  const { name, email, phone, companyName, licenseInfo } = parsed.data;
 
   if (await registrationLimited(email)) return { error: "Too many registration attempts. Please try again in 15 minutes." };
   const existing = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
@@ -172,18 +167,18 @@ export async function applyFinancingAction(_prev: ActionState, formData: FormDat
     return { error: "An account with that email already exists." };
   }
 
-  const passwordHash = await hashPassword(password);
-  const user = await prisma.user.create({
+  const passwordHash = await hashPassword(randomBytes(48).toString("hex"));
+  await prisma.user.create({
     data: {
       name,
       email,
       phone,
       passwordHash,
       role: "FINANCING_PARTNER",
+      passwordSetupRequired: true,
       financingProfile: { create: { companyName, licenseInfo } },
     },
   });
 
-  await createSession(user.id, user.role, formData.get("next"));
-  redirect("/welcome");
+  redirect("/application-received");
 }

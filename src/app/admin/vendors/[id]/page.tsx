@@ -7,6 +7,7 @@ import { setVendorFlyerStatusAction } from "@/lib/actions/admin-actions";
 import { Badge, Card } from "@/components/ui";
 import { formatCents, formatCentsRange } from "@/lib/format";
 import { getVendorMembershipTier } from "@/lib/stripe";
+import MarketplaceProfileForm from "@/components/MarketplaceProfileForm";
 
 function monthsElapsed(since: Date | null): number {
   if (!since) return 0;
@@ -23,7 +24,7 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
   const vendor = await prisma.vendorProfile.findUnique({
     where: { id },
     include: {
-      user: true,
+      user: { include: { marketplaceListing: true } },
       serviceRequests: { include: { homeowner: true }, orderBy: { createdAt: "desc" } },
       flyers: { orderBy: { uploadedAt: "desc" } },
     },
@@ -73,6 +74,13 @@ export default async function AdminVendorDetailPage({ params }: { params: Promis
           </p>
         </Card>
       </div>
+
+      <section className="space-y-3">
+        <h2 className="font-semibold text-gray-900">Public Profile Manager</h2>
+        <Card>
+          <MarketplaceProfileForm adminVendorId={vendor.id} financing={false} initial={{ companyName: vendor.user.marketplaceListing?.companyName ?? vendor.companyName, description: vendor.user.marketplaceListing?.description ?? "", services: vendor.user.marketplaceListing?.services ?? vendor.servicesOffered, areas: vendor.user.marketplaceListing?.areas ?? [vendor.serviceArea], categories: vendor.user.marketplaceListing?.categories ?? [], website: vendor.user.marketplaceListing?.website ?? "", email: vendor.user.marketplaceListing?.email ?? "", phone: vendor.user.marketplaceListing?.phone ?? "", logo: vendor.user.marketplaceListing?.logo ?? "", photos: vendor.user.marketplaceListing?.photos ?? [], published: vendor.user.marketplaceListing?.published ?? false }} />
+        </Card>
+      </section>
 
       <section className="space-y-3">
         <h2 className="font-semibold text-gray-900">Leads / Submissions</h2>

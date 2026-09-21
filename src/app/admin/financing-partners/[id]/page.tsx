@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import { formatCents } from "@/lib/format";
+import MarketplaceProfileForm from "@/components/MarketplaceProfileForm";
 
 export default async function AdminFinancingPartnerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requirePageAccess("/admin/financing-partners/[id]");
@@ -13,7 +14,7 @@ export default async function AdminFinancingPartnerDetailPage({ params }: { para
   const partner = await prisma.financingPartnerProfile.findUnique({
     where: { id },
     include: {
-      user: true,
+      user: { include: { marketplaceListing: true } },
       financingRequests: { include: { homeowner: true }, orderBy: { createdAt: "desc" } },
     },
   });
@@ -39,6 +40,7 @@ export default async function AdminFinancingPartnerDetailPage({ params }: { para
           {partner.status}
         </Badge>
       </div>
+      <Card><h2 className="mb-3 font-semibold text-gray-900">Public Financing Profile Manager</h2><MarketplaceProfileForm adminOwnerId={partner.id} financing initial={{ companyName: partner.user.marketplaceListing?.companyName ?? partner.companyName, description: partner.user.marketplaceListing?.description ?? "", services: partner.user.marketplaceListing?.services ?? "", areas: partner.user.marketplaceListing?.areas ?? [], categories: [], website: partner.user.marketplaceListing?.website ?? "", email: partner.user.marketplaceListing?.email ?? "", phone: partner.user.marketplaceListing?.phone ?? "", logo: partner.user.marketplaceListing?.logo ?? "", photos: partner.user.marketplaceListing?.photos ?? [], published: partner.user.marketplaceListing?.published ?? false }} /></Card>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>

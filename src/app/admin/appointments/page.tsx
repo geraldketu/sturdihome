@@ -1,6 +1,7 @@
 import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
+import AppointmentAdminForm from "./AppointmentAdminForm";
 
 export default async function AdminAppointmentsPage() {
   await requirePageAccess("/admin/appointments");
@@ -22,7 +23,7 @@ export default async function AdminAppointmentsPage() {
             <p className="mt-1 text-sm text-gray-600">{appointment.homeowner.name} · {appointment.homeowner.email}</p>
             {appointment.serviceRequest && <p className="mt-1 text-sm text-gray-600">{appointment.serviceRequest.serviceType}{appointment.serviceRequest.assignedVendor ? ` · ${appointment.serviceRequest.assignedVendor.companyName}` : ""}</p>}
           </div>
-          <Badge tone="gray">{appointment.status}</Badge>
+          <div><Badge tone="gray">{appointment.status}</Badge><AppointmentAdminForm appointmentId={appointment.id} status={appointment.status} /></div>
         </div>
       </Card>)}</div>}
     </div>

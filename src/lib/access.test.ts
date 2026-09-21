@@ -10,6 +10,7 @@ test("return destinations reject external URLs, auth loops, APIs and wrong roles
   assert.equal(safeReturnTo("/member/documents", "VENDOR"), null);
   assert.equal(safeReturnTo("/financing/referrals", "VENDOR"), null);
   assert.equal(safeReturnTo("/marketplace/vendors?category=Plumbing&location=Atlanta", "HOMEOWNER"), "/marketplace/vendors?category=Plumbing&location=Atlanta");
+  assert.equal(safeReturnTo("/marketplace/financing", "VENDOR"), null);
   assert.equal(safeReturnTo("/member/appointments", "HOMEOWNER"), "/member/appointments");
 });
 

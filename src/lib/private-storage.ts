@@ -1,4 +1,3 @@
-import "server-only";
 import { S3Client, GetPublicAccessBlockCommand, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { MAX_UPLOAD_BYTES } from "./upload-validation";
 

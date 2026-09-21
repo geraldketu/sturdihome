@@ -3,13 +3,17 @@ import { Card } from "@/components/ui";
 import { MarketplaceSearch, CategoryGrid, ListingCard } from "@/components/Marketplace";
 import { getListingPreviews } from "@/lib/marketplace";
 import HomepageHeroSlider from "@/components/HomepageHeroSlider";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const directory = await getListingPreviews();
+  let announcements: { id: string; title: string; body: string; ctaLabel: string | null; ctaHref: string | null }[] = [];
+  try { announcements = await prisma.siteAnnouncement.findMany({ where: { active: true, OR: [{ startsAt: null }, { startsAt: { lte: new Date() } }], AND: [{ OR: [{ endsAt: null }, { endsAt: { gte: new Date() } }] }] }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }); } catch { announcements = []; }
   return (
     <main>
+      {announcements.length > 0 && <section className="bg-brand-gold-pale px-4 py-3"><div className="mx-auto max-w-6xl space-y-2">{announcements.map(announcement => <div key={announcement.id} className="flex flex-wrap items-center gap-3 text-sm text-brand-navy"><strong>{announcement.title}</strong><span>{announcement.body}</span>{announcement.ctaLabel && announcement.ctaHref && <Link href={announcement.ctaHref} className="font-semibold underline">{announcement.ctaLabel}</Link>}</div>)}</div></section>}
       <section className="bg-brand-navy px-4 py-14 text-white sm:py-20">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold-pale">Your home. Your neighborhood. Your choice.</p>

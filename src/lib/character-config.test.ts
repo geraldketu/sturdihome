@@ -10,5 +10,9 @@ test("Task 3 character positioning, voice separation, and approved prices are co
   assert.equal(CHARACTER_PLANS.tenMinute.seconds, 600);
   assert.equal(CHARACTER_PLANS.tenMinute.days, 7);
   assert.equal(CHARACTER_VOICES.brixy.label, "Brixy");
+  assert.equal(CHARACTER_VOICES.brixy.gender, "male");
+  assert.equal(CHARACTER_VOICES.brixy.pronouns, "he/him");
+  assert.equal(CHARACTER_VOICES.brixy.browserVoiceHint, "male");
+  assert.equal(CHARACTER_VOICES.brixy.pitch, 0.62);
   assert.equal(CHARACTER_TALKING_VIDEO_AVAILABLE.brixy, true);
 });

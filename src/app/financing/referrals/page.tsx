@@ -4,6 +4,7 @@ import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import ReferralStatusForm from "./ReferralStatusForm";
+import LenderDecisionForm from "./LenderDecisionForm";
 
 export default async function FinancingReferralsPage() {
   const user = await requirePageAccess("/financing/referrals");
@@ -36,7 +37,7 @@ export default async function FinancingReferralsPage() {
 
   const referrals = await prisma.financingRequest.findMany({
     where: { assignedPartnerId: user.financingProfile.id },
-    include: { homeowner: true },
+    include: { homeowner: true, serviceRequest: { include: { quoteItems: true } } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -69,6 +70,7 @@ export default async function FinancingReferralsPage() {
               <div className="mt-3">
                 <ReferralStatusForm requestId={ref.id} currentStatus={ref.status} />
               </div>
+              {ref.serviceRequest && <LenderDecisionForm financingRequestId={ref.id} currentStatus={ref.lenderStatus} items={ref.serviceRequest.quoteItems} />}
             </Card>
           ))}
         </div>

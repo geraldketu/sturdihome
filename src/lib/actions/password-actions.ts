@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { destroySession, hashPassword } from "@/lib/auth";
 import { authRateLimited } from "@/lib/auth-throttle";
 import { resetEmailConfigured, sendPasswordResetEmail } from "@/lib/reset-email";
+import { passwordSchema } from "@/lib/password-policy";
 
 export type PasswordState = { error?: string; success?: string } | undefined;
 const genericSuccess = { success: "If an account matches that email, you will receive a password-reset link shortly." };
@@ -35,7 +36,7 @@ export async function requestPasswordReset(_previous: PasswordState, form: FormD
 export async function resetPassword(_previous: PasswordState, form: FormData): Promise<PasswordState> {
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   if (await authRateLimited("reset-consume", ip, 30)) return { error: "Too many attempts. Please try again in 15 minutes." };
-  const parsed = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/), password: z.string().min(8).refine(v => new TextEncoder().encode(v).length <= 72), confirm: z.string() })
+  const parsed = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/), password: passwordSchema, confirm: z.string() })
     .safeParse({ token: form.get("token"), password: form.get("password"), confirm: form.get("confirm") });
   if (!parsed.success) return { error: "Use a valid reset link and a password between 8 and 72 characters." };
   if (parsed.data.password !== parsed.data.confirm) return { error: "Passwords must match." };

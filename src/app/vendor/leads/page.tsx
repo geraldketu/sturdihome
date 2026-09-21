@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge, Card } from "@/components/ui";
 import { formatCentsRange } from "@/lib/format";
 import LeadStatusForm from "./LeadStatusForm";
+import LeadWorkflowForm from "./LeadWorkflowForm";
 
 export default async function VendorLeadsPage() {
   const user = await requirePageAccess("/vendor/leads");
@@ -76,6 +77,7 @@ export default async function VendorLeadsPage() {
               <div className="mt-3">
                 <LeadStatusForm requestId={lead.id} currentStatus={lead.status} />
               </div>
+              <div className="mt-3"><LeadWorkflowForm requestId={lead.id} workflowStatus={lead.workflowStatus} /></div>
             </Card>
           ))}
         </div>

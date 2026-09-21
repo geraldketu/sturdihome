@@ -14,7 +14,6 @@ export default function VendorApplicationForm({ next }: { next?: string }) {
       <Field label="Contact Name" name="name" required />
       <Field label="Email" name="email" type="email" required />
       <Field label="Phone" name="phone" type="tel" />
-      <Field label="Password" name="password" type="password" required placeholder="At least 8 characters" />
       <Field label="Company Name" name="companyName" required />
       <Field label="Service Area" name="serviceArea" required placeholder="e.g. Baltimore County, MD" />
       <TextArea

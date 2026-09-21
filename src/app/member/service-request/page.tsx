@@ -7,9 +7,10 @@ import { Badge, Card, NoticeBanner } from "@/components/ui";
 import { formatCentsRange } from "@/lib/format";
 import ServiceRequestForm from "./ServiceRequestForm";
 
-export default async function ServiceRequestPage() {
+export default async function ServiceRequestPage({ searchParams }: { searchParams: Promise<{ vendor?: string }> }) {
   const user = await requirePageAccess("/member/service-request");
   if (!user) redirect("/login");
+  const params = await searchParams;
 
   const [requests, vendors] = await Promise.all([
     prisma.serviceRequest.findMany({
@@ -42,7 +43,7 @@ export default async function ServiceRequestPage() {
       )}
 
       <Card>
-        <ServiceRequestForm vendors={vendors} />
+        <ServiceRequestForm vendors={vendors} initialVendorId={params.vendor} />
       </Card>
 
       <Card>

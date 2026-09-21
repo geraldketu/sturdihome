@@ -7,7 +7,12 @@ import { listingSchema, splitLines } from "@/lib/marketplace-shared";
 import { authRateLimited } from "@/lib/auth-throttle";
 
 export async function saveMarketplaceListing(_previous: { error?: string; success?: string }, form: FormData): Promise<{ error?: string; success?: string }> {
-  const user = await getApprovedUser();
+  const sessionUser = await getApprovedUser();
+  const adminVendorId = String(form.get("adminVendorId") ?? form.get("adminOwnerId") ?? "");
+  const admin = sessionUser?.role === "ADMIN" ? sessionUser : null;
+  const adminVendor = admin?.role === "ADMIN" && adminVendorId ? await prisma.vendorProfile.findUnique({ where: { id: adminVendorId }, select: { userId: true } }) : null;
+  const adminPartner = admin?.role === "ADMIN" && adminVendorId && !adminVendor ? await prisma.financingPartnerProfile.findUnique({ where: { id: adminVendorId }, select: { userId: true } }) : null;
+  const user = sessionUser ?? (adminVendor ? { ...admin, id: adminVendor.userId, role: "VENDOR" as const, vendorProfile: { status: "APPROVED" } } : adminPartner ? { ...admin, id: adminPartner.userId, role: "FINANCING_PARTNER" as const, financingProfile: { status: "APPROVED" } } : null);
   const kind = user?.role === "VENDOR" ? "vendor" : user?.role === "FINANCING_PARTNER" ? "financing" : null;
   if (!user || !kind) return { error: "Sign in to your partner account to edit your listing." };
   const profile = kind === "vendor" ? user.vendorProfile : user.financingProfile;
@@ -24,7 +29,9 @@ export async function saveMarketplaceListing(_previous: { error?: string; succes
   if (kind === "vendor" && !parsed.data.categories.length) return { error: "Choose at least one service category." };
   try {
     // Owner is derived from the session, never from a submitted ID.
-    const listing = await prisma.marketplaceListing.upsert({ where: { ownerId: user.id }, create: { ownerId: user.id, kind, ...parsed.data }, update: { kind, ...parsed.data } });
+    const adminManaged = user.role === "ADMIN" && !!adminVendorId;
+    const listingData = { kind, ...parsed.data, ...(adminManaged ? { featured: form.get("featured") === "on", sortOrder: Number(form.get("sortOrder") || 0) } : {}) };
+    const listing = await prisma.marketplaceListing.upsert({ where: { ownerId: user.id }, create: { ownerId: user.id, ...listingData }, update: listingData });
     revalidatePath("/marketplace/vendors");
     revalidatePath("/marketplace/financing");
     revalidatePath(`/marketplace/profiles/${listing.id}`);

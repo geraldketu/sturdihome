@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { Card } from "@/components/ui";
+export default function ApplicationReceivedPage(){return <main className="mx-auto max-w-md px-4 py-16"><Card><h1 className="text-2xl font-bold text-brand-navy">Application received</h1><p className="mt-3 text-sm leading-6 text-gray-600">Your SturdiHome application is pending approval. We will email you a secure setup link if your application is approved.</p><Link href="/" className="mt-5 inline-block font-semibold text-brand underline">Return home</Link></Card></main>}

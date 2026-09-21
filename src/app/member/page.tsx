@@ -5,6 +5,7 @@ import { requirePageAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, NoticeBanner } from "@/components/ui";
 import PortalWelcome from "@/components/PortalWelcome";
+import MemberProjectActions from "./MemberProjectActions";
 
 export default async function MemberDashboardPage() {
   const user = await requirePageAccess("/member");
@@ -14,7 +15,7 @@ export default async function MemberDashboardPage() {
     await Promise.all([
       prisma.document.count({ where: { userId: user.id } }),
       prisma.financingRequest.count({ where: { homeownerId: user.id } }),
-      prisma.serviceRequest.count({ where: { homeownerId: user.id } }),
+      prisma.serviceRequest.findMany({ where: { homeownerId: user.id }, include: { assignedVendor: true, quoteItems: true, changeOrders: true }, orderBy: { createdAt: "desc" } }),
       prisma.appointment.count({ where: { homeownerId: user.id } }),
       prisma.vendorProfile.count({ where: { status: "APPROVED", membershipStatus: "ACTIVE", user: await approvedAccountWhere("VENDOR") } }),
       prisma.financingPartnerProfile.count({ where: { status: "APPROVED", paymentStatus: "PAID", user: await approvedAccountWhere("FINANCING_PARTNER") } }),
@@ -71,7 +72,7 @@ export default async function MemberDashboardPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {!serviceOnly && <Card>
+          {!serviceOnly && <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Documents</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{documentCount} uploaded</p>
           <Link href="/member/documents" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
@@ -80,7 +81,7 @@ export default async function MemberDashboardPage() {
         </Card>}
         {!serviceOnly && <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Home Service Estimator</p>
-          <p className="mt-1 text-lg font-semibold text-gray-900">{serviceRequests}</p>
+          <p className="mt-1 text-lg font-semibold text-gray-900">{serviceRequests.length}</p>
           <Link href="/member/service-request" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
             View / Submit →
           </Link>
@@ -100,6 +101,11 @@ export default async function MemberDashboardPage() {
           </Link>
         </Card>
       </div>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold text-brand-navy">My Projects</h2>
+        {serviceRequests.length === 0 ? <Card><p className="text-sm text-gray-500">No service projects yet.</p></Card> : serviceRequests.map((project) => <Card key={project.id}><div className="flex items-start justify-between gap-3"><div><p className="font-semibold text-gray-900">{project.serviceType}</p><p className="mt-1 text-sm text-gray-600">{project.assignedVendor?.companyName ?? "Vendor matching in progress"}</p><p className="mt-1 text-xs text-gray-500">{project.workflowStatus.replaceAll("_", " ")}</p>{project.finalQuoteTotalCents != null && <p className="mt-1 text-sm text-brand-navy">Final quote: ${(project.finalQuoteTotalCents / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })}</p>}{project.changeOrders.filter(order => order.status === "PENDING_HOMEOWNER").map(order => <p key={order.id} className="mt-1 text-xs text-red-700">Change order: ${(order.requestedAmountCents / 100).toFixed(2)} · {order.reason}</p>)}</div><Badge tone={project.workflowStatus === "COMPLETED" ? "green" : "yellow"}>{project.workflowStatus.replaceAll("_", " ")}</Badge></div><MemberProjectActions requestId={project.id} workflowStatus={project.workflowStatus} changeOrderId={project.changeOrders.find(order => order.status === "PENDING_HOMEOWNER")?.id} /></Card>)}
+      </section>
     </div>
   );
 }

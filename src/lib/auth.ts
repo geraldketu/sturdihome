@@ -65,8 +65,9 @@ export async function requirePageAccess(path: string) {
   const roles = routeRoles(path.split("?")[0]);
   if (roles && !roles.includes(user.role)) redirect(roleHome(user.role));
   const gate = await accountGate(user);
-  if (gate) redirect(gate === "agreement" ? "/agreement" : gate === "cancelled" ? "/account-cancelled" : gate === "revoked" ? "/account-revoked" : "/pending-approval");
+  if (gate) redirect(gate === "agreement" ? "/agreement" : gate === "cancelled" ? "/account-cancelled" : gate === "revoked" ? "/account-revoked" : gate === "paused" || gate === "suspended" ? "/account-unavailable" : "/pending-approval");
   if (path.startsWith("/marketplace")) {
+    if (path.startsWith("/marketplace/financing") && user.role === "VENDOR") redirect(roleHome(user.role));
     if ((user.role === "VENDOR" && user.vendorProfile?.status !== "APPROVED") ||
         (user.role === "FINANCING_PARTNER" && user.financingProfile?.status !== "APPROVED")) redirect("/pending-approval");
   }

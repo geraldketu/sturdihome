@@ -4,7 +4,7 @@ import CharacterStage from "@/components/CharacterStage";
 
 type Character = "brixy";
 
-export default function CharacterInteractionPanel({ activeCharacter, onSelect }: { activeCharacter: Character | null; onSelect: (character: Character) => void }) {
+export default function CharacterInteractionPanel({ activeCharacter, motion = "idle", gesture = "idle", onSelect }: { activeCharacter: Character | null; motion?: "idle" | "speaking" | "listening"; gesture?: "idle" | "point-left" | "point-right"; onSelect: (character: Character) => void }) {
   return (
     <section className="character-interaction-panel border-b border-brand-gold/30 bg-brand-gold-pale/15 p-3" aria-label="Character interaction panel">
       {!activeCharacter ? (
@@ -18,7 +18,7 @@ export default function CharacterInteractionPanel({ activeCharacter, onSelect }:
         </>
       ) : (
         <div className="flex items-center gap-3">
-          <CharacterStage character={activeCharacter} className="character-stage-static h-24 w-20 overflow-hidden rounded-md" />
+          <CharacterStage character={activeCharacter} motion={motion} gesture={gesture} specialSceneAudio={motion === "speaking"} className="h-24 w-20 overflow-hidden rounded-md" />
           <div>
             <p className="text-sm font-semibold text-brand-navy">Bixy is ready to chat.</p>
             <p className="mt-1 text-xs text-gray-600">Your character stays contained inside this AI experience.</p>

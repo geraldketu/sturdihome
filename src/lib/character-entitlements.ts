@@ -1,9 +1,12 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { CHARACTER_FREE_SECONDS, CHARACTER_INTERACTION_SECONDS, CHARACTER_PLANS } from "@/lib/character-config";
+import { getBixySettings } from "@/lib/bixy-settings";
 
 export async function getCharacterStatus(userId: string) {
-  const entitlement = await prisma.characterEntitlement.upsert({ where: { userId }, update: {}, create: { userId, freeSecondsRemaining: CHARACTER_FREE_SECONDS } });
+  const settings = await getBixySettings();
+  const freeSeconds = settings.freePreviewSeconds ?? CHARACTER_FREE_SECONDS;
+  const entitlement = await prisma.characterEntitlement.upsert({ where: { userId }, update: {}, create: { userId, freeSecondsRemaining: freeSeconds } });
   const expired = entitlement.expiresAt !== null && entitlement.expiresAt <= new Date();
   const paidSecondsRemaining = expired ? 0 : entitlement.paidSecondsRemaining;
   if (expired && entitlement.status === "PAID") await prisma.characterEntitlement.update({ where: { id: entitlement.id }, data: { paidSecondsRemaining: 0, status: "EXPIRED" } });
@@ -11,8 +14,10 @@ export async function getCharacterStatus(userId: string) {
 }
 
 export async function consumeCharacterAccess(userId: string, character: "brixy") {
+  const settings = await getBixySettings();
+  const freeSeconds = settings.freePreviewSeconds ?? CHARACTER_FREE_SECONDS;
   return prisma.$transaction(async (tx) => {
-    const entitlement = await tx.characterEntitlement.upsert({ where: { userId }, update: {}, create: { userId, freeSecondsRemaining: CHARACTER_FREE_SECONDS } });
+    const entitlement = await tx.characterEntitlement.upsert({ where: { userId }, update: {}, create: { userId, freeSecondsRemaining: freeSeconds } });
     const now = new Date();
     const paidActive = entitlement.paidSecondsRemaining > 0 && (!entitlement.expiresAt || entitlement.expiresAt > now);
     const useFree = entitlement.freeSecondsRemaining >= CHARACTER_INTERACTION_SECONDS;
