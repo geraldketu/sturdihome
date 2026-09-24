@@ -12,5 +12,7 @@ const env={...process.env,
  PRIVATE_S3_BUCKET:'synthetic-private',PRIVATE_S3_REGION:'us-east-1',PRIVATE_S3_ACCESS_KEY_ID:'synthetic-access',PRIVATE_S3_SECRET_ACCESS_KEY:'synthetic-secret',PRIVATE_S3_ENDPOINT:'http://127.0.0.1:55441',
  UPLOAD_SCAN_URL:'http://127.0.0.1:55441/scan',UPLOAD_SCAN_TOKEN:'synthetic-scanner',
 };
+const providers=spawn(process.execPath,['tests/membership/providers.mjs'],{env:{...env,TEST_PROVIDER_PORT:'55441'},stdio:'inherit',windowsHide:true});
 const child=spawn(process.execPath,['node_modules/next/dist/bin/next','dev','--hostname','127.0.0.1'],{env,stdio:'inherit',windowsHide:true});
-process.on('SIGINT',()=>child.kill());child.on('exit',code=>process.exit(code??1));
+const shutdown=()=>{providers.kill();child.kill();};
+process.on('SIGINT',shutdown);process.on('SIGTERM',shutdown);child.on('exit',code=>{providers.kill();process.exit(code??1);});
