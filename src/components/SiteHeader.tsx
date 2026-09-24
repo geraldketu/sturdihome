@@ -3,9 +3,16 @@ import Link from "next/link";
 import { getSessionUser, loginDestinationForRole } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { MobileNavToggle } from "@/components/MobileNavToggle";
+import { prisma } from "@/lib/prisma";
 
 export default async function SiteHeader() {
   const user = await getSessionUser();
+  let optionalNavigation: { id: string; label: string; href: string }[] = [];
+  try {
+    optionalNavigation = await prisma.siteNavigationItem.findMany({ where: { visible: true }, orderBy: [{ sortOrder: "asc" }, { label: "asc" }], select: { id: true, label: true, href: true } });
+  } catch {
+    optionalNavigation = [];
+  }
 
   return (
     <header className="relative bg-brand-gold-pale">
@@ -63,12 +70,18 @@ export default async function SiteHeader() {
             </>
           )}
           <a
-            href="mailto:Felicia@sturdihomenetwork.com"
-            className="flex flex-col items-center rounded-md border border-brand-navy/30 px-3 py-1.5 font-medium text-brand-navy hover:bg-white/40"
+            href="mailto:felicia@sturdihomenetwork.com"
+            className="rounded-md border border-brand-navy/30 px-3 py-1.5 font-medium text-brand-navy hover:bg-white/40"
           >
-            <span>Contact Us</span>
-            <span className="text-xs font-normal text-brand-navy/70">Felicia@sturdihomenetwork.com</span>
+            Contact Us
           </a>
+          <a
+            href="mailto:felicia@sturdihomenetwork.com"
+            className="rounded-md bg-brand-navy px-3 py-1.5 font-medium text-white hover:bg-brand-navy/90"
+          >
+            Chat With SturdiHome
+          </a>
+          {optionalNavigation.map((item) => <Link key={item.id} href={item.href} className="text-brand-navy/80 hover:text-brand-navy">{item.label}</Link>)}
         </nav>
 
         <MobileNavToggle>
@@ -113,12 +126,18 @@ export default async function SiteHeader() {
             </>
           )}
           <a
-            href="mailto:Felicia@sturdihomenetwork.com"
-            className="mt-1 flex flex-col rounded-md border border-brand-navy/30 px-2 py-2 text-brand-navy hover:bg-white/40"
+            href="mailto:felicia@sturdihomenetwork.com"
+            className="mt-1 rounded-md border border-brand-navy/30 px-2 py-2 text-brand-navy hover:bg-white/40"
           >
-            <span>Contact Us</span>
-            <span className="text-xs font-normal text-brand-navy/70">Felicia@sturdihomenetwork.com</span>
+            Contact Us
           </a>
+          <a
+            href="mailto:felicia@sturdihomenetwork.com"
+            className="mt-1 rounded-md bg-brand-navy px-2 py-2 text-white hover:bg-brand-navy/90"
+          >
+            Chat With SturdiHome
+          </a>
+          {optionalNavigation.map((item) => <Link key={item.id} href={item.href} className="rounded-md px-2 py-2 text-brand-navy/80 hover:bg-white/40">{item.label}</Link>)}
         </MobileNavToggle>
       </div>
       <nav aria-label="Marketplace" className="border-t border-brand-navy/10 bg-white">

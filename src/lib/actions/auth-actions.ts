@@ -16,7 +16,13 @@ async function registrationLimited(email: string) {
 export type ActionState = { error?: string } | undefined;
 
 const signupSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120),
+  firstName: z.string().trim().min(1, "First name is required").max(80),
+  lastName: z.string().trim().min(1, "Last name is required").max(80),
+  propertyAddress: z.string().trim().min(1, "Property address is required").max(240),
+  propertyCity: z.string().trim().min(1, "City is required").max(100),
+  propertyState: z.string().trim().min(2, "State is required").max(50),
+  propertyZip: z.string().trim().min(3, "ZIP is required").max(20),
+  dateOfBirth: z.coerce.date({ message: "Date of birth is required" }),
   email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
   phone: z.string().max(50).optional(),
   homeownerAccountType: z.enum(["VERIFIED_HOMEOWNER", "SERVICE_ONLY"]).default("VERIFIED_HOMEOWNER"),
@@ -24,7 +30,8 @@ const signupSchema = z.object({
 
 export async function signupAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = signupSchema.safeParse({
-    name: formData.get("name"),
+    firstName: formData.get("firstName"), lastName: formData.get("lastName"),
+    propertyAddress: formData.get("propertyAddress"), propertyCity: formData.get("propertyCity"), propertyState: formData.get("propertyState"), propertyZip: formData.get("propertyZip"), dateOfBirth: formData.get("dateOfBirth"),
     email: formData.get("email"),
     phone: formData.get("phone") || undefined,
     homeownerAccountType: formData.get("homeownerAccountType") || undefined,
@@ -32,7 +39,8 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
-  const { name, email, phone, homeownerAccountType } = parsed.data;
+  const { firstName, lastName, propertyAddress, propertyCity, propertyState, propertyZip, dateOfBirth, email, phone, homeownerAccountType } = parsed.data;
+  const name = `${firstName} ${lastName}`;
   const referralCode = String(formData.get("referralCode") ?? "").trim();
 
   if (await registrationLimited(email)) return { error: "Too many registration attempts. Please try again in 15 minutes." };
@@ -47,6 +55,7 @@ export async function signupAction(_prev: ActionState, formData: FormData): Prom
   const user = await prisma.user.create({
     data: {
       name,
+      firstName, lastName, propertyAddress, propertyCity, propertyState, propertyZip, dateOfBirth,
       email,
       phone,
       passwordHash,

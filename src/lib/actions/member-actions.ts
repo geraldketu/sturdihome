@@ -60,9 +60,10 @@ export async function uploadDocumentAction(_prev: ActionState, formData: FormDat
   try { storedName = await saveUpload(file, user.id); }
   catch (error) { return { error: error instanceof UploadValidationError ? error.message : "The file could not be saved. Please try again." }; }
   await prisma.document.create({
-    data: { userId: user.id, label: parsed.data.label, documentType, fileName: storedName },
+    data: { userId: user.id, label: parsed.data.label, documentType, fileName: storedName, reviewStatus: "PENDING_MANUAL_VERIFICATION" },
   });
-  await prisma.user.update({ where: { id: user.id }, data: { homeownerVerificationStatus: "VERIFIED" } });
+  await prisma.user.update({ where: { id: user.id }, data: { homeownerVerificationStatus: "PENDING_MANUAL_VERIFICATION" } });
+  await prisma.userNotification.create({ data: { userId: user.id, title: "Additional verification needed", body: "Your homeownership document was received and is pending manual verification by SturdiHome. You may redact account numbers or unrelated financial information." } });
 
   revalidatePath("/member/documents");
   revalidatePath("/member");

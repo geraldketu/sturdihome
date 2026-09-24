@@ -26,6 +26,13 @@ export default async function HomePage() {
             </Link>
             <p className="text-sm text-white/75">Sign in to search and connect. Your search is never sent to vendors.</p>
           </div>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <Link href="/signup/homeowner" className="rounded-md bg-brand-gold px-4 py-3 text-center text-sm font-semibold text-brand-navy hover:bg-brand-gold-pale">Join as Homeowner</Link>
+            <Link href="/apply/vendor" className="rounded-md border border-white/40 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-white/10">Join as Vendor</Link>
+            <Link href="/apply/financing" className="rounded-md border border-white/40 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-white/10">Join as Financing Partner</Link>
+            <Link href="/login" className="rounded-md border border-white/40 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-white/10">Log In</Link>
+            <Link href="/signup" className="rounded-md border border-white/40 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-white/10">Sign Up</Link>
+          </div>
         </div>
       </section>
       <section className="mx-auto max-w-6xl px-4 py-14">

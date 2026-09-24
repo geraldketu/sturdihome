@@ -11,7 +11,7 @@ export default async function AgreementPage() {
   const agreement = await prisma.networkAgreement.findFirst({ where: { role: user.role, active: true } });
   const acceptance = agreement && await prisma.agreementAcceptance.findUnique({ where: { userId_role_version: { userId: user.id, role: user.role, version: agreement.version } } });
   return <main className="mx-auto w-full max-w-3xl px-4 py-12"><Card>
-    <Image src="/images/portal-logo.png" alt="SturdiHome Network" width={180} height={48} className="mb-6 h-12 w-auto" />
+    <Image src="/images/sturdihome-logo.png" alt="SturdiHome Network" width={280} height={320} className="mb-6 h-20 w-auto object-contain" />
     <h1 className="text-2xl font-bold text-brand-navy">{agreement?.title ?? "Your Network Agreement"}</h1>
     {agreement ? <>
       <p className="mt-2 text-sm text-gray-500">Effective date {agreement.effectiveDate.toLocaleDateString()} · Version {agreement.version}</p>

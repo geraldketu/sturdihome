@@ -53,6 +53,13 @@ model User {
   passwordHash         String
   name                 String
   phone                String?
+  firstName            String?
+  lastName             String?
+  propertyAddress      String?
+  propertyCity         String?
+  propertyState        String?
+  propertyZip           String?
+  dateOfBirth          DateTime?
   role                 Role
   createdAt            DateTime              @default(now())
   agreementAcceptedAt  DateTime?
@@ -77,6 +84,7 @@ model User {
   referredBy                VendorReferral?                     @relation("CustomerReferral")
   characterEntitlement      CharacterEntitlement?
   characterUsage            CharacterUsage[]
+  characterPurchases        CharacterPurchase[]
   accountStatus             String                              @default("ACTIVE")
   canceledAt                DateTime?
   cancellationReason        String?
@@ -92,6 +100,19 @@ model User {
   financingDisputes         FinancingStatusDispute[]
   reportingAcceptances      FinancePartnerReportingAcceptance[]
   setupTokens               AccountSetupToken[]
+  pageVisibility            UserPageVisibility[]
+}
+
+model UserPageVisibility {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pageKey    String
+  removedAt  DateTime @default(now())
+  removedBy  String
+
+  @@unique([userId, pageKey])
+  @@index([pageKey, removedAt])
 }
 
 model AuthSession {
@@ -133,6 +154,20 @@ model CharacterUsage {
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+model CharacterPurchase {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checkoutSessionId String   @unique
+  paymentIntentId   String?  @unique
+  plan              String
+  amountCents       Int
+  seconds           Int
+  purchasedAt       DateTime @default(now())
+
+  @@index([userId, purchasedAt])
 }
 
 model VendorReferral {
@@ -215,6 +250,7 @@ model SiteExperienceSettings {
   holidayEnabled   Boolean  @default(true)
   effectsDisabled  Boolean  @default(false)
   previewTheme     String?
+  activeTheme      String?
   updatedAt        DateTime @updatedAt
 }
 
@@ -572,13 +608,22 @@ model AccountCancellationAudit {
 }
 
 model Document {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  label      String
-  documentType String?
-  fileName   String
-  uploadedAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  userId          String
+  user           User     @relation(fields: [userId], references: [id])
+  label           String
+  documentType    String?
+  fileName        String
+  uploadedAt      DateTime @default(now())
+  reviewStatus    String   @default("PENDING")
+  reviewNote      String?
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  sentAt          DateTime?
+
+  @@index([userId, reviewStatus])
 }
 
 model FinancingRequest {
@@ -636,6 +681,9 @@ model ServiceRequest {
 
   estimateLowCents  Int?
   estimateHighCents Int?
+  adminNote          String?
+  adminUpdatedAt     DateTime?
+  adminUpdatedBy     String?
 }
 
 model QuoteLineItem {

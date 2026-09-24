@@ -26,9 +26,10 @@ export async function getListingPreviews() {
 }
 
 export async function eligibility(kind: "vendor" | "financing"): Promise<Prisma.MarketplaceListingWhereInput> {
+  const pageKey = kind === "vendor" ? "vendor" : "finance";
   return { kind, published: true, owner: kind === "vendor"
-    ? { ...await approvedAccountWhere("VENDOR"), vendorProfile: { is: { status: "APPROVED" } } }
-    : { ...await approvedAccountWhere("FINANCING_PARTNER"), financingProfile: { is: { status: "APPROVED" } } } };
+    ? { ...await approvedAccountWhere("VENDOR"), vendorProfile: { is: { status: "APPROVED" } }, pageVisibility: { none: { pageKey } } }
+    : { ...await approvedAccountWhere("FINANCING_PARTNER"), financingProfile: { is: { status: "APPROVED" } }, pageVisibility: { none: { pageKey } } } };
 }
 
 export async function getListings(kind: "vendor" | "financing", category = "", location = "") {

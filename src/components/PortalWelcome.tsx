@@ -39,10 +39,10 @@ export default function PortalWelcome({
       <div className="grid gap-6 p-5 sm:grid-cols-[144px_minmax(0,1fr)] sm:items-center sm:p-7 lg:gap-8 lg:p-8">
         <div className="w-32 shrink-0 rounded-xl border border-brand-gold/25 bg-white p-2 sm:w-36">
           <Image
-            src="/images/portal-logo.png"
+            src="/images/sturdihome-logo.png"
             alt="SturdiHome Network LLC"
-            width={1254}
-            height={1254}
+            width={280}
+            height={320}
             sizes="144px"
             className="h-auto w-full object-contain"
           />

@@ -10,6 +10,7 @@ export type SiteThemeSettings = {
   holidayEnabled: boolean;
   effectsDisabled: boolean;
   previewTheme: string | null;
+  activeTheme: string | null;
 };
 
 export const DEFAULT_THEME_SETTINGS: SiteThemeSettings = {
@@ -18,6 +19,7 @@ export const DEFAULT_THEME_SETTINGS: SiteThemeSettings = {
   holidayEnabled: true,
   effectsDisabled: false,
   previewTheme: null,
+  activeTheme: null,
 };
 
 export function getSeason(date = new Date()): Season {

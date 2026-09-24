@@ -14,6 +14,7 @@ async function requireAdmin() {
 export async function updateExperienceSettingsAction(formData: FormData): Promise<void> {
   await requireAdmin();
   const previewTheme = getPreviewTheme(String(formData.get("previewTheme") ?? "automatic"));
+  const current = await prisma.siteExperienceSettings.findUnique({ where: { id: "default" }, select: { activeTheme: true } });
   await prisma.siteExperienceSettings.upsert({
     where: { id: "default" },
     update: {
@@ -22,6 +23,7 @@ export async function updateExperienceSettingsAction(formData: FormData): Promis
       holidayEnabled: formData.get("holidayEnabled") === "on",
       effectsDisabled: formData.get("effectsDisabled") === "on",
       previewTheme,
+      activeTheme: current?.activeTheme ?? null,
     },
     create: {
       id: "default",
@@ -30,8 +32,17 @@ export async function updateExperienceSettingsAction(formData: FormData): Promis
       holidayEnabled: formData.get("holidayEnabled") === "on",
       effectsDisabled: formData.get("effectsDisabled") === "on",
       previewTheme,
+      activeTheme: null,
     },
   });
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/experience");
+}
+
+export async function commitExperienceThemeAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const activeTheme = getPreviewTheme(String(formData.get("previewTheme") ?? "automatic"));
+  await prisma.siteExperienceSettings.upsert({ where: { id: "default" }, update: { activeTheme, previewTheme: activeTheme }, create: { id: "default", activeTheme, previewTheme: activeTheme } });
   revalidatePath("/", "layout");
   revalidatePath("/admin/experience");
 }

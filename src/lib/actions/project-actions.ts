@@ -61,3 +61,69 @@ export async function adminCompleteProjectAction(_prev: ActionState, formData: F
   await prisma.$transaction([prisma.serviceRequest.update({ where: { id }, data: { status: "COMPLETED", workflowStatus: "COMPLETED", completedAt: new Date(), completedBy: user.id } }), prisma.serviceRequestAudit.create({ data: { serviceRequestId: id, actorUserId: user.id, previousStatus: request.workflowStatus, newStatus: "COMPLETED", note: `Admin override: ${reason}` } })]);
   revalidatePath("/admin/projects"); revalidatePath("/member"); revalidatePath("/vendor/leads");
 }
+
+async function adminProjectAction(formData: FormData) {
+  const user = await getSessionUser();
+  if (!user || user.role !== "ADMIN") return { error: "Not authorized." };
+  const id = String(formData.get("requestId") ?? "");
+  const request = await prisma.serviceRequest.findUnique({ where: { id } });
+  if (!request) return { error: "Project not found." };
+  return { user, request };
+}
+
+export async function updateProjectAdminAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const context = await adminProjectAction(formData);
+  if ("error" in context) return context;
+  const serviceType = String(formData.get("serviceType") ?? "").trim().slice(0, 120);
+  const description = String(formData.get("description") ?? "").trim().slice(0, 10000);
+  const adminNote = String(formData.get("adminNote") ?? "").trim().slice(0, 1000) || null;
+  if (!serviceType || !description) return { error: "Project type and description are required." };
+  await prisma.serviceRequest.update({ where: { id: context.request.id }, data: { serviceType, description, adminNote, adminUpdatedAt: new Date(), adminUpdatedBy: context.user.id } });
+  revalidatePath("/admin/projects");
+}
+
+export async function suspendProjectAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  return setAdminProjectStatus(formData, "SUSPENDED", "Project suspended by admin");
+}
+
+export async function cancelProjectAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  return setAdminProjectStatus(formData, "CANCELED", "Project canceled by admin");
+}
+
+export async function overrideProjectStatusAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const status = String(formData.get("status") ?? "").trim();
+  if (!["NEW", "ASSIGNED", "IN_PROGRESS", "SITE_VISIT_COMPLETED", "ESTIMATE_SUBMITTED"].includes(status)) return { error: "Choose an active project status." };
+  return setAdminProjectStatus(formData, status, String(formData.get("reason") ?? "Admin status override").trim().slice(0, 500));
+}
+
+async function setAdminProjectStatus(formData: FormData, status: string, note: string): Promise<ActionState> {
+  const context = await adminProjectAction(formData);
+  if ("error" in context) return context;
+  await prisma.$transaction([
+    prisma.serviceRequest.update({ where: { id: context.request.id }, data: { status: status === "CANCELED" ? "CANCELED" : status === "COMPLETED" ? "COMPLETED" : "IN_PROGRESS", workflowStatus: status, completedAt: status === "COMPLETED" ? new Date() : null, completedBy: status === "COMPLETED" ? context.user.id : null, adminUpdatedAt: new Date(), adminUpdatedBy: context.user.id } }),
+    prisma.serviceRequestAudit.create({ data: { serviceRequestId: context.request.id, actorUserId: context.user.id, previousStatus: context.request.workflowStatus, newStatus: status, note } }),
+  ]);
+  revalidatePath("/admin/projects"); revalidatePath("/member"); revalidatePath("/vendor/leads");
+}
+
+export async function transferProjectAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const context = await adminProjectAction(formData);
+  if ("error" in context) return context;
+  const vendorId = String(formData.get("vendorId") ?? "");
+  const vendor = await prisma.vendorProfile.findFirst({ where: { id: vendorId, status: "APPROVED", membershipStatus: "ACTIVE", user: { accountStatus: "ACTIVE" } } });
+  if (!vendor) return { error: "Choose an approved vendor." };
+  await prisma.$transaction([
+    prisma.serviceRequest.update({ where: { id: context.request.id }, data: { assignedVendorId: vendor.id, status: "ASSIGNED", workflowStatus: "ASSIGNED", adminUpdatedAt: new Date(), adminUpdatedBy: context.user.id } }),
+    prisma.serviceRequestAudit.create({ data: { serviceRequestId: context.request.id, actorUserId: context.user.id, previousStatus: context.request.workflowStatus, newStatus: "ASSIGNED", note: "Project transferred to another vendor" } }),
+  ]);
+  revalidatePath("/admin/projects"); revalidatePath("/vendor/leads");
+}
+
+export async function reportVendorComplaintAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const reason = String(formData.get("reason") ?? "").trim().slice(0, 500);
+  if (!reason) return { error: "Enter a complaint note." };
+  const context = await adminProjectAction(formData);
+  if ("error" in context) return context;
+  await prisma.serviceRequestAudit.create({ data: { serviceRequestId: context.request.id, actorUserId: context.user.id, previousStatus: context.request.workflowStatus, newStatus: context.request.workflowStatus, note: `Vendor complaint: ${reason}` } });
+  revalidatePath("/admin/projects");
+}

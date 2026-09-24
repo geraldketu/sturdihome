@@ -12,9 +12,12 @@ export default function SignupForm({ next, referralCode }: { next?: string; refe
       {next && <input type="hidden" name="next" value={next} />}
       {referralCode && <input type="hidden" name="referralCode" value={referralCode} />}
       <FormError message={state?.error} />
-      <Field label="Full Name" name="name" required />
+      <div className="grid gap-4 sm:grid-cols-2"><Field label="First Name" name="firstName" required /><Field label="Last Name" name="lastName" required /></div>
+      <Field label="Property Address" name="propertyAddress" required />
+      <div className="grid gap-4 sm:grid-cols-[1fr_auto_auto]"><Field label="City" name="propertyCity" required /><Field label="State" name="propertyState" required /><Field label="ZIP" name="propertyZip" required /></div>
       <Field label="Email" name="email" type="email" required />
       <Field label="Phone" name="phone" type="tel" />
+      <Field label="Date of Birth" name="dateOfBirth" type="date" required />
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium text-gray-700">Choose your SturdiHome account</legend>
         <label className="flex gap-3 rounded-md border border-gray-200 p-3 text-sm">

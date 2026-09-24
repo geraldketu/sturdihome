@@ -6,10 +6,12 @@ import { prisma } from "@/lib/prisma";
 import { Badge, Card, NoticeBanner } from "@/components/ui";
 import PortalWelcome from "@/components/PortalWelcome";
 import MemberProjectActions from "./MemberProjectActions";
+import { ensureBirthdayNotification } from "@/lib/notifications";
 
 export default async function MemberDashboardPage() {
   const user = await requirePageAccess("/member");
   if (!user) redirect("/login");
+  await ensureBirthdayNotification({ id: user.id, dateOfBirth: user.dateOfBirth });
 
   const [documentCount, financingRequests, serviceRequests, appointments, activeVendorCount, paidPartnerCount] =
     await Promise.all([
@@ -86,19 +88,24 @@ export default async function MemberDashboardPage() {
             View / Submit →
           </Link>
         </Card>}
-        <Card>
+        {!serviceOnly && <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Financing Requests</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{financingRequests}</p>
           <Link href="/member/financing-request" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
             View / Submit →
           </Link>
-        </Card>
+        </Card>}
         <Card>
           <p className="text-xs uppercase tracking-wide text-gray-500">Appointments</p>
           <p className="mt-1 text-lg font-semibold text-gray-900">{appointments} scheduled</p>
           <Link href="/member/appointments" className="mt-2 inline-block text-sm text-brand-dark hover:underline">
             View →
           </Link>
+        </Card>
+        <Card>
+          <p className="text-xs uppercase tracking-wide text-gray-500">Community Room</p>
+          <p className="mt-1 text-sm text-gray-600">Coming soon for SturdiHome members.</p>
+          <span className="mt-2 inline-block text-sm font-medium text-gray-400">Coming soon</span>
         </Card>
       </div>
 

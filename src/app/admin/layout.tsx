@@ -15,8 +15,6 @@ const NAV = [
   { href: "/admin/financing-status", label: "Financing Status Reports" },
   { href: "/admin/experience", label: "Seasonal Experience" },
   { href: "/admin/content", label: "Content Center" },
-  { href: "/admin/bixy", label: "Bixy Control Center" },
-  { href: "/admin/bixy-payments", label: "Bixy Payments" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

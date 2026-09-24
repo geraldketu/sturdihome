@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { renderBrandedDocument } from "@/lib/branded-document";
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
@@ -16,5 +17,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   if (user.role !== "ADMIN" && !acceptance) return new NextResponse("Not found", { status: 404 });
   const body = acceptance?.signedCopyContent ?? agreement?.content ?? "";
   const fileName = agreement?.documentIdentifier ?? acceptance?.documentIdentifier ?? "sturdihome-agreement";
-  return new NextResponse(body, { headers: { "Content-Type": "text/plain; charset=utf-8", "Content-Disposition": `attachment; filename="${fileName}.txt"`, "Cache-Control": "private, no-store" } });
+  const document = await renderBrandedDocument(agreement?.title ?? "SturdiHome Network Agreement", body);
+  return new NextResponse(document, { headers: { "Content-Type": "text/html; charset=utf-8", "Content-Disposition": `attachment; filename="${fileName}.html"`, "Cache-Control": "private, no-store" } });
 }

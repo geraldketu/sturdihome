@@ -14,18 +14,6 @@ export default async function VendorApplyPage({ searchParams }: { searchParams: 
             Learn how the SturdiHome vendor model works, then complete the application below.
           </p>
         </div>
-        <div className="overflow-hidden rounded-xl border border-brand-gold/30 bg-black shadow-sm">
-          <video
-            className="aspect-video w-full"
-            controls
-            playsInline
-            preload="metadata"
-            aria-label="SturdiHome vendor marketing video"
-          >
-            <source src="/videos/vendor-marketing.mp4" type="video/mp4" />
-            Your browser does not support the vendor marketing video.
-          </video>
-        </div>
       </section>
       <p className="mb-6 text-center text-sm text-gray-600">
         Apply to join the SturdiHome vendor network. Once approved, you&apos;ll be able

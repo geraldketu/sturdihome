@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { grantCharacterPlan } from "@/lib/character-entitlements";
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -59,14 +58,6 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      if (session.mode === "payment" && session.payment_status === "paid" && session.metadata?.characterUserId && session.metadata?.characterPlanId) {
-        await grantCharacterPlan(
-          session.metadata.characterUserId,
-          session.metadata.characterPlanId,
-          session.id,
-          typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id ?? null,
-        );
-      }
       break;
     }
 

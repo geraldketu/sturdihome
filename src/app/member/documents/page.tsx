@@ -33,7 +33,7 @@ export default async function DocumentsPage() {
       </Card>
 
       <Card>
-        {user.homeownerAccountType === "SERVICE_ONLY" ? <p className="text-sm text-gray-600">Service-only accounts do not require proof of homeownership or document uploads.</p> : isHomeownerVerified(user) ? <p className="text-sm text-green-700">Homeownership verified. Your proof document is saved privately in My Documents.</p> : <UploadForm />}
+        {user.homeownerAccountType === "SERVICE_ONLY" ? <p className="text-sm text-gray-600">Service-only accounts do not require proof of homeownership or document uploads.</p> : isHomeownerVerified(user) ? <p className="text-sm text-green-700">Homeownership verified. Your proof document is saved privately in My Documents.</p> : user.homeownerVerificationStatus === "PENDING_MANUAL_VERIFICATION" ? <p className="text-sm text-yellow-700">Pending Manual Verification. SturdiHome will notify you when Admin review is complete.</p> : user.homeownerVerificationStatus === "ADDITIONAL_VERIFICATION_NEEDED" ? <UploadForm /> : <UploadForm />}
       </Card>
 
       <Card>

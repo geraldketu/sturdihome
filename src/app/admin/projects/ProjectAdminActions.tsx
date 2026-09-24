@@ -1,0 +1,22 @@
+"use client";
+
+import { useActionState } from "react";
+import { FormError, SubmitButton } from "@/components/ui";
+import { cancelProjectAction, overrideProjectStatusAction, reportVendorComplaintAction, suspendProjectAction, transferProjectAction, updateProjectAdminAction } from "@/lib/actions/project-actions";
+
+export default function ProjectAdminActions({ project, vendors }: { project: { id: string; serviceType: string; description: string; adminNote: string | null; assignedVendorId: string | null }; vendors: { id: string; companyName: string }[] }) {
+  const [editState, editAction] = useActionState(updateProjectAdminAction, undefined);
+  const [transferState, transferAction] = useActionState(transferProjectAction, undefined);
+  const [suspendState, suspendAction] = useActionState(suspendProjectAction, undefined);
+  const [cancelState, cancelAction] = useActionState(cancelProjectAction, undefined);
+  const [complaintState, complaintAction] = useActionState(reportVendorComplaintAction, undefined);
+  const [overrideState, overrideAction] = useActionState(overrideProjectStatusAction, undefined);
+  return <details className="mt-4 border-t border-gray-100 pt-3"><summary className="cursor-pointer text-sm font-semibold text-brand-dark">Admin actions</summary><div className="mt-3 space-y-3 text-sm">
+    <a href={`/admin/projects/${project.id}`} className="font-medium text-brand-dark underline">View Details</a>
+    <form action={editAction} className="grid gap-2 sm:grid-cols-2"><input type="hidden" name="requestId" value={project.id} /><label>Project type<input name="serviceType" defaultValue={project.serviceType} className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5" /></label><label>Admin note<input name="adminNote" defaultValue={project.adminNote ?? ""} className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5" /></label><label className="sm:col-span-2">Description<textarea name="description" defaultValue={project.description} className="mt-1 min-h-20 w-full rounded border border-gray-300 px-2 py-1.5" /></label><SubmitButton pendingText="Saving...">Edit Project</SubmitButton><FormError message={editState?.error} /></form>
+    <form action={transferAction} className="flex flex-wrap items-end gap-2"><input type="hidden" name="requestId" value={project.id} /><label className="min-w-48">Transfer to<select name="vendorId" defaultValue={project.assignedVendorId ?? ""} className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5">{vendors.map(vendor => <option key={vendor.id} value={vendor.id}>{vendor.companyName}</option>)}</select></label><SubmitButton pendingText="Transferring...">Transfer Project to Another Vendor</SubmitButton><FormError message={transferState?.error} /></form>
+    <div className="flex flex-wrap gap-2"><form action={suspendAction}><input type="hidden" name="requestId" value={project.id} /><SubmitButton pendingText="Suspending...">Suspend Project</SubmitButton></form><form action={cancelAction}><input type="hidden" name="requestId" value={project.id} /><SubmitButton pendingText="Canceling...">Cancel Project</SubmitButton></form></div><FormError message={suspendState?.error ?? cancelState?.error} />
+    <form action={complaintAction} className="flex flex-wrap items-end gap-2"><input type="hidden" name="requestId" value={project.id} /><label className="min-w-56">Complaint note<input name="reason" required className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5" /></label><SubmitButton pendingText="Reporting...">Report Complaint to Vendor</SubmitButton><FormError message={complaintState?.error} /></form>
+    <form action={overrideAction} className="flex flex-wrap items-end gap-2"><input type="hidden" name="requestId" value={project.id} /><label>Status<select name="status" className="mt-1 block rounded border border-gray-300 px-2 py-1.5"><option value="NEW">New</option><option value="ASSIGNED">Assigned</option><option value="IN_PROGRESS">In progress</option><option value="SITE_VISIT_COMPLETED">Site visit completed</option><option value="ESTIMATE_SUBMITTED">Estimate submitted</option></select></label><label className="min-w-56">Reason<input name="reason" required className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5" /></label><SubmitButton pendingText="Overriding...">Override Project Status</SubmitButton><FormError message={overrideState?.error} /></form>
+  </div></details>;
+}

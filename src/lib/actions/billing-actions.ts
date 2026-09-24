@@ -15,8 +15,6 @@ import {
 } from "@/lib/stripe";
 import type Stripe from "stripe";
 import { authRateLimited } from "@/lib/auth-throttle";
-import { characterPlan } from "@/lib/character-entitlements";
-import { getBixySettings } from "@/lib/bixy-settings";
 
 export async function createVendorMembershipCheckoutAction(formData: FormData): Promise<void> {
   const user = await getApprovedUser();
@@ -104,7 +102,6 @@ export async function createVendorMembershipCheckoutAction(formData: FormData): 
   if (!session.url) throw new Error("Stripe did not return a checkout URL");
   redirect(session.url);
 }
-
 export async function openVendorBillingPortalAction(): Promise<void> {
   const user = await getApprovedUser();
   if (!user || user.role !== "VENDOR" || !user.vendorProfile?.stripeCustomerId) {
@@ -120,7 +117,6 @@ export async function openVendorBillingPortalAction(): Promise<void> {
 
   redirect(session.url);
 }
-
 export async function createFinancingPartnerPaymentCheckoutAction(): Promise<void> {
   const user = await getApprovedUser();
   if (!user || user.role !== "FINANCING_PARTNER" || user.financingProfile?.status !== "APPROVED") {
@@ -169,23 +165,3 @@ export async function createFinancingPartnerPaymentCheckoutAction(): Promise<voi
   redirect(session.url);
 }
 
-export async function createCharacterCheckoutAction(formData: FormData): Promise<void> {
-  const user = await getApprovedUser();
-  if (!user) throw new Error("Not authorized");
-  const bixySettings = await getBixySettings();
-  if (process.env.CHARACTER_PAYMENTS_ENABLED !== "true" || !bixySettings.paidAccessEnabled) throw new Error("Character payments are pending final review.");
-  if (await authRateLimited("character-billing", user.id, 5)) throw new Error("Too many billing requests. Please try again later.");
-  const plan = characterPlan(String(formData.get("plan") ?? ""));
-  if (!plan) throw new Error("Invalid character plan");
-  const stripe = getStripe();
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: user.email,
-    line_items: [{ price_data: { currency: "usd", product_data: { name: `SturdiHome Character Access - ${plan.name}` }, unit_amount: plan.amountCents }, quantity: 1 }],
-    success_url: `${getBaseUrl()}/?character=success`,
-    cancel_url: `${getBaseUrl()}/?character=canceled`,
-    metadata: { characterUserId: user.id, characterPlanId: plan.id },
-  });
-  if (!session.url) throw new Error("Stripe did not return a checkout URL");
-  redirect(session.url);
-}
