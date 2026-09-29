@@ -1,11 +1,14 @@
 {
-  "testedAt": "2026-09-19T19:21:46.986Z",
+  "testedAt": "2026-09-26T21:45:15.274Z",
   "results": [
-    "First vendor registration has role-specific first welcome and preserves approval gate at 320px",
-    "First financing registration has role-specific first welcome and preserves approval gate at 320px",
+    "First vendor application requires approval + setup link, gets role-specific first welcome and preserves agreement gate at 320px",
+    "First financing application requires approval + setup link, gets role-specific first welcome and preserves agreement gate at 320px",
     "Existing assigned admin access remains intact",
-    "Sturdi Girl and Brixy introduction appears for guests and chat offers Join/Sign In",
-    "Homepage search preserves service and location through membership gate",
-    "Unknown email receives the same non-enumerating recovery response"
+    "Homepage search sends guest to /login?next= preserving service and location",
+    "After sign-in the searched destination is restored",
+    "test-member role restrictions: allowed areas open, other portals/admin and wrong-role return URL redirect home, cross-role APIs forbidden",
+    "test-vendor role restrictions: allowed areas open, other portals/admin and wrong-role return URL redirect home, cross-role APIs forbidden",
+    "test-finance role restrictions: allowed areas open, other portals/admin and wrong-role return URL redirect home, cross-role APIs forbidden",
+    "Recovery response is identical for known and unknown emails (email provider not configured locally)"
   ]
 }

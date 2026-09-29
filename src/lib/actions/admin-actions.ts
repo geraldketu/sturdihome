@@ -99,7 +99,13 @@ async function reviewUserAccount(form: FormData, status: "APPROVED" | "REJECTED"
   const admin = await requireAdmin();
   const userId = String(form.get("userId") ?? "");
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user || user.role === "ADMIN" || user.approvalStatus !== "PENDING") return;
+  if (!user || user.role === "ADMIN") throw new Error("Invalid account.");
+  if (user.approvalStatus !== "PENDING") throw new Error("This account has already been reviewed.");
+  if (status === "APPROVED") {
+    const activeAgreement = await prisma.networkAgreement.findFirst({ where: { role: user.role, active: true }, select: { version: true } });
+    if (!activeAgreement) throw new Error("An active network agreement is required before approval.");
+    if (user.agreementVersion !== activeAgreement.version || !user.agreementAcceptedAt) throw new Error("The applicant must accept the current network agreement before approval.");
+  }
   await reviewAccount(admin.id, userId, user.role, status);
   if (status === "APPROVED" && user.passwordSetupRequired) { try { await issueAccountSetupLink(userId); } catch { /* Approval remains recorded; admin can resend once email configuration is available. */ } }
   revalidatePath("/admin", "layout");

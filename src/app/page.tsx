@@ -3,12 +3,14 @@ import { Card } from "@/components/ui";
 import { MarketplaceSearch, CategoryGrid, ListingCard } from "@/components/Marketplace";
 import { getListingPreviews } from "@/lib/marketplace";
 import HomepageHeroSlider from "@/components/HomepageHeroSlider";
+import SturdiHomeVideo from "@/components/SturdiHomeVideo";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const directory = await getListingPreviews();
+  const homepageVideo = await prisma.siteMediaAsset.findFirst({ where: { mediaType: "video", published: true }, orderBy: { createdAt: "desc" }, select: { sourceUrl: true, label: true } });
   let announcements: { id: string; title: string; body: string; ctaLabel: string | null; ctaHref: string | null }[] = [];
   try { announcements = await prisma.siteAnnouncement.findMany({ where: { active: true, OR: [{ startsAt: null }, { startsAt: { lte: new Date() } }], AND: [{ OR: [{ endsAt: null }, { endsAt: { gte: new Date() } }] }] }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }); } catch { announcements = []; }
   return (
@@ -19,6 +21,7 @@ export default async function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold-pale">Your home. Your neighborhood. Your choice.</p>
           <h1 className="mt-5 max-w-3xl font-display text-4xl leading-tight sm:text-6xl">A stronger home starts with the right connection.</h1>
           <p className="mb-8 mt-5 max-w-2xl text-base leading-7 text-white/85">Discover local service providers, compare their profiles, and contact the business you choose. You stay in control, from the first search to the first conversation.</p>
+          <SturdiHomeVideo className="mb-8 max-w-3xl" src={homepageVideo?.sourceUrl} label={homepageVideo?.label ?? "SturdiHome overview video"} />
           <MarketplaceSearch />
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Link href="/emergency-services" className="inline-flex min-h-11 items-center rounded-md border border-red-300 bg-red-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300">

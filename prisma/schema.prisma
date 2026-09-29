@@ -254,6 +254,21 @@ model SiteExperienceSettings {
   updatedAt        DateTime @updatedAt
 }
 
+model SeasonalEffect {
+  id            String   @id @default(cuid())
+  storageUserId String
+  fileName      String
+  originalName  String
+  mimeType      String
+  byteSize      Int
+  active        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  @@index([active, deletedAt, createdAt])
+}
+
 model BixySettings {
   id                    String   @id
   enabled               Boolean  @default(true)

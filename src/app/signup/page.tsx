@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Card } from "@/components/ui";
+import SturdiHomeVideo from "@/components/SturdiHomeVideo";
 
 export default async function SignupPage() {
   return (
     <main className="mx-auto max-w-md px-4 py-16">
+      <SturdiHomeVideo className="mb-8" />
       <h1 className="mb-2 text-center text-2xl font-bold text-brand-dark">
         Sign Up for SturdiHome
       </h1>

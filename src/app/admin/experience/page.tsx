@@ -4,9 +4,9 @@ import ExperienceControls from "./ExperienceControls";
 
 export default async function AdminExperiencePage() {
   await requirePageAccess("/admin/experience");
-  const settings = await prisma.siteExperienceSettings.findUnique({ where: { id: "default" } });
+  const effects = await prisma.seasonalEffect.findMany({ where: { deletedAt: null }, orderBy: { createdAt: "desc" }, select: { id: true, originalName: true, mimeType: true, byteSize: true, active: true } });
   return <div className="space-y-6">
     <div><h1 className="text-2xl font-bold text-brand-dark">Seasonal Experience</h1><p className="text-sm text-gray-600">Control automatic weather and seasonal presentation. Weather uses permission-based browser location and fails back to the calendar.</p></div>
-    <ExperienceControls settings={settings ? { weatherEnabled: settings.weatherEnabled, seasonalEnabled: settings.seasonalEnabled, holidayEnabled: settings.holidayEnabled, effectsDisabled: settings.effectsDisabled, previewTheme: settings.previewTheme, activeTheme: settings.activeTheme } : null} />
+    <ExperienceControls effects={effects} />
   </div>;
 }

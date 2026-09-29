@@ -1,10 +1,12 @@
 import { Card } from "@/components/ui";
+import SturdiHomeVideo from "@/components/SturdiHomeVideo";
 import FinancingApplicationForm from "./FinancingApplicationForm";
 
 export default async function FinancingApplyPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;
   return (
     <main className="mx-auto max-w-md px-4 py-16">
+      <SturdiHomeVideo className="mb-8" src="/videos/lender-signup.mp4" label="SturdiHome lender welcome video" />
       <h1 className="mb-2 text-center text-2xl font-bold text-brand-dark">
         Financing Partner Application
       </h1>

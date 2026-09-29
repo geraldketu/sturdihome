@@ -1,5 +1,7 @@
-import { S3Client, GetPublicAccessBlockCommand, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetPublicAccessBlockCommand, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { MAX_UPLOAD_BYTES } from "./upload-validation";
+import { scanUpload } from "./upload-scanning";
+export { scanUpload } from "./upload-scanning";
 
 function storage() {
   const { PRIVATE_S3_BUCKET: bucket, PRIVATE_S3_REGION: region, PRIVATE_S3_ACCESS_KEY_ID: accessKeyId, PRIVATE_S3_SECRET_ACCESS_KEY: secretAccessKey } = process.env;
@@ -25,18 +27,6 @@ export function objectKey(userId: string, name: string) {
   return `private/${userId}/${name}`;
 }
 
-// Scanner contract: authenticated HTTPS POST of bytes; JSON { clean: true } only
-// after a full scan. Missing service, timeouts or any other response fail closed.
-export async function scanUpload(bytes: Uint8Array) {
-  const endpoint = process.env.UPLOAD_SCAN_URL;
-  const token = process.env.UPLOAD_SCAN_TOKEN;
-  if (!endpoint || !token) throw new Error("Upload scanning is not configured");
-  const url = new URL(endpoint);
-  if (url.username || url.password || (url.protocol !== "https:" && !(process.env.NODE_ENV !== "production" && url.protocol === "http:" && ["127.0.0.1", "localhost"].includes(url.hostname)))) throw new Error("Invalid scanner endpoint");
-  const response = await fetch(url, { method: "POST", redirect: "error", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/octet-stream" }, body: Buffer.from(bytes), signal: AbortSignal.timeout(20000) });
-  if (!response.ok || (await response.json()).clean !== true) throw new Error("File did not pass security scanning");
-}
-
 export async function putPrivateUpload(userId: string, name: string, bytes: Uint8Array) {
   const Key = objectKey(userId, name);
   await scanUpload(bytes);
@@ -44,12 +34,18 @@ export async function putPrivateUpload(userId: string, name: string, bytes: Uint
   await client.send(new PutObjectCommand({ Bucket: bucket, Key, Body: bytes, ContentLength: bytes.length, ContentType: "application/octet-stream", ServerSideEncryption: "AES256" }), { abortSignal: AbortSignal.timeout(20000) });
 }
 
-export async function readPrivateUpload(userId: string, name: string) {
+export async function readPrivateUpload(userId: string, name: string, maxBytes = MAX_UPLOAD_BYTES) {
   const Key = objectKey(userId, name);
   const { client, bucket } = await privateBucket();
   const result = await client.send(new GetObjectCommand({ Bucket: bucket, Key }), { abortSignal: AbortSignal.timeout(20000) });
-  if (!result.Body || !result.ContentLength || result.ContentLength > MAX_UPLOAD_BYTES) throw new Error("Invalid stored file");
+  if (!result.Body || !result.ContentLength || result.ContentLength > maxBytes) throw new Error("Invalid stored file");
   const bytes = await result.Body.transformToByteArray();
-  if (bytes.length > MAX_UPLOAD_BYTES) throw new Error("Invalid stored file");
+  if (bytes.length > maxBytes) throw new Error("Invalid stored file");
   return bytes;
+}
+
+export async function deletePrivateUpload(userId: string, name: string) {
+  const Key = objectKey(userId, name);
+  const { client, bucket } = await privateBucket();
+  await client.send(new DeleteObjectCommand({ Bucket: bucket, Key }), { abortSignal: AbortSignal.timeout(20000) });
 }

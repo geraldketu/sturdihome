@@ -19,12 +19,12 @@ export async function reviewDocumentAction(_prev: ActionState, formData: FormDat
   const id = String(formData.get("documentId") ?? "");
   const status = String(formData.get("status") ?? "");
   if (!["APPROVED", "REJECTED", "REQUESTED_INFO"].includes(status)) return { error: "Invalid document decision." };
-  const document = await prisma.document.findUnique({ where: { id } });
+  const document = await prisma.document.findUnique({ where: { id }, include: { user: { select: { role: true } } } });
   if (!document || document.deletedAt) return { error: "Document not found." };
   const note = String(formData.get("note") ?? "").trim().slice(0, 500) || null;
   await prisma.$transaction(async tx => {
     await tx.document.update({ where: { id }, data: { reviewStatus: status, reviewNote: note, reviewedAt: new Date(), reviewedBy: admin.id } });
-    if (document.userId) {
+    if (document.userId && document.user.role === "HOMEOWNER") {
       const verificationStatus = status === "APPROVED" ? "VERIFIED" : status === "REQUESTED_INFO" ? "ADDITIONAL_VERIFICATION_NEEDED" : "PENDING_MANUAL_VERIFICATION";
       await tx.user.update({ where: { id: document.userId }, data: { homeownerVerificationStatus: verificationStatus } });
       await tx.userNotification.create({ data: { userId: document.userId, title: status === "APPROVED" ? "Homeownership verified" : status === "REQUESTED_INFO" ? "Additional verification needed" : "Homeownership verification needs review", body: note ?? (status === "APPROVED" ? "Your homeownership document was approved by SturdiHome." : "SturdiHome needs additional information to complete your homeownership verification.") } });

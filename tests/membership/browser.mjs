@@ -22,10 +22,10 @@ try {
    assert.ok([307,308].includes(response.status()),route+' '+response.status());
    assert.match(response.headers().location,/\/join-network\?next=/);
  } pass('All '+allRoutes.filter(r=>/^\/(member|vendor|financing|admin|marketplace)(\/|$)/.test(r)).length+' protected page URLs reject logged-out visitors');
- for(const path of ['/api/documents/fake','/api/vendor-flyers/fake']) assert.equal((await visitor.get(path)).status(),401);
- assert.equal((await visitor.post('/api/chat',{data:{messages:[]}})).status(),401);pass('Chat and private download APIs reject unauthenticated requests');
+ for(const path of ['/api/documents/fake','/api/vendor-flyers/fake','/api/agreements/fake/copy','/api/member-standing/copy']) assert.equal((await visitor.get(path)).status(),401,path);
+ pass('Private document, flyer and agreement-copy APIs reject unauthenticated requests');
  const publicPage=await browser.newPage({viewport:{width:390,height:844}});
- for(const route of ['/','/services','/how-it-works','/join-network','/apply/vendor','/apply/financing','/signup','/login','/forgot-password']) {
+ for(const route of ['/','/services','/how-it-works','/join-network','/apply/vendor','/apply/financing','/signup','/signup/homeowner','/login','/forgot-password','/privacy','/terms','/refund-policy','/community-rules','/support','/emergency-services','/application-received']) {
    const res=await publicPage.goto(base+route);assert.equal(res.status(),200,route);assert.equal(new URL(publicPage.url()).pathname,route,route+" was redirected");
    assert.ok(await publicPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),route+' horizontal overflow');
  }pass('Public information, registration and recovery pages remain accessible and fit a phone');
@@ -38,6 +38,13 @@ try {
  await publicPage.screenshot({path:out+'/join-mobile.png',fullPage:true});
  await publicPage.getByRole('link',{name:'Already a Member? Sign In'}).click();
  assert.equal(new URL(publicPage.url()).searchParams.get('next'),'/marketplace/vendors?category=Plumbing&location=Atlanta');
+ pass('Direct protected URL uses server gate and Join page Sign In preserves destination');
+ await publicPage.goto(base+'/services');
+ await publicPage.locator('a[href="/marketplace/vendors?category=Plumbing"]').click();
+ await publicPage.waitForURL('**/login?next=*');
+ assert.equal(new URL(publicPage.url()).searchParams.get('next'),'/marketplace/vendors?category=Plumbing');
+ pass('Logged-out protected action on mobile goes straight to /login?next=');
+ await publicPage.goto(base+'/login?next='+encodeURIComponent('/marketplace/vendors?category=Plumbing&location=Atlanta'));
  await publicPage.getByLabel('Email',{exact:true}).fill('test-member@example.test');await publicPage.getByLabel('Password',{exact:true}).fill('Review-only-Password42');
  await publicPage.getByRole('button',{name:'Sign In',exact:true}).click();await publicPage.waitForURL('**/welcome');
  assert.match(await publicPage.locator('h1').innerText(),/Welcome Back, Felicia!/);
@@ -53,7 +60,9 @@ try {
  await publicPage.getByRole('button',{name:'Sign Out',exact:true}).click();await publicPage.waitForURL('**/login');
  await publicPage.goto(base+'/member');assert.equal(new URL(publicPage.url()).pathname,'/join-network');
  const replay=await request.newContext({baseURL:base,extraHTTPHeaders:{Cookie:oldCookies.map(c=>c.name+'='+c.value).join('; ')}});
- assert.equal((await replay.post('/api/chat',{data:{messages:[]}})).status(),401);await replay.dispose();pass('Mobile sign-out blocks pages and revokes the old cookie on the server');
+ assert.equal((await replay.get('/api/documents/fake')).status(),401);assert.equal((await replay.get('/api/member-standing/copy')).status(),401);
+ const replayPage=await replay.get('/member',{maxRedirects:0});assert.equal(replayPage.status(),307);assert.match(replayPage.headers().location,/\/join-network/);
+ await replay.dispose();pass('Mobile sign-out blocks pages and revokes the old cookie on the server');
  await publicPage.close();
  for(const [id,destination,title,forbidden] of [['test-vendor','/vendor','Victor','/financing'],['test-finance','/financing','Fiona','/vendor'],['test-pending','/pending-approval','Pending','/admin']]) {
    const context=await browser.newContext({viewport:{width:1280,height:900}});const page=await context.newPage();
@@ -68,11 +77,26 @@ try {
    await context.close();
  }
  const firstContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});const first=await firstContext.newPage();
- await first.goto(base+'/signup?next='+encodeURIComponent('/member/service-request'));
+ await first.goto(base+'/signup/homeowner');
  const email='first-'+Date.now()+'@example.test';
- await first.getByLabel('Full Name',{exact:true}).fill('New Homeowner');await first.getByLabel('Email',{exact:true}).fill(email);await first.getByLabel('Password',{exact:true}).fill('Review-only-Password42');await first.getByRole('button',{name:'Create Account',exact:true}).click();await first.waitForURL('**/welcome');
+ await first.getByLabel('First Name',{exact:true}).fill('New');await first.getByLabel('Last Name',{exact:true}).fill('Homeowner');await first.getByLabel('Property Address',{exact:true}).fill('1 Synthetic Way');await first.getByLabel('City',{exact:true}).fill('Atlanta');await first.getByLabel('State',{exact:true}).fill('GA');await first.getByLabel('ZIP',{exact:true}).fill('30301');await first.getByLabel('Email',{exact:true}).fill(email);await first.getByLabel('Date of Birth',{exact:true}).fill('1980-01-01');
+ await first.getByRole('button',{name:'Create Account',exact:true}).click();await first.waitForURL('**/application-received');
+ const created=(await query('SELECT id,role,"passwordSetupRequired","approvalStatus" FROM "User" WHERE email=$1',[email]))[0];assert.equal(created.role,'HOMEOWNER');assert.equal(created.passwordSetupRequired,true);assert.equal((await query('SELECT count(*)::int as n FROM "AuthSession" WHERE "userId"=$1',[created.id]))[0].n,0);
+ await first.goto(base+'/login');await first.getByLabel('Email',{exact:true}).fill(email);await first.getByLabel('Password',{exact:true}).fill('Review-only-Password42');await first.getByRole('button',{name:'Sign In',exact:true}).click();await first.getByText('Your application is awaiting approval and password setup.').waitFor();
+ pass('New homeowner application creates no session and cannot sign in before approval and password setup');
+ const setupToken=randomBytes(32).toString('hex');
+ await first.goto(base+'/account-setup?token='+setupToken);await first.getByLabel('Create password',{exact:true}).fill('Review-only-Password42');await first.getByLabel('Confirm password',{exact:true}).fill('Review-only-Password42');await first.getByRole('button',{name:'Create Password',exact:true}).click();await first.getByText(/invalid, expired, or already used/).waitFor();
+ await query(`UPDATE "User" SET "approvalStatus"='APPROVED',"approvalReviewedBy"='test-admin',"approvalReviewedAt"=now() WHERE id=$1`,[created.id]);
+ await query('INSERT INTO "AccountSetupToken" ("tokenHash","userId","expiresAt") VALUES ($1,$2,$3)',[createHash('sha256').update(setupToken).digest('hex'),created.id,new Date(Date.now()+60000)]);
+ await first.goto(base+'/account-setup?token='+setupToken);await first.getByLabel('Create password',{exact:true}).fill('Review-only-Password42');await first.getByLabel('Confirm password',{exact:true}).fill('Review-only-Password42');await first.getByRole('button',{name:'Create Password',exact:true}).click();await first.waitForURL('**/welcome');
  assert.equal(await first.locator('h1').innerText(),'Welcome to SturdiHome! ❤️');assert.equal(await first.locator('.welcome-heart').first().evaluate(el=>getComputedStyle(el).display),'none');
- await first.getByRole('button',{name:'Continue now'}).click();await first.waitForURL('**/agreement');await first.getByRole('checkbox',{name:/I have read and agree/}).check();await first.getByRole('checkbox',{name:/I consent to electronic/}).check();await first.getByLabel('Full Legal Name',{exact:true}).fill('New Homeowner');await first.getByLabel('Electronic Signature',{exact:true}).fill('New Homeowner');await first.getByRole('button',{name:'AGREE & SIGN',exact:true}).click();await first.waitForURL('**/pending-approval');await query(`UPDATE "User" SET "approvalStatus"='APPROVED',"approvalReviewedBy"='test-admin',"approvalReviewedAt"=now() WHERE email=$1`,[email]);await first.goto(base+'/pending-approval');await first.waitForURL('**/member/service-request');pass('First signup gets first-time welcome, reduced motion and selected-service return');
+ await first.getByRole('button',{name:'Continue now'}).click();await first.waitForURL('**/agreement');await first.getByRole('checkbox',{name:/I have read and agree/}).check();await first.getByRole('checkbox',{name:/I consent to electronic/}).check();await first.getByLabel('Full Legal Name',{exact:true}).fill('New Homeowner');await first.getByLabel('Electronic Signature',{exact:true}).fill('New Homeowner');await first.getByRole('button',{name:'AGREE & SIGN',exact:true}).click();await first.waitForURL('**/pending-approval');
+ await first.goto(base+'/member/service-request');assert.equal(new URL(first.url()).pathname,'/pending-approval');
+ await query(`UPDATE "User" SET "approvalStatus"='APPROVED',"approvalReviewedBy"='test-admin',"approvalReviewedAt"=now() WHERE id=$1`,[created.id]);await first.goto(base+'/pending-approval');await first.waitForURL(u=>new URL(u).pathname==='/member');
+ pass('Approved setup link sets password, gives first-time welcome with reduced motion, and agreement + review gate is enforced');
+ const setupReplay=await browser.newPage();await setupReplay.goto(base+'/account-setup?token='+setupToken);await setupReplay.getByLabel('Create password',{exact:true}).fill('Replay-Password42');await setupReplay.getByLabel('Confirm password',{exact:true}).fill('Replay-Password42');await setupReplay.getByRole('button',{name:'Create Password',exact:true}).click();await setupReplay.getByText(/invalid, expired, or already used/).waitFor();await setupReplay.close();
+ pass('Account setup link is single-use');
+ await first.goto(base+'/member/service-request');
  await first.getByLabel('Service Type').selectOption('Plumbing');await first.locator('textarea[name="description"]').fill('Synthetic local access-control test');
  const mutationPromise=first.waitForRequest(r=>r.method()==='POST'&&!!r.headers()['next-action']);
  await first.getByRole('button',{name:/Submit/}).click();const mutation=await mutationPromise;

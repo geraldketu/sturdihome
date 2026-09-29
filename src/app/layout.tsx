@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import SeasonalExperience from "@/components/SeasonalExperience";
+import AuthGate from "@/components/AuthGate";
+import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import "./globals.css";
 
@@ -26,6 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const user = await getSessionUser();
   let themeSettings = null;
   try {
     themeSettings = await prisma.siteExperienceSettings.findUnique({ where: { id: "default" } });
@@ -39,6 +42,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
           <SeasonalExperience initialSettings={themeSettings}>
+          <AuthGate signedIn={Boolean(user)} />
           <SiteHeader />
           <div className="flex-1">{children}</div>
         </SeasonalExperience>

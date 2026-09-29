@@ -30,40 +30,13 @@ body {
 }
 
 .seasonal-experience { position: relative; min-height: 100%; isolation: isolate; }
-.seasonal-experience > *:not(.theme-effects) { position: relative; z-index: 1; }
-.theme-effects { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: .6; }
-.theme-photo { position: absolute; display: block; pointer-events: none; background-repeat: no-repeat; will-change: transform, opacity; }
-.theme-snow-photo { width: 28vw; height: 42vh; background-image: url('/seasonal/optimized/snow_crystals_2b.webp'); background-size: cover; background-position: center; mix-blend-mode: screen; opacity: .3; filter: blur(1px) brightness(1.3); animation: theme-snow-photo-fall linear infinite; }
-.theme-snow-photo-0 { left: -10vw; top: -20vh; animation-duration: 28s; }
-.theme-snow-photo-1 { left: 18vw; top: -28vh; transform: scale(.65); animation-duration: 34s; animation-delay: -12s; }
-.theme-snow-photo-2 { right: 12vw; top: -22vh; transform: scale(.8); animation-duration: 31s; animation-delay: -19s; }
-.theme-snow-photo-3 { right: -9vw; top: -25vh; transform: scale(.55); animation-duration: 25s; animation-delay: -7s; }
-.theme-snow-photo-4 { left: 42vw; top: -32vh; transform: scale(.48); animation-duration: 39s; animation-delay: -26s; }
-.theme-rain-photo { left: 0; right: 0; height: 30vh; background-image: url('/seasonal/optimized/rain_texture.webp'); background-size: cover; background-position: center; mix-blend-mode: multiply; opacity: .13; filter: saturate(.65) contrast(1.1); animation: theme-rain-photo-shift linear infinite; }
-.theme-rain-photo-0 { top: -8vh; animation-duration: 18s; }
-.theme-rain-photo-1 { top: 24vh; animation-duration: 25s; animation-delay: -8s; opacity: .1; }
-.theme-rain-photo-2 { bottom: -4vh; animation-duration: 31s; animation-delay: -16s; opacity: .08; }
-.theme-rain-photo-3 { top: 48vh; animation-duration: 22s; animation-delay: -11s; opacity: .08; }
-.theme-summer-photo { inset: 0; background-image: url('/seasonal/optimized/sunlight.webp'); background-size: cover; background-position: center top; mix-blend-mode: screen; opacity: .08; filter: saturate(.7) sepia(.15) blur(3px); animation: theme-summer-glow 14s ease-in-out infinite alternate; }
-.seasonal-spring { --theme-tint: rgb(242 223 205 / 18%); background-image: linear-gradient(180deg, var(--theme-tint), transparent 30%); }
-.seasonal-summer { background-image: linear-gradient(180deg, rgb(250 226 157 / 12%), transparent 30%); }
-.seasonal-fall { background-image: linear-gradient(180deg, rgb(199 120 43 / 10%), transparent 30%); }
-.seasonal-winter { background-image: linear-gradient(180deg, rgb(214 229 240 / 18%), transparent 30%); }
-.holiday-valentines { background-image: linear-gradient(180deg, rgb(237 92 120 / 10%), transparent 28%); }
-.holiday-halloween { background-image: linear-gradient(180deg, rgb(92 62 98 / 10%), transparent 28%); }
-.holiday-thanksgiving { background-image: linear-gradient(180deg, rgb(191 113 45 / 10%), transparent 28%); }
-.holiday-christmas { background-image: linear-gradient(180deg, rgb(44 112 75 / 10%), transparent 28%); }
-.holiday-new-years { background-image: linear-gradient(180deg, rgb(199 154 43 / 12%), transparent 28%); }
-.seasonal-effects-disabled { background-image: none; }
-
-@media (prefers-reduced-motion: reduce) {
-  .theme-effects { display: none; }
-}
-
-@keyframes theme-snow-photo-fall { 0% { transform: translate3d(0, -12vh, 0) rotate(-3deg) scale(var(--theme-scale, 1)); } 50% { transform: translate3d(4vw, 48vh, 0) rotate(4deg) scale(var(--theme-scale, 1)); } 100% { transform: translate3d(-3vw, 118vh, 0) rotate(-5deg) scale(var(--theme-scale, 1)); } }
-@keyframes theme-rain-photo-shift { 0%, 100% { transform: translate3d(-2%, -1%, 0) scale(1.04); } 50% { transform: translate3d(2%, 1%, 0) scale(1.08); } }
-@keyframes theme-summer-glow { from { opacity: .04; transform: scale(1); } to { opacity: .12; transform: scale(1.05); } }
-
+.seasonal-experience > *:not(.theme-effects, .seasonal-custom-effect) { position: relative; z-index: 1; }
+/* Header (and its mobile menu dropdown) must stack above page content; :not() matches the sibling rule's specificity. */
+.seasonal-experience > header:not(.seasonal-custom-effect) { z-index: 2; }
+.theme-effects { display: none; }
+.seasonal-custom-effect { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: .72; }
+.seasonal-custom-effect img, .seasonal-custom-effect video { height: 100%; width: 100%; object-fit: cover; object-position: center; }
+.seasonal-experience > *:not(.seasonal-custom-effect) { position: relative; z-index: 1; }
 .hero-section {
   min-height: 600px;
 }
